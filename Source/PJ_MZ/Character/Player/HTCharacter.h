@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PJ_MZCharacter.h"
-#include "HorrorCharacter.generated.h"
+#include "../Default/PJ_MZCharacter.h"
+#include "HTCharacter.generated.h"
 
 class USpotLightComponent;
 class UInputAction;
@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSprintStateChangedDelegate, bool, b
  *  Provides stamina-based sprinting
  */
 UCLASS(abstract)
-class PJ_MZ_API AHorrorCharacter : public APJ_MZCharacter
+class PJ_MZ_API AHTCharacter : public APJ_MZCharacter
 {
 	GENERATED_BODY()
 
@@ -78,7 +78,7 @@ public:
 protected:
 
 	/** Constructor */
-	AHorrorCharacter();
+	AHTCharacter();
 
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;

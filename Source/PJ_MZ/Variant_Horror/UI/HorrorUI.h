@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "HorrorUI.generated.h"
 
-class AHorrorCharacter;
+class AHTCharacter;
 
 /**
  *  Simple UI for a first person horror game
@@ -20,7 +20,7 @@ class PJ_MZ_API UHorrorUI : public UUserWidget
 public:
 
 	/** Sets up delegate listeners for the passed character */
-	void SetupCharacter(AHorrorCharacter* HorrorCharacter);
+	void SetupCharacter(AHTCharacter* HorrorCharacter);
 
 	/** Called when the character's sprint meter is updated */
 	UFUNCTION()

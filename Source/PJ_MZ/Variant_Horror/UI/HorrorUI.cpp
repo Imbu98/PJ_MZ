@@ -2,12 +2,12 @@
 
 
 #include "HorrorUI.h"
-#include "HorrorCharacter.h"
+#include "../Character/HTCharacter.h"
 
-void UHorrorUI::SetupCharacter(AHorrorCharacter* HorrorCharacter)
+void UHorrorUI::SetupCharacter(AHTCharacter* HTCharacter)
 {
-	HorrorCharacter->OnSprintMeterUpdated.AddDynamic(this, &UHorrorUI::OnSprintMeterUpdated);
-	HorrorCharacter->OnSprintStateChanged.AddDynamic(this, &UHorrorUI::OnSprintStateChanged);
+	HTCharacter->OnSprintMeterUpdated.AddDynamic(this, &UHorrorUI::OnSprintMeterUpdated);
+	HTCharacter->OnSprintStateChanged.AddDynamic(this, &UHorrorUI::OnSprintStateChanged);
 }
 
 void UHorrorUI::OnSprintMeterUpdated(float Percent)

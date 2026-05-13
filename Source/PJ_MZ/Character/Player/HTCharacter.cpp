@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 
-#include "Variant_Horror/HorrorCharacter.h"
+#include "HTCharacter.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -10,7 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 
-AHorrorCharacter::AHorrorCharacter()
+AHTCharacter::AHTCharacter()
 {
 	// create the spotlight
 	SpotLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("SpotLight"));
@@ -24,7 +24,7 @@ AHorrorCharacter::AHorrorCharacter()
 	SpotLight->OuterConeAngle = 45.24f;
 }
 
-void AHorrorCharacter::BeginPlay()
+void AHTCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -35,10 +35,10 @@ void AHorrorCharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
 	// start the sprint tick timer
-	GetWorld()->GetTimerManager().SetTimer(SprintTimer, this, &AHorrorCharacter::SprintFixedTick, SprintFixedTickTime, true);
+	GetWorld()->GetTimerManager().SetTimer(SprintTimer, this, &AHTCharacter::SprintFixedTick, SprintFixedTickTime, true);
 }
 
-void AHorrorCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
+void AHTCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
@@ -46,7 +46,7 @@ void AHorrorCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(SprintTimer);
 }
 
-void AHorrorCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AHTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -55,14 +55,14 @@ void AHorrorCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 		{
 			// Sprinting
-			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AHorrorCharacter::DoStartSprint);
-			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AHorrorCharacter::DoEndSprint);
+			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AHTCharacter::DoStartSprint);
+			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AHTCharacter::DoEndSprint);
 
 		}
 	}
 }
 
-void AHorrorCharacter::DoStartSprint()
+void AHTCharacter::DoStartSprint()
 {
 	// set the sprinting flag
 	bSprinting = true;
@@ -79,7 +79,7 @@ void AHorrorCharacter::DoStartSprint()
 
 }
 
-void AHorrorCharacter::DoEndSprint()
+void AHTCharacter::DoEndSprint()
 {
 	// set the sprinting flag
 	bSprinting = false;
@@ -95,7 +95,7 @@ void AHorrorCharacter::DoEndSprint()
 	}
 }
 
-void AHorrorCharacter::SprintFixedTick()
+void AHTCharacter::SprintFixedTick()
 {
 	// are we out of recovery, still have stamina and are moving faster than our walk speed?
 	if (bSprinting && !bRecovering && GetVelocity().Length() > WalkSpeed)
