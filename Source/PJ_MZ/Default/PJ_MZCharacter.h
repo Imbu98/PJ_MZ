@@ -49,6 +49,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
 	
+	
 public:
 	APJ_MZCharacter();
 

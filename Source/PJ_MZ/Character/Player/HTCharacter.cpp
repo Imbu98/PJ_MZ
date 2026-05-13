@@ -8,7 +8,11 @@
 #include "Camera/CameraComponent.h"
 #include "Components/SpotLightComponent.h"
 #include "EnhancedInputComponent.h"
+#include "HT_PlayerController.h"
 #include "InputAction.h"
+#include "Interface/Interact_Interface.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AHTCharacter::AHTCharacter()
 {
@@ -60,6 +64,12 @@ void AHTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			// Sprinting
 			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AHTCharacter::DoStartSprint);
 			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AHTCharacter::DoEndSprint);
+			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AHTCharacter::OnInteractInput);
+			
+			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Started, this, &AHTCharacter::OnEnterCameraMode);
+			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Completed, this, &AHTCharacter::OnOutCameraMode);
+			
+			
 
 		}
 	}
@@ -75,9 +85,6 @@ void AHTCharacter::DoStartSprint()
 	{
 		// set the sprint walk speed
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-
-		// call the sprint state changed delegate
-		OnSprintStateChanged.Broadcast(true);
 	}
 
 }
@@ -92,9 +99,6 @@ void AHTCharacter::DoEndSprint()
 	{
 		// set the default walk speed
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
-		// call the sprint state changed delegate
-		OnSprintStateChanged.Broadcast(false);
 	}
 }
 
@@ -133,15 +137,12 @@ void AHTCharacter::SprintFixedTick()
 
 			// set the walk or sprint speed depending on whether the sprint button is down
 			GetCharacterMovement()->MaxWalkSpeed = bSprinting ? SprintSpeed : WalkSpeed;
-
-			// update the sprint state depending on whether the button is down or not
-			OnSprintStateChanged.Broadcast(bSprinting);
 		}
 
 	}
 
 	// broadcast the sprint meter updated delegate
-	OnSprintMeterUpdated.Broadcast(SprintMeter / SprintTime);
+	OnStaminaChangeDelegate.Broadcast(SprintMeter / SprintTime);
 
 }
 
@@ -150,4 +151,39 @@ void AHTCharacter::OnChangeMentality(float amount)
 	CurrentMentality+=amount;
 	
 	OnMentalityChangeDelegate.Broadcast(CurrentMentality/MaxMentality);
+}
+
+void AHTCharacter::OnInteractInput(const FInputActionValue& Value)
+{
+	TArray<AActor*> actorsToIgnore;
+	FHitResult outHit;
+	bool isHit = UKismetSystemLibrary::SphereTraceSingleByProfile(GetWorld(), GetActorLocation(), GetActorLocation(),200.f,
+		TEXT("Interactable"),false,actorsToIgnore,EDrawDebugTrace::ForDuration,outHit,
+		true,FLinearColor::Red);
+	
+	if (isHit)
+	{
+		AActor* hitActor = outHit.GetActor();
+		if (hitActor&&hitActor->GetClass()->ImplementsInterface(UInteract_Interface::StaticClass()))
+		{
+			IInteract_Interface::Execute_Interacted(hitActor);
+		}
+	}
+}
+
+void AHTCharacter::OnEnterCameraMode(const FInputActionValue& Value)
+{
+	if (AHT_PlayerController* ht_pc = Cast<AHT_PlayerController>(Controller))
+	{
+		ht_pc->CreateObscuraWidget();
+	}
+}
+
+void AHTCharacter::OnOutCameraMode(const FInputActionValue& Value)
+{
+	if (AHT_PlayerController* ht_pc = Cast<AHT_PlayerController>(Controller))
+	{
+		ht_pc->RemoveObscuraWidget();
+	}
+	
 }

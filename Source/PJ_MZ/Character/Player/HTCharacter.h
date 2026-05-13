@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "../../Default/PJ_MZCharacter.h"
 #include "PJ_MZ_Delegates.h"
+#include "Interface/Interact_Interface.h"
 #include "HTCharacter.generated.h"
 
 class USpotLightComponent;
@@ -17,7 +18,7 @@ class UInputAction;
  *  Provides stamina-based sprinting
  */
 UCLASS(abstract)
-class PJ_MZ_API AHTCharacter : public APJ_MZCharacter
+class PJ_MZ_API AHTCharacter : public APJ_MZCharacter , public IInteract_Interface
 {
 	GENERATED_BODY()
 
@@ -30,6 +31,14 @@ protected:
 	/** Fire weapon input action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* SprintAction;
+	
+	// 상호작용 InputAction
+	UPROPERTY(EditAnywhere, Category ="Input")
+	UInputAction* InteractAction;
+	
+	// 카메라 촬영모드 진입
+	UPROPERTY(EditAnywhere, Category ="Input")
+	UInputAction* EnterCameraModeAction;
 
 	/** If true, we're sprinting */
 	bool bSprinting = false;
@@ -79,14 +88,8 @@ protected:
 
 public:
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateSprintMeterDelegate, float, Percentage);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSprintStateChangedDelegate, bool, bSprinting);
-
-	/** Delegate called when the sprint meter should be updated */
-	FUpdateSprintMeterDelegate OnSprintMeterUpdated;
-
 	/** Delegate called when we start and stop sprinting */
-	FSprintStateChangedDelegate OnSprintStateChanged;
+	FStaminaChangeDelegate OnStaminaChangeDelegate;
 	
 	FMentalityChangedDelegate OnMentalityChangeDelegate;
 
@@ -117,6 +120,17 @@ protected:
 	/** Called while sprinting at a fixed time interval */
 	void SprintFixedTick();
 	
+	// 플레이어 정신력 변화 함수
 	UFUNCTION()
 	void OnChangeMentality(float amount);
+	
+	UFUNCTION()
+	void OnInteractInput(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnEnterCameraMode(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnOutCameraMode(const FInputActionValue& Value);
+	
 };
