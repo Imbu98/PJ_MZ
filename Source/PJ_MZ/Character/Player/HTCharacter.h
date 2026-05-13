@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "../Default/PJ_MZCharacter.h"
+#include "PJ_MZ_Delegates.h"
 #include "HTCharacter.generated.h"
 
 class USpotLightComponent;
@@ -65,6 +66,16 @@ protected:
 
 	/** Sprint tick timer */
 	FTimerHandle SprintTimer;
+	
+	// Player 최대 정신력
+	UPROPERTY(EditAnywhere,Category="Mentality")
+	float MaxMentality = 100.f;
+	
+	// Player 현재 정신력
+	UPROPERTY()
+	float CurrentMentality;
+	
+	FMentalityChangedDelegate OnMentalityChangeDelegate;
 
 public:
 
@@ -100,4 +111,7 @@ protected:
 
 	/** Called while sprinting at a fixed time interval */
 	void SprintFixedTick();
+	
+	UFUNCTION()
+	void OnChangeMentality(float amount);
 };

@@ -36,6 +36,9 @@ void AHTCharacter::BeginPlay()
 
 	// start the sprint tick timer
 	GetWorld()->GetTimerManager().SetTimer(SprintTimer, this, &AHTCharacter::SprintFixedTick, SprintFixedTickTime, true);
+	
+	// 정신력 초기화
+	CurrentMentality = MaxMentality;
 }
 
 void AHTCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -140,4 +143,11 @@ void AHTCharacter::SprintFixedTick()
 	// broadcast the sprint meter updated delegate
 	OnSprintMeterUpdated.Broadcast(SprintMeter / SprintTime);
 
+}
+
+void AHTCharacter::OnChangeMentality(float amount)
+{
+	CurrentMentality+=amount;
+	
+	OnMentalityChangeDelegate.Broadcast(CurrentMentality/MaxMentality);
 }

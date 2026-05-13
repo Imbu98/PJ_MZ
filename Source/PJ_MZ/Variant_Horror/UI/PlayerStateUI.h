@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "HorrorUI.generated.h"
+#include "PlayerStateUI.generated.h"
 
 class AHTCharacter;
 
@@ -13,7 +13,7 @@ class AHTCharacter;
  *  Manages character sprint meter display
  */
 UCLASS(abstract)
-class PJ_MZ_API UHorrorUI : public UUserWidget
+class PJ_MZ_API UPlayerStateUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -39,4 +39,13 @@ protected:
 	/** Passes control to Blueprint to update the sprint meter status */
 	UFUNCTION(BlueprintImplementableEvent, Category="Horror", meta = (DisplayName = "Sprint State Changed"))
 	void BP_SprintStateChanged(bool bSprinting);
+	
+private:
+	// player 정신력수치 프로그레스 바
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UProgressBar> PB_MentalityBar;
+	
+	UFUNCTION()
+	void OnPlayerMentalityBarUpdated(float percent);
+	
 };
