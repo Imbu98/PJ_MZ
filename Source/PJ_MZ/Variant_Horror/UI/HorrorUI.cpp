@@ -2,7 +2,7 @@
 
 
 #include "HorrorUI.h"
-#include "../Character/HTCharacter.h"
+#include "../Character/Player/HTCharacter.h"
 
 void UHorrorUI::SetupCharacter(AHTCharacter* HTCharacter)
 {
