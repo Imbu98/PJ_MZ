@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../Default/PJ_MZCharacter.h"
+#include "../../Default/PJ_MZCharacter.h"
 #include "PJ_MZ_Delegates.h"
 #include "HTCharacter.generated.h"
 
@@ -75,15 +75,20 @@ protected:
 	UPROPERTY()
 	float CurrentMentality;
 	
-	FMentalityChangedDelegate OnMentalityChangeDelegate;
+	
 
 public:
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateSprintMeterDelegate, float, Percentage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSprintStateChangedDelegate, bool, bSprinting);
 
 	/** Delegate called when the sprint meter should be updated */
 	FUpdateSprintMeterDelegate OnSprintMeterUpdated;
 
 	/** Delegate called when we start and stop sprinting */
 	FSprintStateChangedDelegate OnSprintStateChanged;
+	
+	FMentalityChangedDelegate OnMentalityChangeDelegate;
 
 protected:
 

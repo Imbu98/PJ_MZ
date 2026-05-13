@@ -25,12 +25,6 @@ public class PJ_MZ : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] {
 			"PJ_MZ",
-			"PJ_MZ/Variant_Horror",
-			"PJ_MZ/Variant_Horror/UI",
-			"PJ_MZ/Variant_Shooter",
-			"PJ_MZ/Variant_Shooter/AI",
-			"PJ_MZ/Variant_Shooter/UI",
-			"PJ_MZ/Variant_Shooter/Weapons"
 		});
 
 		// Uncomment if you are using Slate UI

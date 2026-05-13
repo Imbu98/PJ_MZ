@@ -11,8 +11,8 @@ void UPlayerStateUI::SetupCharacter(AHTCharacter* HTCharacter)
 	HTCharacter->OnSprintStateChanged.RemoveAll(this);
 	HTCharacter->OnSprintStateChanged.AddDynamic(this, &UPlayerStateUI::OnSprintStateChanged);
 	
-	HTCharacter->OnPlayerMentalityBarUpdated.RemoveAll(this);
-	HTCharacter->OnPlayerMentalityBarUpdated.AddDynamic(this, &UPlayerStateUI::OnPlayerMentalityBarUpdated);
+	HTCharacter->OnMentalityChangeDelegate.RemoveAll(this);
+	HTCharacter->OnMentalityChangeDelegate.AddUObject(this,&UPlayerStateUI::OnPlayerMentalityBarUpdated);
 	
 }
 
