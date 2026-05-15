@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerStateUI.generated.h"
 
-class AHTCharacter;
+class AHT_Player;
 
 /**
  *  Simple UI for a first person horror game
@@ -20,32 +20,35 @@ class PJ_MZ_API UPlayerStateUI : public UUserWidget
 public:
 
 	/** Sets up delegate listeners for the passed character */
-	void SetupCharacter(AHTCharacter* HorrorCharacter);
-
-	/** Called when the character's sprint meter is updated */
+	void SetupCharacter(AHT_Player* HorrorCharacter);
+	
 	UFUNCTION()
-	void OnSprintMeterUpdated(float Percent);
-
-	/** Called when the character's sprint state changes */
+	void OnPlayerMentalityBarUpdated(float percent);
+	
+	// 스프린트 게이지
 	UFUNCTION()
-	void OnSprintStateChanged(bool bSprinting);
-
-protected:
-
-	/** Passes control to Blueprint to update the sprint meter widgets */
-	UFUNCTION(BlueprintImplementableEvent, Category="Horror", meta = (DisplayName = "Sprint Meter Updated"))
-	void BP_SprintMeterUpdated(float Percent);
-
-	/** Passes control to Blueprint to update the sprint meter status */
-	UFUNCTION(BlueprintImplementableEvent, Category="Horror", meta = (DisplayName = "Sprint State Changed"))
-	void BP_SprintStateChanged(bool bSprinting);
+	void OnStaminaBarUpdated(float percent);
+	
+	UFUNCTION()
+	void OnShotCountUpdated(int shotCount);
 	
 private:
 	// player 정신력수치 프로그레스 바
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UProgressBar> PB_MentalityBar;
 	
-	UFUNCTION()
-	void OnPlayerMentalityBarUpdated(float percent);
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UProgressBar> PB_StaminaBar;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UHorizontalBox> ObscuraCountHorizontalBox;
+	
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<UUserWidget> ObscuraCountFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> ObscuraCountWidget;
+	
 	
 };
