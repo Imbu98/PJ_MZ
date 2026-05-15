@@ -3,20 +3,40 @@
 
 #include "ControlFadeUI.h"
 
-void UControlFadeUI::FadeOut()
+void UControlFadeUI::FadeOutBlack()
 {
-	if (FadeOutAnim)
+	if (FadeOutBlackAnim)
 	{
 		// 애니메이션 완료 콜백
 		FWidgetAnimationDynamicEvent EndEvent;
-		EndEvent.BindDynamic(this, &UControlFadeUI::OnFadeOutFinished);
-		BindToAnimationFinished(FadeOutAnim, EndEvent);
+		EndEvent.BindDynamic(this, &UControlFadeUI::OnFadeOutBlackFinished);
+		BindToAnimationFinished(FadeOutBlackAnim, EndEvent);
 
-		PlayAnimation(FadeOutAnim);	
+		PlayAnimation(FadeOutBlackAnim);	
 	}
 }
 
-void UControlFadeUI::OnFadeOutFinished()
+void UControlFadeUI::OnFadeOutBlackFinished()
 {
 	RemoveFromParent();
 }
+
+
+void UControlFadeUI::FadeOutWhite()
+{
+	if (FadeOutWhiteAnim)
+	{
+		// 애니메이션 완료 콜백
+		FWidgetAnimationDynamicEvent EndEvent;
+		EndEvent.BindDynamic(this, &UControlFadeUI::OnFadeOutWhiteFinished);
+		BindToAnimationFinished(FadeOutWhiteAnim, EndEvent);
+
+		PlayAnimation(FadeOutWhiteAnim);	
+	}
+}
+
+void UControlFadeUI::OnFadeOutWhiteFinished()
+{
+	RemoveFromParent();
+}
+

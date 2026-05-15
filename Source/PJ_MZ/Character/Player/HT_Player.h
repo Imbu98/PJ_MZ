@@ -95,12 +95,15 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class AHT_PlayerController> CachedHT_Pc;
 	
+	UPROPERTY()
+	FTimerHandle ObscuraTimer;
+	
 	// Player Obscura Mode Montage
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	// TObjectPtr<class UAnimMontage> EquipObscuraMontage;
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	// TObjectPtr<UAnimMontage> UnEquipObscuraMontage;
-	//
+	
 	
 
 public:
@@ -113,6 +116,9 @@ public:
 	
 	// 촬영 시 촬영 횟수 감소 UI 델리게이트
 	FShotCountChangeDelegate OnShotCountChangeDelegate;
+	
+	// 쿨타임 시 UI 델리게이트
+	FObscuraCooltimeFinished OnObscuraCooltimeFinished;
 
 protected:
 
@@ -166,5 +172,8 @@ public:
 	
 	UFUNCTION()
 	void RemoveObscuraWidget();
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float cameraFadeSpeed;
 	
 };

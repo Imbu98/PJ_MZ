@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PJ_MZ.h"
+#include "Kismet/GameplayStatics.h"
 
 APJ_MZCharacter::APJ_MZCharacter()
 {
@@ -79,6 +80,8 @@ void APJ_MZCharacter::MoveInput(const FInputActionValue& Value)
 
 void APJ_MZCharacter::LookInput(const FInputActionValue& Value)
 {
+	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld())<0.5f) return;
+	
 	// get the Vector2D look axis
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 

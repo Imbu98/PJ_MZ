@@ -16,6 +16,7 @@
 #include "Components/ObscuraCameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "UI/ObscuraUI.h"
 
 AHT_Player::AHT_Player()
 {
@@ -212,6 +213,13 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 {
 	if (!ObscuraCameraComp) return;
+	if (ObscuraCameraComp->IsObscraCooltime)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("CooltimeBlocked"));
+		return;
+	}
+	
+	
 		if (ObscuraCameraComp->GetObscuraMode()==EObscuraModeAction::CAMERAMODE)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::SHOTTING);
@@ -219,17 +227,34 @@ void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 			{
 				SpotLight->SetVisibility(true);
 				
-				FTimerHandle timerHandle;
-				GetWorldTimerManager().SetTimer(timerHandle,[this]()
+				if (CachedHT_Pc&&CachedHT_Pc->ObscuraUIWidget)
+				{
+					ObscuraCameraComp->IsObscraCooltime = true;	
+				}
+				
+				
+				// 화면 플래시 , todo: 찰칼소리
+				AHT_PlayerController* pc = Cast<AHT_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
+				if (pc)
+				{
+					pc->SetFadeOutWhiteUI();
+				}
+					
+				FTimerHandle TimerHandle;
+	
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.01f);
+	
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
 				{
 					SpotLight->SetVisibility(false);
-					//if (ObscuraCameraComp->GetObscuraMode()==EObscuraModeAction::CAMERAMODE)
+					UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.f);
 					ObscuraCameraComp->ApplyShutterDamage();
 					ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
 					OnUpdateObscuraShotCount();
-				},1.0f,false);
+					GetWorldTimerManager().ClearTimer(ObscuraTimer);
+		
+				},0.01f,false);
 			}
-			
 		}
 }
 
@@ -240,6 +265,7 @@ void AHT_Player::OnUpdateObscuraShotCount()
 		int count = ObscuraCameraComp->CurrentCanShotCount;
 		OnShotCountChangeDelegate.Broadcast(count);
 	
+		// GI에 저장
 		UMz_GameInstance* Mz_GI = Cast<UMz_GameInstance>(GetGameInstance());
 		if (Mz_GI)
 		{
@@ -271,6 +297,17 @@ void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 	// 		AnimInstance->Montage_Play(UnEquipObscuraMontage,-1.0f);
 	// 	}
 	// }
+	if (ObscuraCameraComp)
+	{
+		ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
+		GetWorldTimerManager().ClearTimer(ObscuraTimer);
+		if (SpotLight->IsVisible())
+		{
+			SpotLight->SetVisibility(false);
+		}
+	}
+
+	
 	RemoveObscuraWidget();
 
 }
@@ -283,6 +320,7 @@ void AHT_Player::CreateObscuraWidget()
 		if (ObscuraCameraComp)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
+			OnShotCountChangeDelegate.Broadcast(ObscuraCameraComp->CurrentCanShotCount);
 		}
 	}
 }

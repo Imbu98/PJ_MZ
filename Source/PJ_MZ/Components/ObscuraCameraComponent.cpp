@@ -1,5 +1,6 @@
 #include "ObscuraCameraComponent.h"
 
+#include "Character/Player/HT_Player.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -11,11 +12,31 @@ UObscuraCameraComponent::UObscuraCameraComponent()
 void UObscuraCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// 추후 업그레이드를 하게 되면 값을 바꿔주기
+	MaxObscuraCooltime = 3.0f;
 }
 
 void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (IsObscraCooltime)
+	{
+		currentObscuraCooltime+=DeltaTime;
+		
+		if (currentObscuraCooltime>MaxObscuraCooltime)
+		{
+			IsObscraCooltime= false;
+			currentObscuraCooltime = 0.f;
+			AHT_Player* player =  Cast<AHT_Player>(GetOwner());
+
+			if (player)
+			{
+				player-> OnObscuraCooltimeFinished.Broadcast();
+			}
+		}
+	}
 }
 
 void UObscuraCameraComponent::InitPoints(int32 PointCount)
@@ -50,11 +71,23 @@ float UObscuraCameraComponent::GetDamageMultiplier() const
 
 void UObscuraCameraComponent::ApplyShutterDamage()
 {
-	float FinalDamage = GetDamageMultiplier();
+	// 촬영횟수가 없으면 사망
+	if (CurrentCanShotCount <= 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
+		
+		return;
+	}
 	
 	CurrentCanShotCount--;
 	
+	float FinalDamage = GetDamageMultiplier();
+	
 	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalDamage));
+	
+	
+	
+	
 	
 	
 	// AActor* Target = GetPrimaryTarget();

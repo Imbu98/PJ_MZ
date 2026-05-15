@@ -31,6 +31,8 @@ protected:
 	
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+	
+	
 public:
 
 	// 위젯에서 포인트별 결과를 전달받아 저장
@@ -65,9 +67,13 @@ public:
 	UFUNCTION()
 	void InitShotCount();
 	
-	
 	UPROPERTY()
 	EObscuraModeAction CurrentMode;
+	
+public:
+	bool IsObscraCooltime = false;
+	float currentObscuraCooltime=0.f;
+	float MaxObscuraCooltime;
 	
 public:
 	UPROPERTY()

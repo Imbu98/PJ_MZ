@@ -37,61 +37,57 @@ void AHT_PlayerController::BeginPlay()
 
 void AHT_PlayerController::CreateObscuraWidget()
 {
-	SetFadeOutUI();
-	
+	SetFadeOutBlackUI();
+    
 	if (PlayerStateUIWidget)
 	{
 		PlayerStateUIWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-	
+    
 	if (!ObscuraUIWidget)
 	{
 		if (ObscuraUIFactory)
 		{
-			ObscuraUIWidget = CreateWidget<UObscuraUI>(this,ObscuraUIFactory);
+			ObscuraUIWidget = CreateWidget<UObscuraUI>(this, ObscuraUIFactory);
 			if (ObscuraUIWidget)
 			{
 				ObscuraUIWidget->CameraObscuraComp = GetPawn()->FindComponentByClass<UObscuraCameraComponent>();
-
 				ObscuraUIWidget->AddToViewport();
-				ObscuraUIWidget->bDetectionActive = true; // 감지 시작
 			}
-		}	
-	}
-	else
-	{
-		if (!ObscuraUIWidget->IsInViewport())
-		{
-			ObscuraUIWidget->AddToViewport();
 		}
+	}
+    
+	if (ObscuraUIWidget)
+	{
+		ObscuraUIWidget->SetVisibility(ESlateVisibility::Visible);
+		ObscuraUIWidget->bDetectionActive = true;
 	}
 }
 
 void AHT_PlayerController::RemoveObscuraWidget()
 {
-	SetFadeOutUI();
-	
+	SetFadeOutBlackUI();
+		
 	if (PlayerStateUIWidget)
 	{
 		PlayerStateUIWidget->SetVisibility(ESlateVisibility::Visible);	
 	}
 	
-	if (ObscuraUIWidget&&ObscuraUIWidget->IsInViewport())
+	if (ObscuraUIWidget&& ObscuraUIWidget->IsInViewport())
 	{
-		ObscuraUIWidget->RemoveFromParent();
-		ObscuraUIWidget->bDetectionActive = false; // 감지 중단
-		ObscuraUIWidget = nullptr;
+		ObscuraUIWidget->SetVisibility(ESlateVisibility::Collapsed);
+		ObscuraUIWidget->bDetectionActive = false;
 	}
 }
 
-void AHT_PlayerController::SetFadeOutUI()
+void AHT_PlayerController::SetFadeOutBlackUI()
 {
 	if (!ControlFadeUIFactory) return;
 
 	if (ControlFadeUIWidget && ControlFadeUIWidget->IsInViewport())
 	{
 		// 이미 있으면 페이드아웃만 (제거는 애니메이션 완료 후)
-		ControlFadeUIWidget->FadeOut();
+		ControlFadeUIWidget->FadeOutBlack();
 	}
 	else
 	{
@@ -102,11 +98,33 @@ void AHT_PlayerController::SetFadeOutUI()
 		{
 			ControlFadeUIWidget = NewWidget;
 			ControlFadeUIWidget->AddToViewport();
-			ControlFadeUIWidget->FadeOut();
+			ControlFadeUIWidget->FadeOutBlack();
 		}
 	}
 }
 
+void AHT_PlayerController::SetFadeOutWhiteUI()
+{
+	if (!ControlFadeUIFactory) return;
+
+	if (ControlFadeUIWidget && ControlFadeUIWidget->IsInViewport())
+	{
+		// 이미 있으면 페이드아웃만 (제거는 애니메이션 완료 후)
+		ControlFadeUIWidget->FadeOutWhite();
+	}
+	else
+	{
+		// 새로 생성
+		UControlFadeUI* NewWidget = CreateWidget<UControlFadeUI>(this, ControlFadeUIFactory);
+
+		if (NewWidget)
+		{
+			ControlFadeUIWidget = NewWidget;
+			ControlFadeUIWidget->AddToViewport();
+			ControlFadeUIWidget->FadeOutWhite();
+		}
+	}
+}
 
 
 void AHT_PlayerController::SetupInputComponent()
