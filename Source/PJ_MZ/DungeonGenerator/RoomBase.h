@@ -1,11 +1,30 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "components/BoxComponent.h"
+#include "components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "RoomBase.generated.h"
+
+UENUM(BlueprintType)
+enum class ERoomType : uint8
+{
+	Room,
+	Corridor
+};
+
+USTRUCT(BlueprintType)
+struct FDoorData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UArrowComponent> DoorArrow;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bUsed = false;
+};
 
 UCLASS()
 class PJ_MZ_API ARoomBase : public AActor
@@ -13,14 +32,22 @@ class PJ_MZ_API ARoomBase : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ARoomBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="RoomInfo")
 	TObjectPtr<UBoxComponent> RoomBounds;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RoomInfo")
+	ERoomType RoomType;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RoomInfo")
+	TArray<FDoorData> Doors;
+	
+	UFUNCTION()
+	void BuildDoors();
 };

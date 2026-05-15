@@ -76,3 +76,6 @@ DerivedDataCache/*
 
 #Rider Ignore
 .idea/*
+
+# content big file ignore
+Content/DerelictCorridor/*
