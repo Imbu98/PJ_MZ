@@ -6,8 +6,9 @@
 #include "../../Default/PJ_MZCharacter.h"
 #include "PJ_MZ_Delegates.h"
 #include "Interface/Interact_Interface.h"
-#include "HTCharacter.generated.h"
+#include "HT_Player.generated.h"
 
+class AHT_PlayerController;
 class USpotLightComponent;
 class UInputAction;
 
@@ -18,7 +19,7 @@ class UInputAction;
  *  Provides stamina-based sprinting
  */
 UCLASS(abstract)
-class PJ_MZ_API AHTCharacter : public APJ_MZCharacter , public IInteract_Interface
+class PJ_MZ_API AHT_Player : public APJ_MZCharacter , public IInteract_Interface
 {
 	GENERATED_BODY()
 
@@ -26,19 +27,25 @@ class PJ_MZ_API AHTCharacter : public APJ_MZCharacter , public IInteract_Interfa
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpotLightComponent* SpotLight;
 	
+	UPROPERTY()
+	TObjectPtr<class UObscuraCameraComponent> ObscuraCameraComp;
+	
 protected:
 
-	/** Fire weapon input action */
 	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* SprintAction;
+	TObjectPtr<UInputAction> SprintAction;
+	
+	// 카메라 촬영
+	UPROPERTY(EditAnywhere, Category ="Input")
+	TObjectPtr<UInputAction> ShotObscuraAction;
 	
 	// 상호작용 InputAction
 	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* InteractAction;
+	TObjectPtr<UInputAction> InteractAction;
 	
 	// 카메라 촬영모드 진입
 	UPROPERTY(EditAnywhere, Category ="Input")
-	UInputAction* EnterCameraModeAction;
+	TObjectPtr<UInputAction> EnterCameraModeAction;
 
 	/** If true, we're sprinting */
 	bool bSprinting = false;
@@ -48,7 +55,7 @@ protected:
 
 	/** Default walk speed when not sprinting or recovering */
 	UPROPERTY(EditAnywhere, Category="Walk")
-	float WalkSpeed = 250.0f;
+	float WalkSpeed = 150.0f;
 
 	/** Time interval for sprinting stamina ticks */
 	UPROPERTY(EditAnywhere, Category="Sprint", meta = (ClampMin = 0, ClampMax = 1, Units = "s"))
@@ -63,7 +70,7 @@ protected:
 
 	/** Walk speed while sprinting */
 	UPROPERTY(EditAnywhere, Category="Sprint", meta = (ClampMin = 0, ClampMax = 10, Units = "cm/s"))
-	float SprintSpeed = 600.0f;
+	float SprintSpeed = 250.0f;
 
 	/** Walk speed while recovering stamina */
 	UPROPERTY(EditAnywhere, Category="Recovery", meta = (ClampMin = 0, ClampMax = 10, Units = "cm/s"))
@@ -84,6 +91,16 @@ protected:
 	UPROPERTY()
 	float CurrentMentality;
 	
+	// PlayerController
+	UPROPERTY()
+	TObjectPtr<class AHT_PlayerController> CachedHT_Pc;
+	
+	// Player Obscura Mode Montage
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// TObjectPtr<class UAnimMontage> EquipObscuraMontage;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// TObjectPtr<UAnimMontage> UnEquipObscuraMontage;
+	//
 	
 
 public:
@@ -91,12 +108,16 @@ public:
 	/** Delegate called when we start and stop sprinting */
 	FStaminaChangeDelegate OnStaminaChangeDelegate;
 	
+	// 정신력 감소 델리게이트
 	FMentalityChangedDelegate OnMentalityChangeDelegate;
+	
+	// 촬영 시 촬영 횟수 감소 UI 델리게이트
+	FShotCountChangeDelegate OnShotCountChangeDelegate;
 
 protected:
 
 	/** Constructor */
-	AHTCharacter();
+	AHT_Player();
 
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
@@ -128,9 +149,22 @@ protected:
 	void OnInteractInput(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void OnEnterCameraMode(const FInputActionValue& Value);
+	void OnShotObscura(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void OnOutCameraMode(const FInputActionValue& Value);
+	void OnUpdateObscuraShotCount();
+	
+public:
+	UFUNCTION()
+	void OnEnterObscuraMode(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnOutObscuraMode(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void CreateObscuraWidget();
+	
+	UFUNCTION()
+	void RemoveObscuraWidget();
 	
 };

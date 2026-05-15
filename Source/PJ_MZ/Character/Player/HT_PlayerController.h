@@ -16,19 +16,19 @@ public:
 	TArray<class UInputMappingContext*> DefaultMappingContexts;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UUserWidget> PlayerStateUIFactory;
+	TSubclassOf<class UPlayerStateUI> PlayerStateUIFactory;
 	
 	UPROPERTY()
 	TObjectPtr<class UPlayerStateUI> PlayerStateUIWidget;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UUserWidget> ObscuraUIFactory;
+	TSubclassOf<class UObscuraUI> ObscuraUIFactory;
 	
 	UPROPERTY()
 	TObjectPtr<class UObscuraUI> ObscuraUIWidget;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UUserWidget> ControlFadeUIFactory;
+	TSubclassOf<class UControlFadeUI> ControlFadeUIFactory;
 	
 	UPROPERTY()
 	TObjectPtr<class UControlFadeUI> ControlFadeUIWidget;

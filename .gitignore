@@ -76,3 +76,6 @@ DerivedDataCache/*
 
 #Rider Ignore
 .idea/*
+
+#zip file
+*.zip

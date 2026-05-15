@@ -1,8 +1,9 @@
 #include "HT_PlayerController.h"
 
 #include "EnhancedInputSubsystems.h"
-#include "HTCharacter.h"
+#include "HT_Player.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/ObscuraCameraComponent.h"
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
 #include "UI/PlayerStateUI.h"
@@ -19,11 +20,11 @@ void AHT_PlayerController::BeginPlay()
 	
 	if (PlayerStateUIFactory)
 	{
-		PlayerStateUIWidget = Cast<UPlayerStateUI>(CreateWidget(this,PlayerStateUIFactory));
+		PlayerStateUIWidget = CreateWidget<UPlayerStateUI>(this,PlayerStateUIFactory);
 		if (PlayerStateUIWidget)
 		{
 			PlayerStateUIWidget->AddToViewport();
-			auto* player = Cast<AHTCharacter>(this->GetPawn());
+			auto* player = Cast<AHT_Player>(this->GetPawn());
 			if (player)
 			{
 				PlayerStateUIWidget->SetupCharacter(player);	
@@ -37,20 +38,23 @@ void AHT_PlayerController::BeginPlay()
 void AHT_PlayerController::CreateObscuraWidget()
 {
 	SetFadeOutUI();
+	
 	if (PlayerStateUIWidget)
 	{
-		PlayerStateUIWidget->SetVisibility(ESlateVisibility::Collapsed);
+		PlayerStateUIWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 	
 	if (!ObscuraUIWidget)
 	{
 		if (ObscuraUIFactory)
 		{
-			ObscuraUIWidget = Cast<UObscuraUI>(CreateWidget(this,ObscuraUIFactory));
+			ObscuraUIWidget = CreateWidget<UObscuraUI>(this,ObscuraUIFactory);
 			if (ObscuraUIWidget)
 			{
+				ObscuraUIWidget->CameraObscuraComp = GetPawn()->FindComponentByClass<UObscuraCameraComponent>();
 
 				ObscuraUIWidget->AddToViewport();
+				ObscuraUIWidget->bDetectionActive = true; // 감지 시작
 			}
 		}	
 	}
@@ -61,8 +65,6 @@ void AHT_PlayerController::CreateObscuraWidget()
 			ObscuraUIWidget->AddToViewport();
 		}
 	}
-	
-	
 }
 
 void AHT_PlayerController::RemoveObscuraWidget()
@@ -74,9 +76,11 @@ void AHT_PlayerController::RemoveObscuraWidget()
 		PlayerStateUIWidget->SetVisibility(ESlateVisibility::Visible);	
 	}
 	
-	if (ObscuraUIWidget->IsInViewport())
+	if (ObscuraUIWidget&&ObscuraUIWidget->IsInViewport())
 	{
 		ObscuraUIWidget->RemoveFromParent();
+		ObscuraUIWidget->bDetectionActive = false; // 감지 중단
+		ObscuraUIWidget = nullptr;
 	}
 }
 
@@ -92,9 +96,7 @@ void AHT_PlayerController::SetFadeOutUI()
 	else
 	{
 		// 새로 생성
-		UControlFadeUI* NewWidget = Cast<UControlFadeUI>(
-			CreateWidget(this, ControlFadeUIFactory)
-		);
+		UControlFadeUI* NewWidget = CreateWidget<UControlFadeUI>(this, ControlFadeUIFactory);
 
 		if (NewWidget)
 		{

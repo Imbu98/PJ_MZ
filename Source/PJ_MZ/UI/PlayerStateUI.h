@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerStateUI.generated.h"
 
-class AHTCharacter;
+class AHT_Player;
 
 /**
  *  Simple UI for a first person horror game
@@ -20,7 +20,7 @@ class PJ_MZ_API UPlayerStateUI : public UUserWidget
 public:
 
 	/** Sets up delegate listeners for the passed character */
-	void SetupCharacter(AHTCharacter* HorrorCharacter);
+	void SetupCharacter(AHT_Player* HorrorCharacter);
 	
 	UFUNCTION()
 	void OnPlayerMentalityBarUpdated(float percent);
@@ -29,6 +29,9 @@ public:
 	UFUNCTION()
 	void OnStaminaBarUpdated(float percent);
 	
+	UFUNCTION()
+	void OnShotCountUpdated(int shotCount);
+	
 private:
 	// player 정신력수치 프로그레스 바
 	UPROPERTY(meta=(BindWidget))
@@ -36,6 +39,16 @@ private:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UProgressBar> PB_StaminaBar;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UHorizontalBox> ObscuraCountHorizontalBox;
+	
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<UUserWidget> ObscuraCountFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> ObscuraCountWidget;
 	
 	
 };
