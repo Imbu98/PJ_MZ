@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,21 +5,27 @@
 #include "DoorComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Dungeon), meta=(BlueprintSpawnableComponent))
 class PJ_MZ_API UDoorComponent : public UArrowComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UDoorComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(BlueprintReadOnly, Category="Door")
+	bool bUsed = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Door")
+	bool bBlocked = false;
+	
+	UFUNCTION(BlueprintCallable, Category="Door")
+	bool IsAvailable() const { return !bUsed && !bBlocked; }
+	
+	UFUNCTION(BlueprintCallable, Category="Door")
+	FVector GetWorldDirection() const { return GetForwardVector(); }
+	
+	UFUNCTION(BlueprintCallable, Category="Door")
+	FTransform GetWorldTransform() const { return GetComponentTransform(); }
+	
 };

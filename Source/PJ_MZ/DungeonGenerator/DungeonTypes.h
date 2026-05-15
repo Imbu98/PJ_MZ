@@ -1,15 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RoomBase.h"
+#include "DungeonTypes.generated.h"
 
-/**
- * 
- */
-class PJ_MZ_API DungeonTypes
+USTRUCT(BlueprintType)
+struct FRoomTypeEntry
 {
-public:
-	DungeonTypes();
-	~DungeonTypes();
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Room")
+	ERoomType RoomType = ERoomType::Room;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Room",
+		meta=(ClampMin=1))
+	int32 Weight = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Room")
+	TArray<TSubclassOf<ARoomBase>> RoomClasses;
 };

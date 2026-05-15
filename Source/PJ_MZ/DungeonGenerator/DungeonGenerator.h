@@ -1,27 +1,70 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "DungeonTypes.h"
+#include "RoomBase.h"
+#include "DoorComponent.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Engine/SCS_Node.h"
 #include "DungeonGenerator.generated.h"
 
+USTRUCT()
+struct FCachedRoomInfo
+{
+	GENERATED_BODY()
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+	ERoomType RoomType = ERoomType::Room;
+	FVector BoxExtent = FVector::ZeroVector;
+	TArray<FTransform> DoorLocalTransforms;
+};
+
+UCLASS(ClassGroup=(Dungeon), meta=(BlueprintSpawnableComponent))
 class PJ_MZ_API UDungeonGenerator : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UDungeonGenerator();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon")
+	float OverlapTolerance = 0.0f;
 
-public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable, Category="Dungeon")
+	void GenerateDungeon(
+		TSubclassOf<ARoomBase> StartRoomClass,
+		const TArray<FRoomTypeEntry>& RoomTypeTable,
+		int32 MinRooms,
+		int32 MaxRooms,
+		TArray<ARoomBase*>& OutSpawnedRooms);
+
+	UFUNCTION(BlueprintCallable, Category="Dungeon")
+	void ClearDungeon(TArray<ARoomBase*>& SpawnedRooms);
+
+private:
+	TMap<UClass*, FCachedRoomInfo> RoomInfoCache;
+
+	void BuildRoomInfoCache(
+		TSubclassOf<ARoomBase> StartRoomClass,
+		const TArray<FRoomTypeEntry>& RoomTypeTable);
+
+	void CacheRoomInfo(TSubclassOf<ARoomBase> RoomClass);
+
+	TSubclassOf<ARoomBase> PickRoomByWeight(
+		const TArray<FRoomTypeEntry>& RoomTypeTable) const;
+
+	FTransform CalculateRoomTransform(
+		UDoorComponent* FromDoor,
+		const FTransform& ToDoorLocal) const;
+
+	bool IsOverlapping(
+		const FTransform& NewTransform,
+		const FVector& NewExtent,
+		const TArray<ARoomBase*>& SpawnedRooms) const;
+
+	ARoomBase* TrySpawnAndAttachRoom(
+		UDoorComponent* FromDoor,
+		TSubclassOf<ARoomBase> RoomClass,
+		const TArray<ARoomBase*>& SpawnedRooms);
 };

@@ -3,27 +3,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "DoorComponent.h"
 #include "RoomBase.generated.h"
 
 UENUM(BlueprintType)
 enum class ERoomType : uint8
 {
+	Start,
+	Corridor,
 	Room,
-	Corridor
-};
-
-USTRUCT(BlueprintType)
-struct FDoorData
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UArrowComponent> DoorArrow;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bUsed = false;
+	Hall
 };
 
 UCLASS()
@@ -36,7 +26,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	
+	void CollectDoors();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="RoomInfo")
@@ -46,8 +37,8 @@ public:
 	ERoomType RoomType;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RoomInfo")
-	TArray<FDoorData> Doors;
+	TArray<TObjectPtr<UDoorComponent>> Doors;
 	
-	UFUNCTION()
-	void BuildDoors();
+	UFUNCTION(BlueprintCallable, Category="RoomInfo")
+	UDoorComponent* GetRandomAvailableDoor() const;
 };
