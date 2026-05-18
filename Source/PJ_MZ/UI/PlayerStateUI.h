@@ -20,7 +20,7 @@ class PJ_MZ_API UPlayerStateUI : public UUserWidget
 public:
 
 	/** Sets up delegate listeners for the passed character */
-	void SetupCharacter(AHT_Player* HorrorCharacter);
+	void SetupCharacter(class AHT_PlayerState* playerState);
 	
 	UFUNCTION()
 	void OnPlayerMentalityBarUpdated(float percent);

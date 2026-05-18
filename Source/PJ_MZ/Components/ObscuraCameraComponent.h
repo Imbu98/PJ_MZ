@@ -65,22 +65,16 @@ public:
 	EObscuraModeAction GetObscuraMode(){ return CurrentMode;};
 	
 	UFUNCTION()
-	void InitShotCount();
+	bool ObscuraCanShot();
+	
+	UFUNCTION()
+	float GetObscuraCooltimePercent();
 	
 	UPROPERTY()
 	EObscuraModeAction CurrentMode;
 	
-public:
-	bool IsObscraCooltime = false;
-	float currentObscuraCooltime=0.f;
-	float MaxObscuraCooltime;
-	
-public:
 	UPROPERTY()
-	int32 MaxCanShotCount=3;
-	
-	UPROPERTY()
-	int32 CurrentCanShotCount;
+	TObjectPtr<class AHT_PlayerState> Cached_PS;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Obscura")
 	// float BaseDamage = 30.f;

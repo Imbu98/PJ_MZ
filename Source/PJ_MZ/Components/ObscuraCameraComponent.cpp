@@ -1,7 +1,8 @@
 #include "ObscuraCameraComponent.h"
 
+#include "Mz_GameInstance.h"
+#include "Character/Player/HT_PlayerState.h"
 #include "Character/Player/HT_Player.h"
-#include "Kismet/GameplayStatics.h"
 
 
 UObscuraCameraComponent::UObscuraCameraComponent()
@@ -13,30 +14,32 @@ void UObscuraCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 추후 업그레이드를 하게 되면 값을 바꿔주기
-	MaxObscuraCooltime = 3.0f;
+	AHT_Player* Player = Cast<AHT_Player>(GetOwner());
+	if (!Player) return;
+
+	AHT_PlayerState* PS = Player->GetPlayerState<AHT_PlayerState>();
+	if (!PS) return;
+	
+	Cached_PS = PS;
 }
 
 void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (IsObscraCooltime)
-	{
-		currentObscuraCooltime+=DeltaTime;
+	if (Cached_PS&&Cached_PS->IsObscraCooltime)
 		
-		if (currentObscuraCooltime>MaxObscuraCooltime)
-		{
-			IsObscraCooltime= false;
-			currentObscuraCooltime = 0.f;
-			AHT_Player* player =  Cast<AHT_Player>(GetOwner());
+		Cached_PS->currentObscuraCooltime += DeltaTime;
 
-			if (player)
-			{
-				player-> OnObscuraCooltimeFinished.Broadcast();
-			}
-		}
+	if (Cached_PS->currentObscuraCooltime >= Cached_PS->MaxObscuraCooltime)
+	{
+		Cached_PS->IsObscraCooltime = false;
+		Cached_PS->currentObscuraCooltime = 0.f;
+			
 	}
+		
+	Cached_PS->OnObscuraCooltimeFinished.Broadcast();
+	
 }
 
 void UObscuraCameraComponent::InitPoints(int32 PointCount)
@@ -71,6 +74,7 @@ float UObscuraCameraComponent::GetDamageMultiplier() const
 
 void UObscuraCameraComponent::ApplyShutterDamage()
 {
+	int32 CurrentCanShotCount =Cached_PS->GetCurrentCanShotCount();
 	// 촬영횟수가 없으면 사망
 	if (CurrentCanShotCount <= 0)
 	{
@@ -79,14 +83,14 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 		return;
 	}
 	
-	CurrentCanShotCount--;
+	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);
+	
 	
 	float FinalDamage = GetDamageMultiplier();
 	
 	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalDamage));
 	
-	
-	
+
 	
 	
 	
@@ -135,9 +139,14 @@ AActor* UObscuraCameraComponent::GetPrimaryTarget() const
 	return nullptr;
 }
 
-void UObscuraCameraComponent::InitShotCount()
+bool UObscuraCameraComponent::ObscuraCanShot()
 {
-	CurrentCanShotCount = MaxCanShotCount;
+	return Cached_PS->IsObscraCooltime;
+}
+
+float UObscuraCameraComponent::GetObscuraCooltimePercent()
+{
+	return Cached_PS->currentObscuraCooltime/Cached_PS->MaxObscuraCooltime;
 }
 
 

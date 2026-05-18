@@ -2,6 +2,7 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "HT_Player.h"
+#include "HT_PlayerState.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ObscuraCameraComponent.h"
 #include "UI/ControlFadeUI.h"
@@ -24,10 +25,10 @@ void AHT_PlayerController::BeginPlay()
 		if (PlayerStateUIWidget)
 		{
 			PlayerStateUIWidget->AddToViewport();
-			auto* player = Cast<AHT_Player>(this->GetPawn());
-			if (player)
+			auto* playerState =(GetPlayerState<AHT_PlayerState>());
+			if (playerState)
 			{
-				PlayerStateUIWidget->SetupCharacter(player);	
+				PlayerStateUIWidget->SetupCharacter(playerState);
 			}
 			
 		}
