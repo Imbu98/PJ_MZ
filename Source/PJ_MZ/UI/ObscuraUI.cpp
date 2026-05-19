@@ -12,6 +12,7 @@
 #include "Components/ObscuraCameraComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Character/Player/HT_PlayerState.h"
 
 
 
@@ -55,7 +56,7 @@ void UObscuraUI::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 	
 	if (CameraObscuraComp)
 	{
-		if (CameraObscuraComp->IsObscraCooltime)
+		if (CameraObscuraComp->ObscuraCanShot())
 		{
 			ObscuraCooltimeUpdate();
 		}	
@@ -150,16 +151,28 @@ void UObscuraUI::ResetObscura()
 
 void UObscuraUI::BindingEvent()
 {
-	// 현재 촬영 가능 횟수 델리게이트 
-	AHT_Player* ht_player =  Cast<AHT_Player>(GetOwningPlayer()->GetPawn());
-	if (ht_player)
+	// 기존 CameraObscuraComp 대신 PlayerState에서 읽기
+	AHT_PlayerState* PS = GetOwningPlayer()->GetPlayerState<AHT_PlayerState>();
+	if (PS)
 	{
-		ht_player->OnShotCountChangeDelegate.AddUObject(this, &UObscuraUI::OnShotCountUpdated);
-		ht_player->OnMentalityChangeDelegate.AddUObject(this, &UObscuraUI::OnPlayerMentalityBarUpdated);
-		ht_player->OnStaminaChangeDelegate.AddUObject(this, &UObscuraUI::OnStaminaBarUpdated);
-		ht_player->OnObscuraCooltimeFinished.AddUObject(this,&UObscuraUI::OnObscuraBarReset);
+		if (PS)
+		{
+			PS->OnShotCountChangeDelegate.RemoveAll(this);
+			PS->OnShotCountChangeDelegate.AddUObject(this, &UObscuraUI::OnShotCountUpdated);
+			
+			PS->OnMentalityChangeDelegate.RemoveAll(this);
+			PS->OnMentalityChangeDelegate.AddUObject(this, &UObscuraUI::OnPlayerMentalityBarUpdated);
+			
+			PS->OnObscuraCooltimeFinished.RemoveAll(this);
+			PS->OnObscuraCooltimeFinished.AddUObject(this,&UObscuraUI::OnObscuraBarReset);
+			
+			PS->OnStaminaBarUpdated.RemoveAll(this);
+			PS->OnStaminaBarUpdated.AddUObject(this, &UObscuraUI::OnStaminaBarUpdated);
 		
+		}
+	
 	}
+	
 }
 
 
@@ -194,7 +207,7 @@ void UObscuraUI::ObscuraCooltimeUpdate()
 	
 	if (PB_ObscuraCooltimeBar)
 	{
-		float percent = (CameraObscuraComp->currentObscuraCooltime / CameraObscuraComp->MaxObscuraCooltime); // 0 → 1로 채워짐
+		float percent = CameraObscuraComp->GetObscuraCooltimePercent();
 		
 		PB_ObscuraCooltimeBar->SetPercent(percent);
 	}
@@ -208,5 +221,7 @@ void UObscuraUI::OnObscuraBarReset()
 	}
 	
 }
+
+
 
 

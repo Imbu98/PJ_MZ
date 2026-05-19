@@ -63,6 +63,7 @@ private:
 	UFUNCTION()
 	void OnObscuraBarReset();
 	
+	
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
 
