@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "DungeonTypes.h"
+#include "RoomTypeEntry.h"
 #include "RoomBase.h"
 #include "DoorComponent.h"
 #include "Engine/BlueprintGeneratedClass.h"
