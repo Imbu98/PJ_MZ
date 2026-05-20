@@ -38,7 +38,4 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RoomInfo")
 	TArray<TObjectPtr<UDoorComponent>> Doors;
-	
-	UFUNCTION(BlueprintCallable, Category="RoomInfo")
-	UDoorComponent* GetRandomAvailableDoor() const;
 };

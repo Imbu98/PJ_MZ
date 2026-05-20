@@ -21,11 +21,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Door")
 	bool IsAvailable() const { return !bUsed && !bBlocked; }
-	
-	UFUNCTION(BlueprintCallable, Category="Door")
-	FVector GetWorldDirection() const { return GetForwardVector(); }
-	
-	UFUNCTION(BlueprintCallable, Category="Door")
-	FTransform GetWorldTransform() const { return GetComponentTransform(); }
-	
+	//
+	// UFUNCTION(BlueprintCallable, Category="Door")
+	// FVector GetWorldDirection() const { return GetForwardVector(); }
+	//
+	// UFUNCTION(BlueprintCallable, Category="Door")
+	// FTransform GetWorldTransform() const { return GetComponentTransform(); }
+	//
 };

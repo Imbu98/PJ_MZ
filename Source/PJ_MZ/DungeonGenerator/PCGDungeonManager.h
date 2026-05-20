@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DungeonTypes.h"
+#include "RoomTypeEntry.h"
 #include "DungeonGenerator.h"
 #include "RoomBase.h"
 #include "PCGDungeonManager.generated.h"

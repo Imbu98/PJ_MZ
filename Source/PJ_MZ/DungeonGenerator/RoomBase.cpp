@@ -32,22 +32,5 @@ void ARoomBase::CollectDoors()
 	UE_LOG(LogTemp, Log, TEXT("[RoomBase] %s : %d Doors Collected.]"), *GetName(), Doors.Num());
 }
 
-UDoorComponent* ARoomBase::GetRandomAvailableDoor() const
-{
-	TArray<UDoorComponent*> Available;
-
-	for (UDoorComponent* Door : Doors)
-	{		
-		if (Door && Door->IsAvailable())
-		{
-			Available.Add(Door);
-		}
-	}
-	
-	if (Available.IsEmpty()) return  nullptr;
-	
-	return Available[FMath::RandRange(0, Available.Num() - 1)];
-}
-
 
 

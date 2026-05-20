@@ -1,5 +1,5 @@
 #include "DungeonGenerator.h"
-#include "DungeonTypes.h"
+#include "RoomTypeEntry.h"
 #include "Engine/World.h"
 
 UDungeonGenerator::UDungeonGenerator()
@@ -29,10 +29,12 @@ void UDungeonGenerator::GenerateDungeon(
     UE_LOG(LogTemp, Log,
         TEXT("[Generator] 목표 방 수: %d"), TargetCount);
 
-    // StartRoom 스폰
+    // StartRoom 스폰 및 스폰 옵션 설정
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride =
         ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    //왜 항상 스폰으로 설정하냐면 이미 코드에서 정보를 읽어와서 충돌계산 후 스폰하기 떄문에
+    //언리얼이 계산해줄 필요도 없을 뿐더러 스폰이 안되는 상황 방지하기 위해서
 
     ARoomBase* StartRoom = GetWorld()->SpawnActor<ARoomBase>(
         StartRoomClass, FTransform::Identity, SpawnParams);
@@ -77,6 +79,14 @@ void UDungeonGenerator::GenerateDungeon(
 
         TSubclassOf<ARoomBase> NextRoomClass =
             PickRoomByWeight(RoomTypeTable);
+        
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
 
         if (!NextRoomClass) continue;
 
@@ -235,7 +245,7 @@ TSubclassOf<ARoomBase> UDungeonGenerator::PickRoomByWeight(
         if (Entry.RoomClasses.IsEmpty()) continue;
 
         Accumulated += Entry.Weight;
-
+        
         if (RandValue < Accumulated)
         {
             int32 Idx = FMath::RandRange(

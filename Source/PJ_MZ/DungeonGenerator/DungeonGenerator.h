@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "DungeonTypes.h"
+#include "RoomTypeEntry.h"
 #include "RoomBase.h"
 #include "DoorComponent.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -20,7 +20,7 @@ struct FCachedRoomInfo
 	TArray<FTransform> DoorLocalTransforms;
 };
 
-UCLASS(ClassGroup=(Dungeon), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Dungeon))
 class PJ_MZ_API UDungeonGenerator : public UActorComponent
 {
 	GENERATED_BODY()
