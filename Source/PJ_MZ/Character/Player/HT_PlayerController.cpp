@@ -8,6 +8,7 @@
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
 #include "UI/PlayerStateUI.h"
+#include "UI/PhotoResultUI.h"
 
 AHT_PlayerController::AHT_PlayerController()
 {
@@ -31,6 +32,25 @@ void AHT_PlayerController::BeginPlay()
 				PlayerStateUIWidget->SetupCharacter(playerState);
 			}
 			
+		}
+	}
+	
+}
+
+void AHT_PlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	// only add IMCs for local player controllers
+	if (IsLocalPlayerController())
+	{
+		// Add Input Mapping Context
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+		{
+			for (UInputMappingContext* CurrentContext : DefaultMappingContexts)
+			{
+				Subsystem->AddMappingContext(CurrentContext, 0);
+			}
 		}
 	}
 	
@@ -127,22 +147,27 @@ void AHT_PlayerController::SetFadeOutWhiteUI()
 	}
 }
 
-
-void AHT_PlayerController::SetupInputComponent()
+void AHT_PlayerController::SetResultUI()
 {
-	Super::SetupInputComponent();
-
-	// only add IMCs for local player controllers
-	if (IsLocalPlayerController())
+	AHT_PlayerState* Ps=  GetPlayerState<AHT_PlayerState>();
+	if (Ps==nullptr) return;
+	
+	if (PhotoResultUIFactory)
 	{
-		// Add Input Mapping Context
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+		PhotoResultUIWidget = CreateWidget<UPhotoResultUI>(this, PhotoResultUIFactory);
+		if (PhotoResultUIWidget)
 		{
-			for (UInputMappingContext* CurrentContext : DefaultMappingContexts)
-			{
-				Subsystem->AddMappingContext(CurrentContext, 0);
-			}
+			PhotoResultUIWidget->AddToViewport();
+			
+				for (int32 i=0;i<Ps->MaxCanShotCount;i++)
+				{
+					UTextureRenderTarget2D* RenderTarget = Ps->GetPhotoTexture(i);
+					float score = Ps->GetCachedScore(i);
+					if (RenderTarget)
+					{
+						PhotoResultUIWidget->SetPhotoImage(i,RenderTarget,score);	
+					}
+				}
 		}
 	}
-	
 }

@@ -33,6 +33,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UControlFadeUI> ControlFadeUIWidget;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class UPhotoResultUI> PhotoResultUIFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UPhotoResultUI> PhotoResultUIWidget;
+	
 	UFUNCTION()
 	void CreateObscuraWidget();
 	
@@ -44,6 +50,9 @@ public:
 	
 	UFUNCTION()
 	void SetFadeOutWhiteUI();
+	
+	UFUNCTION()
+	void SetResultUI();
 	
 
 protected:

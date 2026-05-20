@@ -1,13 +1,21 @@
 #include "ObscuraCameraComponent.h"
 
 #include "Mz_GameInstance.h"
+#include "Camera/CameraComponent.h"
 #include "Character/Player/HT_PlayerState.h"
 #include "Character/Player/HT_Player.h"
+#include "Character/Player/HT_PlayerController.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 
 UObscuraCameraComponent::UObscuraCameraComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
+	SceneCapture->bCaptureEveryFrame = false; // 촬영할 때만 캡처
+	SceneCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR; // HUD 제외
 }
 
 void UObscuraCameraComponent::BeginPlay()
@@ -21,6 +29,14 @@ void UObscuraCameraComponent::BeginPlay()
 	if (!PS) return;
 	
 	Cached_PS = PS;
+        
+	UCameraComponent* MainCam = Player->GetFirstPersonCameraComponent();
+	if (MainCam)
+	{
+		SceneCapture->AttachToComponent(MainCam, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		SceneCapture->FOVAngle = MainCam->FieldOfView; // FOV 맞추기
+	}
+	
 }
 
 void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -41,6 +57,8 @@ void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Cached_PS->OnObscuraCooltimeFinished.Broadcast();
 	
 }
+
+
 
 void UObscuraCameraComponent::InitPoints(int32 PointCount)
 {
@@ -74,11 +92,15 @@ float UObscuraCameraComponent::GetDamageMultiplier() const
 
 void UObscuraCameraComponent::ApplyShutterDamage()
 {
+	if (Cached_PS==nullptr) return;
+	
 	int32 CurrentCanShotCount =Cached_PS->GetCurrentCanShotCount();
 	// 촬영횟수가 없으면 사망
 	if (CurrentCanShotCount <= 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
+		
+		SetResultUI();
 		
 		return;
 	}
@@ -86,13 +108,13 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);
 	
 	
-	float FinalDamage = GetDamageMultiplier();
+	float FinalScore = GetDamageMultiplier();
 	
-	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalDamage));
+	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalScore));
 	
-
+	AddCurrentScoreToArray(FinalScore);
 	
-	
+	CapturePhoto();
 	
 	// AActor* Target = GetPrimaryTarget();
 	// if (!Target) return;
@@ -147,6 +169,53 @@ bool UObscuraCameraComponent::ObscuraCanShot()
 float UObscuraCameraComponent::GetObscuraCooltimePercent()
 {
 	return Cached_PS->currentObscuraCooltime/Cached_PS->MaxObscuraCooltime;
+}
+
+void UObscuraCameraComponent::SetResultUI()
+{
+	AHT_Player* Player = Cast<AHT_Player>(GetOwner());
+	if (!Player) return;
+	
+	AHT_PlayerController* Pc=  Cast<AHT_PlayerController>(Player->GetController());
+	if (!Pc) return;
+	
+	Pc->SetResultUI();
+}
+
+void UObscuraCameraComponent::AddCurrentScoreToArray(float scoreVal)
+{
+	if (Cached_PS)
+	{
+		Cached_PS->CachedScoreArray.Add(scoreVal);
+	}
+}
+
+float UObscuraCameraComponent::GetScoreArrayValue(int32 index)
+{
+	if (Cached_PS)
+	{
+		return Cached_PS->CachedScoreArray[index];
+	}
+	return 0.f;
+}
+
+void UObscuraCameraComponent::CapturePhoto()
+{
+	if (Cached_PS==nullptr) return;
+	
+	// 새 RenderTarget 생성
+	UTextureRenderTarget2D* NewRT = NewObject<UTextureRenderTarget2D>();
+	NewRT->InitAutoFormat(1920, 1080);
+	NewRT->UpdateResourceImmediate();
+
+	SceneCapture->TextureTarget = NewRT;
+	SceneCapture->CaptureScene(); // 캡처
+
+	
+	Cached_PS->PhotoList.Add(NewRT); // 앨범에 저장
+	
+	// 캡처 후 연결 끊기
+	SceneCapture->TextureTarget = nullptr;
 }
 
 

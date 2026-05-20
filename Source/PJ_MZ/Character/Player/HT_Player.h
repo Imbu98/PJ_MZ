@@ -30,6 +30,13 @@ class PJ_MZ_API AHT_Player : public APJ_MZCharacter , public IInteract_Interface
 	UPROPERTY()
 	TObjectPtr<class UObscuraCameraComponent> ObscuraCameraComp;
 	
+	// 헤더
+	UPROPERTY()
+	USceneCaptureComponent2D* SceneCapture;
+
+	UPROPERTY()
+	UTextureRenderTarget2D* RenderTarget;
+	
 protected:
 
 	UPROPERTY(EditAnywhere, Category ="Input")
@@ -168,6 +175,10 @@ public:
 	
 	UFUNCTION()
 	void RemoveObscuraWidget();
+	
+	bool bObscuraReleased = false; // 중간에 똇는지 확인하기 위한 플래그
+	
+	
 	
 
 	

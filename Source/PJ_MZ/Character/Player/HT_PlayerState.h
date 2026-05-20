@@ -12,12 +12,32 @@ class PJ_MZ_API AHT_PlayerState : public APlayerState
 
 public:
 
+	// ===============================
 	// 촬영 횟수
+	// ===============================
 	UPROPERTY()
 	int32 MaxCanShotCount = 3;
 
 	UPROPERTY()
 	int32 CurrentCanShotCount;
+	
+	void InitShotCount() { CurrentCanShotCount = MaxCanShotCount; }
+	void SetCurrentCanShotCount(int32 newCount) { CurrentCanShotCount = newCount; }
+	int32 GetCurrentCanShotCount() { return CurrentCanShotCount; }
+	
+	// ===============================
+	// 점수 및 사진 저장
+	// ===============================
+	UPROPERTY()
+	TArray<float> CachedScoreArray;
+	
+	float GetCachedScore(int32 index);
+
+	UPROPERTY()
+	TArray<UTextureRenderTarget2D*> PhotoList;	// 찍은 사진들 저장
+	
+	UTextureRenderTarget2D* GetPhotoTexture(int32 index);
+
 
 	// 쿨타임
 	bool IsObscraCooltime = false;
@@ -27,7 +47,6 @@ public:
 	// 정신력
 	UPROPERTY(EditAnywhere, Category="Mentality")
 	float MaxMentality = 100.f;
-
 	UPROPERTY()
 	float CurrentMentality;
 
@@ -37,7 +56,7 @@ public:
 	FShotCountChangeDelegate OnShotCountChangeDelegate;
 	FObscuraCooltimeFinished OnObscuraCooltimeFinished;
 
-	void InitShotCount() { CurrentCanShotCount = MaxCanShotCount; }
-	void SetCurrentCanShotCount(int32 newCount) { CurrentCanShotCount = newCount; }
-	int32 GetCurrentCanShotCount() { return CurrentCanShotCount; }
+	
+	
+	
 };
