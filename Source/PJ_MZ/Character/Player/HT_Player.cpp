@@ -16,6 +16,8 @@
 #include "Components/ObscuraCameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "UI/ObscuraUI.h"
+#include "HT_PlayerState.h"
 
 AHT_Player::AHT_Player()
 {
@@ -37,49 +39,39 @@ void AHT_Player::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// initialize sprint meter to max
 	SprintMeter = SprintTime;
-
-	// Initialize the walk speed
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
-	// start the sprint tick timer
 	GetWorld()->GetTimerManager().SetTimer(SprintTimer, this, &AHT_Player::SprintFixedTick, SprintFixedTickTime, true);
-	
-	// 정신력 초기화
-	CurrentMentality = MaxMentality;
-	
-	// 플레이어컨트롤러 캐싱
+
 	CachedHT_Pc = Cast<AHT_PlayerController>(Controller);
-	
-	// 불 끄기
+    
+	// PlayerState 캐싱
+	Cached_PS = GetPlayerState<AHT_PlayerState>();
+
 	if (SpotLight)
 	{
 		SpotLight->SetVisibility(false);
 	}
-	
-	//
-	if (ObscuraCameraComp)
+
+	// 촬영 횟수 초기화 → PlayerState에서
+	if (Cached_PS)
 	{
 		UMz_GameInstance* Mz_GI = Cast<UMz_GameInstance>(GetGameInstance());
 		if (Mz_GI)
 		{
-			if (Mz_GI->bIsShotCountInitialized==false)
+			if (!Mz_GI->bIsShotCountInitialized)
 			{
-				ObscuraCameraComp->InitShotCount();	
+				Cached_PS->InitShotCount();
 			}
 			else
 			{
-				ObscuraCameraComp->CurrentCanShotCount= Mz_GI->CachedShotCount;
+				Cached_PS->CurrentCanShotCount = Mz_GI->CachedShotCount;
 			}
-			OnUpdateObscuraShotCount();
-			
-			Mz_GI->bIsShotCountInitialized=true;
+			Mz_GI->bIsShotCountInitialized = true;
 		}
 
-		
-		
-	
+		Cached_PS->CurrentMentality = Cached_PS->MaxMentality;
+		OnUpdateObscuraShotCount();
 	}
 }
 
@@ -180,15 +172,22 @@ void AHT_Player::SprintFixedTick()
 	}
 
 	// broadcast the sprint meter updated delegate
-	OnStaminaChangeDelegate.Broadcast(SprintMeter / SprintTime);
+	AHT_PlayerState* playerState = GetPlayerState<AHT_PlayerState>();
+	if (playerState)
+	{
+		playerState->OnStaminaBarUpdated.Broadcast(SprintMeter / SprintTime);
+	}
+	
 
 }
 
 void AHT_Player::OnChangeMentality(float amount)
 {
-	CurrentMentality+=amount;
-	
-	OnMentalityChangeDelegate.Broadcast(CurrentMentality/MaxMentality);
+	if (!Cached_PS) return;
+	Cached_PS->CurrentMentality += amount;
+	Cached_PS->OnMentalityChangeDelegate.Broadcast(
+		Cached_PS->CurrentMentality / Cached_PS->MaxMentality
+	);
 }
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
@@ -211,41 +210,62 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 
 void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 {
-	if (!ObscuraCameraComp) return;
-		if (ObscuraCameraComp->GetObscuraMode()==EObscuraModeAction::CAMERAMODE)
+	if (!ObscuraCameraComp || !Cached_PS) return;
+	if (Cached_PS->IsObscraCooltime)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("CooltimeBlocked"));
+		return;
+	}
+
+	if (ObscuraCameraComp->GetObscuraMode() == EObscuraModeAction::CAMERAMODE)
+	{
+		ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::SHOTTING);
+		if (SpotLight)
 		{
-			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::SHOTTING);
-			if (SpotLight)
+			SpotLight->SetVisibility(true);
+
+			if (CachedHT_Pc && CachedHT_Pc->ObscuraUIWidget)
 			{
-				SpotLight->SetVisibility(true);
-				
-				FTimerHandle timerHandle;
-				GetWorldTimerManager().SetTimer(timerHandle,[this]()
-				{
-					SpotLight->SetVisibility(false);
-					//if (ObscuraCameraComp->GetObscuraMode()==EObscuraModeAction::CAMERAMODE)
-					ObscuraCameraComp->ApplyShutterDamage();
-					ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
-					OnUpdateObscuraShotCount();
-				},1.0f,false);
+				Cached_PS->IsObscraCooltime = true;
 			}
-			
+
+			AHT_PlayerController* PC = Cast<AHT_PlayerController>(
+				UGameplayStatics::GetPlayerController(GetWorld(), 0)
+			);
+			if (PC)
+			{
+				PC->SetFadeOutWhiteUI();
+			}
+
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
+
+			GetWorld()->GetTimerManager().SetTimer(ObscuraTimer, [this]()
+			{
+				SpotLight->SetVisibility(false);
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+				ObscuraCameraComp->ApplyShutterDamage();
+				ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
+				OnUpdateObscuraShotCount();
+				GetWorldTimerManager().ClearTimer(ObscuraTimer);
+
+			}, 0.01f, false);
 		}
+	}
 }
 
 void AHT_Player::OnUpdateObscuraShotCount()
 {
-	if (ObscuraCameraComp)
-	{
-		int count = ObscuraCameraComp->CurrentCanShotCount;
-		OnShotCountChangeDelegate.Broadcast(count);
+	if (!Cached_PS) return;
 	
-		UMz_GameInstance* Mz_GI = Cast<UMz_GameInstance>(GetGameInstance());
-		if (Mz_GI)
-		{
-			Mz_GI->CachedShotCount = count; 
-		}		
+	Cached_PS->OnShotCountChangeDelegate.Broadcast(Cached_PS->GetCurrentCanShotCount());
+
+	// 게임인스턴스에 저장
+	UMz_GameInstance* Mz_GI = Cast<UMz_GameInstance>(GetWorld()->GetGameInstance());
+	if (Mz_GI)
+	{
+		Mz_GI->CachedShotCount = Cached_PS->GetCurrentCanShotCount();
 	}
+	
 }
 
 void AHT_Player::OnEnterObscuraMode(const FInputActionValue& Value)
@@ -271,18 +291,31 @@ void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 	// 		AnimInstance->Montage_Play(UnEquipObscuraMontage,-1.0f);
 	// 	}
 	// }
-	RemoveObscuraWidget();
+	if (ObscuraCameraComp&&ObscuraCameraComp->GetObscuraMode()!=EObscuraModeAction::SHOTTING)
+	{
+		ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
+		
+		if (SpotLight->IsVisible())
+		{
+			SpotLight->SetVisibility(false);
+		}
+		RemoveObscuraWidget();
+	}
+
+	
+	
 
 }
 
 void AHT_Player::CreateObscuraWidget()
 {
-	if (CachedHT_Pc)
+	if (CachedHT_Pc && Cached_PS)
 	{
 		CachedHT_Pc->CreateObscuraWidget();
 		if (ObscuraCameraComp)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
+			Cached_PS->OnShotCountChangeDelegate.Broadcast(Cached_PS->CurrentCanShotCount);
 		}
 	}
 }

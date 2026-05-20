@@ -40,7 +40,10 @@ public:
 	void RemoveObscuraWidget();
 	
 	UFUNCTION()
-	void SetFadeOutUI();
+	void SetFadeOutBlackUI();
+	
+	UFUNCTION()
+	void SetFadeOutWhiteUI();
 	
 
 protected:

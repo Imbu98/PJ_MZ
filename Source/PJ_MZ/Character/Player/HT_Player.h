@@ -95,24 +95,26 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class AHT_PlayerController> CachedHT_Pc;
 	
+	UPROPERTY()
+	TObjectPtr<class AHT_PlayerState> Cached_PS;
+	
+	UPROPERTY()
+	FTimerHandle ObscuraTimer;
+	
+
+	
 	// Player Obscura Mode Montage
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	// TObjectPtr<class UAnimMontage> EquipObscuraMontage;
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	// TObjectPtr<UAnimMontage> UnEquipObscuraMontage;
-	//
+	
 	
 
 public:
 
-	/** Delegate called when we start and stop sprinting */
-	FStaminaChangeDelegate OnStaminaChangeDelegate;
-	
-	// 정신력 감소 델리게이트
-	FMentalityChangedDelegate OnMentalityChangeDelegate;
-	
-	// 촬영 시 촬영 횟수 감소 UI 델리게이트
-	FShotCountChangeDelegate OnShotCountChangeDelegate;
+	// /** Delegate called when we start and stop sprinting */
+	// FStaminaChangeDelegate OnStaminaChangeDelegate;
 
 protected:
 
@@ -166,5 +168,7 @@ public:
 	
 	UFUNCTION()
 	void RemoveObscuraWidget();
+	
+
 	
 };

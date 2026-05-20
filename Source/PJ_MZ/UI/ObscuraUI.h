@@ -32,16 +32,50 @@ public:
 	// 감지 활성화 여부 (카메라 열렸을 때만 true)
 	UPROPERTY(BlueprintReadWrite, Category="Camera Obscura")
 	bool bDetectionActive = false;
+	
+private:
+	// player 정신력수치 프로그레스 바
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UProgressBar> PB_MentalityBar;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UProgressBar> PB_StaminaBar;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UProgressBar> PB_ObscuraCooltimeBar;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UTextBlock> Text_ObscuraCount;
+		
+	UFUNCTION()
+	void OnPlayerMentalityBarUpdated(float percent);
+	
+	// 스프린트 게이지
+	UFUNCTION()
+	void OnStaminaBarUpdated(float percent);
+	
+	UFUNCTION()
+	void OnShotCountUpdated(int shotCount);
 
+	UFUNCTION()
+	void ObscuraCooltimeUpdate();
+	
+	UFUNCTION()
+	void OnObscuraBarReset();
+	
+	
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
 
 	APlayerController* PC;
 
+	// 라인 트레이스 관련 함수들
 	void UpdateAllPoints();
 	bool TraceFromScreenPoint(UImage* PointImage, AActor*& OutHitActor);
 	FVector2D GetPointScreenCenter(UImage* PointImage);
 	void ResetObscura();
+	
+	void BindingEvent();
 	
 	
 };

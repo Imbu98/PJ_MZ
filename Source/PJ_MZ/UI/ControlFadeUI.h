@@ -12,18 +12,25 @@ class PJ_MZ_API UControlFadeUI : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(BlueprintAssignable)
-	FOnFadeComplete OnFadeOutComplete;
 	
 public:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
-	TObjectPtr<UWidgetAnimation> FadeOutAnim;
+	TObjectPtr<UWidgetAnimation> FadeOutBlackAnim;
+	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> FadeOutWhiteAnim;
 	
 	UFUNCTION()
-	void FadeOut();
+	void FadeOutBlack();
 	
 	UFUNCTION()
-	void OnFadeOutFinished();
+	void FadeOutWhite();
+	
+	UFUNCTION()
+	void OnFadeOutBlackFinished();
+	
+	UFUNCTION()
+	void OnFadeOutWhiteFinished();
 	
 	
 };

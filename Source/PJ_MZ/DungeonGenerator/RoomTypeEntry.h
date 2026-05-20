@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "RoomBase.h"
-#include "DungeonTypes.generated.h"
+#include "RoomTypeEntry.generated.h"
 
 USTRUCT(BlueprintType)
 struct FRoomTypeEntry

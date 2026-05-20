@@ -6,8 +6,15 @@
 #include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
+#include "Character/Player/HT_Player.h"
+#include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 #include "Components/ObscuraCameraComponent.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
+#include "Character/Player/HT_PlayerState.h"
+
+
 
 void UObscuraUI::NativeConstruct()
 {
@@ -32,6 +39,8 @@ void UObscuraUI::NativeConstruct()
 		CameraObscuraComp->InitPoints(FinderPoints.Num());
 
 	ResetObscura();
+	
+	BindingEvent();
 }
 
 // CameraObscuraWidget.cpp
@@ -44,6 +53,14 @@ void UObscuraUI::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 	if (!bDetectionActive || !PC || !CameraObscuraComp) return;
 
 	UpdateAllPoints();
+	
+	if (CameraObscuraComp)
+	{
+		if (CameraObscuraComp->ObscuraCanShot())
+		{
+			ObscuraCooltimeUpdate();
+		}	
+	}
 }
 
 void UObscuraUI::UpdateAllPoints()
@@ -128,6 +145,83 @@ void UObscuraUI::ResetObscura()
 	{
 		if (Point) Point->SetColorAndOpacity(DefaultColor);
 	}
+	
+	
 }
+
+void UObscuraUI::BindingEvent()
+{
+	// 기존 CameraObscuraComp 대신 PlayerState에서 읽기
+	AHT_PlayerState* PS = GetOwningPlayer()->GetPlayerState<AHT_PlayerState>();
+	if (PS)
+	{
+		if (PS)
+		{
+			PS->OnShotCountChangeDelegate.RemoveAll(this);
+			PS->OnShotCountChangeDelegate.AddUObject(this, &UObscuraUI::OnShotCountUpdated);
+			
+			PS->OnMentalityChangeDelegate.RemoveAll(this);
+			PS->OnMentalityChangeDelegate.AddUObject(this, &UObscuraUI::OnPlayerMentalityBarUpdated);
+			
+			PS->OnObscuraCooltimeFinished.RemoveAll(this);
+			PS->OnObscuraCooltimeFinished.AddUObject(this,&UObscuraUI::OnObscuraBarReset);
+			
+			PS->OnStaminaBarUpdated.RemoveAll(this);
+			PS->OnStaminaBarUpdated.AddUObject(this, &UObscuraUI::OnStaminaBarUpdated);
+		
+		}
+	
+	}
+	
+}
+
+
+void UObscuraUI::OnPlayerMentalityBarUpdated(float percent)
+{
+	if (PB_MentalityBar)
+	{
+		PB_MentalityBar->SetPercent(percent);
+	}
+}
+
+void UObscuraUI::OnStaminaBarUpdated(float percent)
+{
+	if (PB_MentalityBar)
+	{
+		PB_MentalityBar->SetPercent(percent);
+	}
+}
+
+void UObscuraUI::OnShotCountUpdated(int shotCount)
+{
+	if (Text_ObscuraCount)
+	{
+		Text_ObscuraCount->SetText(FText::AsNumber(shotCount));
+	}
+}
+
+
+void UObscuraUI::ObscuraCooltimeUpdate()
+{
+	if (!CameraObscuraComp) return;
+	
+	if (PB_ObscuraCooltimeBar)
+	{
+		float percent = CameraObscuraComp->GetObscuraCooltimePercent();
+		
+		PB_ObscuraCooltimeBar->SetPercent(percent);
+	}
+}
+
+void UObscuraUI::OnObscuraBarReset()
+{ 
+	if (PB_ObscuraCooltimeBar)
+	{
+		PB_ObscuraCooltimeBar->SetPercent(0.f);	
+	}
+	
+}
+
+
 
 

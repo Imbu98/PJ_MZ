@@ -1,6 +1,8 @@
 #include "ObscuraCameraComponent.h"
 
-#include "Kismet/GameplayStatics.h"
+#include "Mz_GameInstance.h"
+#include "Character/Player/HT_PlayerState.h"
+#include "Character/Player/HT_Player.h"
 
 
 UObscuraCameraComponent::UObscuraCameraComponent()
@@ -11,11 +13,33 @@ UObscuraCameraComponent::UObscuraCameraComponent()
 void UObscuraCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	AHT_Player* Player = Cast<AHT_Player>(GetOwner());
+	if (!Player) return;
+
+	AHT_PlayerState* PS = Player->GetPlayerState<AHT_PlayerState>();
+	if (!PS) return;
+	
+	Cached_PS = PS;
 }
 
 void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (Cached_PS&&Cached_PS->IsObscraCooltime)
+		
+		Cached_PS->currentObscuraCooltime += DeltaTime;
+
+	if (Cached_PS->currentObscuraCooltime >= Cached_PS->MaxObscuraCooltime)
+	{
+		Cached_PS->IsObscraCooltime = false;
+		Cached_PS->currentObscuraCooltime = 0.f;
+			
+	}
+		
+	Cached_PS->OnObscuraCooltimeFinished.Broadcast();
+	
 }
 
 void UObscuraCameraComponent::InitPoints(int32 PointCount)
@@ -50,11 +74,24 @@ float UObscuraCameraComponent::GetDamageMultiplier() const
 
 void UObscuraCameraComponent::ApplyShutterDamage()
 {
+	int32 CurrentCanShotCount =Cached_PS->GetCurrentCanShotCount();
+	// 촬영횟수가 없으면 사망
+	if (CurrentCanShotCount <= 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
+		
+		return;
+	}
+	
+	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);
+	
+	
 	float FinalDamage = GetDamageMultiplier();
 	
-	CurrentCanShotCount--;
-	
 	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalDamage));
+	
+
+	
 	
 	
 	// AActor* Target = GetPrimaryTarget();
@@ -102,9 +139,14 @@ AActor* UObscuraCameraComponent::GetPrimaryTarget() const
 	return nullptr;
 }
 
-void UObscuraCameraComponent::InitShotCount()
+bool UObscuraCameraComponent::ObscuraCanShot()
 {
-	CurrentCanShotCount = MaxCanShotCount;
+	return Cached_PS->IsObscraCooltime;
+}
+
+float UObscuraCameraComponent::GetObscuraCooltimePercent()
+{
+	return Cached_PS->currentObscuraCooltime/Cached_PS->MaxObscuraCooltime;
 }
 
 

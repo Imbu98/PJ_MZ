@@ -31,6 +31,8 @@ protected:
 	
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+	
+	
 public:
 
 	// 위젯에서 포인트별 결과를 전달받아 저장
@@ -63,18 +65,16 @@ public:
 	EObscuraModeAction GetObscuraMode(){ return CurrentMode;};
 	
 	UFUNCTION()
-	void InitShotCount();
+	bool ObscuraCanShot();
 	
+	UFUNCTION()
+	float GetObscuraCooltimePercent();
 	
 	UPROPERTY()
 	EObscuraModeAction CurrentMode;
 	
-public:
 	UPROPERTY()
-	int32 MaxCanShotCount=3;
-	
-	UPROPERTY()
-	int32 CurrentCanShotCount;
+	TObjectPtr<class AHT_PlayerState> Cached_PS;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Obscura")
 	// float BaseDamage = 30.f;

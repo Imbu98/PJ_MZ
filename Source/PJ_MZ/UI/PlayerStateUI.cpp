@@ -1,23 +1,24 @@
 #include "PlayerStateUI.h"
 #include "../Character/Player/HT_Player.h"
 #include "Character/Player/HT_PlayerController.h"
+#include "Character/Player/HT_PlayerState.h"
 #include "Components/HorizontalBox.h"
 #include "Components/ProgressBar.h"
 #include "Components/VerticalBox.h"
 
 
-void UPlayerStateUI::SetupCharacter(AHT_Player* HTCharacter)
+void UPlayerStateUI::SetupCharacter(AHT_PlayerState* playerState)
 {
-	if (HTCharacter==nullptr) return;
+	if (playerState==nullptr) return;
 	
-	HTCharacter->OnStaminaChangeDelegate.RemoveAll(this);
-	HTCharacter->OnStaminaChangeDelegate.AddUObject(this, &UPlayerStateUI::OnStaminaBarUpdated);
+	playerState->OnStaminaBarUpdated.RemoveAll(this);
+	playerState->OnStaminaBarUpdated.AddUObject(this, &UPlayerStateUI::OnStaminaBarUpdated);
 	
-	HTCharacter->OnMentalityChangeDelegate.RemoveAll(this);
-	HTCharacter->OnMentalityChangeDelegate.AddUObject(this,&UPlayerStateUI::OnPlayerMentalityBarUpdated);
+	playerState->OnMentalityChangeDelegate.RemoveAll(this);
+	playerState->OnMentalityChangeDelegate.AddUObject(this,&UPlayerStateUI::OnPlayerMentalityBarUpdated);
 	
-	HTCharacter->OnShotCountChangeDelegate.RemoveAll(this);
-	HTCharacter->OnShotCountChangeDelegate.AddUObject(this,&UPlayerStateUI::OnShotCountUpdated);
+	playerState->OnShotCountChangeDelegate.RemoveAll(this);
+	playerState->OnShotCountChangeDelegate.AddUObject(this,&UPlayerStateUI::OnShotCountUpdated);
 }
 
 void UPlayerStateUI::OnPlayerMentalityBarUpdated(float percent)
