@@ -20,7 +20,7 @@ struct FCachedRoomInfo
 	TArray<FTransform> DoorLocalTransforms;
 };
 
-UCLASS(ClassGroup=(Dungeon), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Dungeon))
 class PJ_MZ_API UDungeonGenerator : public UActorComponent
 {
 	GENERATED_BODY()
