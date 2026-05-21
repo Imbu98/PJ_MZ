@@ -6,6 +6,10 @@ APCGDungeonManager::APCGDungeonManager()
 
 	Generator = CreateDefaultSubobject<UDungeonGenerator>(
 		TEXT("DungeonGenerator"));
+	
+	
+	Spawner = CreateDefaultSubobject<UObjectSpawner>(
+		TEXT("ObjectSpawner"));
 }
 
 void APCGDungeonManager::BeginPlay()
@@ -29,10 +33,31 @@ void APCGDungeonManager::GenerateDungeon()
 		MinRooms,
 		MaxRooms,
 		SpawnedRooms);
+	
+	SpawnObjects();
 }
 
 void APCGDungeonManager::ClearDungeon()
 {
 	if (!IsValid(Generator)) return;
 	Generator->ClearDungeon(SpawnedRooms);
+}
+
+void APCGDungeonManager::SpawnObjects()
+{
+	if (!IsValid(Spawner))
+	{
+		UE_LOG(LogTemp, Error,
+			TEXT("[DungeonManager] Spawner가 없음!"));
+		return;
+	}
+	
+	Spawner->SpawnObjects(ObjTypeTable, SpawnedRooms, SpawnedItems);
+	
+}
+
+void APCGDungeonManager::ClearObjects()
+{
+	if (!IsValid(Spawner)) return;
+	Spawner->ClearObjects(SpawnedItems);
 }

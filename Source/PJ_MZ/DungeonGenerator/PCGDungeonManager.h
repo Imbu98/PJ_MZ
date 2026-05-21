@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "RoomTypeEntry.h"
 #include "DungeonGenerator.h"
+#include "ObjectSpawner.h"
 #include "RoomBase.h"
 #include "PCGDungeonManager.generated.h"
 
@@ -24,7 +25,11 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
     TArray<FRoomTypeEntry> RoomTypeTable;
-
+    
+    //수정필요 HT
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
+    TArray<AActor*> ObjTypeTable;
+    
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup",
         meta=(ClampMin=1))
     int32 MinRooms = 5;
@@ -35,14 +40,27 @@ public:
 
     UPROPERTY(BlueprintReadOnly, Category="Dungeon|Runtime")
     TArray<ARoomBase*> SpawnedRooms;
+    
+    UPROPERTY(BlueprintReadOnly, Category="Dungeon|Runtime")
+    TArray<AActor*> SpawnedItems;
 
     UFUNCTION(BlueprintCallable, Category="Dungeon")
     void GenerateDungeon();
 
     UFUNCTION(BlueprintCallable, Category="Dungeon")
     void ClearDungeon();
+    
+    UFUNCTION(BlueprintCallable, Category="Dungeon")
+    void SpawnObjects();
+
+    UFUNCTION(BlueprintCallable, Category="Dungeon")
+    void ClearObjects();
+
 
 private:
     UPROPERTY()
     TObjectPtr<UDungeonGenerator> Generator;
+    
+    UPROPERTY()
+    TObjectPtr<UObjectSpawner> Spawner;
 };

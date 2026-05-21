@@ -37,5 +37,8 @@ public:
 	ERoomType RoomType;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RoomInfo")
+	bool bCanSpawnObj = true;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="RoomInfo")
 	TArray<TObjectPtr<UDoorComponent>> Doors;
 };

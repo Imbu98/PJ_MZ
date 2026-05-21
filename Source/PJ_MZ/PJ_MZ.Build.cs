@@ -21,7 +21,7 @@ public class PJ_MZ : ModuleRules
 			"Slate"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[] { "Imath", "Imath", "Imath" });
 
 		PublicIncludePaths.AddRange(new string[] {
 			"PJ_MZ",
