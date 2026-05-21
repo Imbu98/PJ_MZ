@@ -30,6 +30,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon")
 	float OverlapTolerance = 0.0f;
+	bool bHallSpawned = false;
 
 	UFUNCTION(BlueprintCallable, Category="Dungeon")
 	void GenerateDungeon(

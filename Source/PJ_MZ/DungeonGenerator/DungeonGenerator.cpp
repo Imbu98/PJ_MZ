@@ -61,7 +61,7 @@ void UDungeonGenerator::GenerateDungeon(
                 StartRoom, Door));
         }
     }
-
+    
     // 열린 문이 있고 목표 방 수에 안 달했으면 계속
     while (!OpenDoors.IsEmpty() &&
            OutSpawnedRooms.Num() < TargetCount)
@@ -76,23 +76,47 @@ void UDungeonGenerator::GenerateDungeon(
 
         // 이미 사용된 문이면 스킵
         if (!FromDoor || !FromDoor->IsAvailable()) continue;
-
-        TSubclassOf<ARoomBase> NextRoomClass =
-            PickRoomByWeight(RoomTypeTable);
         
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
+        TSubclassOf<ARoomBase> NextRoomClass;
+        
+        if (!bHallSpawned && OutSpawnedRooms.Num() > TargetCount/2)
+        {
+            ARoomBase** FoundRoom = OutSpawnedRooms.FindByPredicate([](ARoomBase* Room)
+                {return Room && Room->RoomType == ERoomType::Hall;});
+        
+            if (!FoundRoom)
+            {
+                TSubclassOf<ARoomBase> HallClass = nullptr;
+        
+                for (const FRoomTypeEntry& Entry : RoomTypeTable)
+                {
+                    if (Entry.RoomType == ERoomType::Hall &&
+                        !Entry.RoomClasses.IsEmpty())
+                    {
+                        int32 Idx = FMath::RandRange(0, Entry.RoomClasses.Num() - 1);
+                        HallClass = Entry.RoomClasses[Idx];
+                        break;
+                    }
+                }
+                NextRoomClass = HallClass;
+                UE_LOG(LogTemp, Log,
+                    TEXT("[Generator] Hall 생성시도"),
+                    OutSpawnedRooms.Num());
+            }
+            
+            bHallSpawned = true;
+        }
+        else
+        {
+            NextRoomClass = PickRoomByWeight(RoomTypeTable);
+        }
+        
 
         if (!NextRoomClass) continue;
 
         ARoomBase* NewRoom = TrySpawnAndAttachRoom(
             FromDoor, NextRoomClass, OutSpawnedRooms);
-
+        
         if (NewRoom)
         {
             FromDoor->bUsed = true;
