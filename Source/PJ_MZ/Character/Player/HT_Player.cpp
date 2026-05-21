@@ -337,6 +337,7 @@ void AHT_Player::RemoveObscuraWidget()
 		if (ObscuraCameraComp)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
+			ObscuraCameraComp->ClearMainPhotoActor();
 		}
 	}
 }

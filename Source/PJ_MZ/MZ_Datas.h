@@ -14,7 +14,7 @@ enum class ERarity : uint8
 
 
 USTRUCT(BlueprintType)
-struct FPicturable : public FTableRowBase
+struct FPicturableDatas : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 public:

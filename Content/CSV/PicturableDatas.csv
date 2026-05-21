@@ -1,0 +1,9 @@
+﻿ID,PicturableName,PicturableMaxScore,PicturableStaticMesh,PicturableRarity,SetID
+101,GrandmaStaff,20,,ERarity::NORMAL,Set_Grandma
+102,Camera,25,,ERarity::NORMAL,None
+201,GrandmaHat,30,,ERarity::RARE,Set_Grandma
+202,OldSkeleton,35,,ERarity::RARE,Set_Old
+301,OldShirt,40,,ERarity::EPIC,Set_Old
+302,Ball,45,,ERarity::EPIC,None
+401,GrandmaGlasses,50,,ERarity::LEGENDARY,Set_Grandma
+402,OldShoes,55,,ERarity::LEGENDARY,Set_Old

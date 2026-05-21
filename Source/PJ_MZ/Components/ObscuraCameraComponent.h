@@ -62,7 +62,7 @@ public:
 
 	// 포인트 수 기반 데미지 배율 반환
 	UFUNCTION(BlueprintCallable)
-	float GetDamageMultiplier() const;
+	float GetFinalScore(float score) const;
 
 	// 셔터 시 가장 많이 걸린 몹에게 데미지 적용
 	UFUNCTION(BlueprintCallable)
@@ -71,9 +71,6 @@ public:
 	// 포인트 배열 초기화 (위젯이 포인트 수 알려줄 때 호출)
 	UFUNCTION(BlueprintCallable)
 	void InitPoints(int32 PointCount);
-	
-	UFUNCTION()
-	AActor* GetPrimaryTarget() const;
 	
 	UFUNCTION()
 	void SetObscuraMode(EObscuraModeAction mode){ CurrentMode = mode;};
@@ -98,7 +95,10 @@ public:
 	// 현재 Playerstate의 점수배열의 점수 가져오기
 	float GetScoreArrayValue(int32 index);
 	
-	//<사진 캡쳐 관련 >
+	
+	// ===============================
+	// 캡쳐 관련
+	// ===============================
 private:
 	UPROPERTY(VisibleAnywhere)
 	USceneCaptureComponent2D* SceneCapture;
@@ -107,10 +107,19 @@ private:
 	UTextureRenderTarget2D* RenderTarget;
 
 public:
-
-
 	UFUNCTION()
 	void CapturePhoto();
-	//<사진 캡쳐 관련 >
+	
+	// ===============================
+	// 사진 액터 저장
+	// ===============================
+	UPROPERTY()
+	TObjectPtr<AActor> MainPhotoActor;
+	
+	UFUNCTION()
+	void ClearMainPhotoActor(){MainPhotoActor = nullptr;}
+	
+	UFUNCTION()
+	float GetPicturableScore();
 	
 };

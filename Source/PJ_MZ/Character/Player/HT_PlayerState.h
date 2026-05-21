@@ -9,6 +9,11 @@ UCLASS()
 class PJ_MZ_API AHT_PlayerState : public APlayerState
 {
 	GENERATED_BODY()
+	
+protected:
+	virtual  void Tick(float DeltaTime) override;
+	
+	AHT_PlayerState();
 
 public:
 
@@ -37,20 +42,34 @@ public:
 	TArray<UTextureRenderTarget2D*> PhotoList;	// 찍은 사진들 저장
 	
 	UTextureRenderTarget2D* GetPhotoTexture(int32 index);
-
-
-	// 쿨타임
+	
+	// ===============================
+	// 플레이어 플레이타임
+	// ===============================
+	UPROPERTY()
+	float ElapsedSeconds = 0.f;
+	
+	FString GetFormattedTime() const;
+	
+	
+	// ===============================
+	// 사진 쿨타임
+	// ===============================
 	bool IsObscraCooltime = false;
 	float currentObscuraCooltime = 0.f;
 	float MaxObscuraCooltime = 3.f;
 
-	// 정신력
+	// ===============================
+	// 플레이어 정신력
+	// ===============================
 	UPROPERTY(EditAnywhere, Category="Mentality")
 	float MaxMentality = 100.f;
 	UPROPERTY()
 	float CurrentMentality;
 
+	// ===============================
 	// 델리게이트
+	// ===============================
 	FStaminaChangeDelegate OnStaminaBarUpdated;
 	FMentalityChangedDelegate OnMentalityChangeDelegate;
 	FShotCountChangeDelegate OnShotCountChangeDelegate;

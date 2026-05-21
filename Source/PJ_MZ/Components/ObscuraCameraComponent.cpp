@@ -7,6 +7,7 @@
 #include "Character/Player/HT_PlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "ETC/Picturable/PicturableBase.h"
 
 
 UObscuraCameraComponent::UObscuraCameraComponent()
@@ -81,15 +82,6 @@ void UObscuraCameraComponent::SetPointActive(int32 Index, bool bActive, AActor* 
 	else if (!bActive && bWas)  ActivePointCount--;
 }
 
-float UObscuraCameraComponent::GetDamageMultiplier() const
-{
-	if (ActivePointCount >= 7) return 4.0f;
-	if (ActivePointCount >= 5) return 3.0f;
-	if (ActivePointCount >= 3) return 2.0f;
-	if (ActivePointCount >= 1) return 1.5f;
-	return 1.0f;
-}
-
 void UObscuraCameraComponent::ApplyShutterDamage()
 {
 	if (Cached_PS==nullptr) return;
@@ -108,7 +100,7 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);
 	
 	
-	float FinalScore = GetDamageMultiplier();
+	float FinalScore = GetFinalScore(GetPicturableScore());
 	
 	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalScore));
 	
@@ -135,31 +127,17 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	// 	GetDamageMultiplier(), FinalDamage);
 }
 
-AActor* UObscuraCameraComponent::GetPrimaryTarget() const
+float UObscuraCameraComponent::GetFinalScore(float score) const
 {
-	// TMap<AActor*, int32> HitCount;
-	//
-	// for (int32 i = 0; i < PointHitActors.Num(); i++)
-	// {
-	// 	if (!PointActiveList[i]) continue;
-	// 	AActor* Actor = PointHitActors[i].Get();
-	// 	if (!Actor) continue;
-	// 	HitCount.FindOrAdd(Actor)++;
-	// }
-	//
-	// AActor* Best = nullptr;
-	// int32 MaxCount = 0;
-	// for (auto& Pair : HitCount)
-	// {
-	// 	if (Pair.Value > MaxCount)
-	// 	{
-	// 		MaxCount = Pair.Value;
-	// 		Best = Pair.Key;
-	// 	}
-	// }
-	// return Best;
-	return nullptr;
+	if (ActivePointCount <= 0) return 0.0f;
+
+	if (ActivePointCount >= 5) return score / 1.0f;
+	if (ActivePointCount >= 3) return score / 2.0f;
+	if (ActivePointCount >= 1) return score / 3.0f;
+	
+	return 0.0f;
 }
+
 
 bool UObscuraCameraComponent::ObscuraCanShot()
 {
@@ -216,6 +194,20 @@ void UObscuraCameraComponent::CapturePhoto()
 	
 	// 캡처 후 연결 끊기
 	SceneCapture->TextureTarget = nullptr;
+}
+
+float UObscuraCameraComponent::GetPicturableScore()
+{
+	if (MainPhotoActor)
+	{
+		APicturableBase* PicturableBase = Cast<APicturableBase>(MainPhotoActor);
+		if (PicturableBase)
+		{
+			return PicturableBase->GetScore();
+		}
+	}
+	
+	return 0.f;
 }
 
 

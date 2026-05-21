@@ -20,21 +20,26 @@ void AHT_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (PlayerStateUIFactory)
-	{
-		PlayerStateUIWidget = CreateWidget<UPlayerStateUI>(this,PlayerStateUIFactory);
-		if (PlayerStateUIWidget)
-		{
-			PlayerStateUIWidget->AddToViewport();
-			auto* playerState =(GetPlayerState<AHT_PlayerState>());
-			if (playerState)
-			{
-				PlayerStateUIWidget->SetupCharacter(playerState);
-			}
-			
-		}
-	}
+}
+
+void AHT_PlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
 	
+		if (PlayerStateUIFactory)
+    	{
+    		PlayerStateUIWidget = CreateWidget<UPlayerStateUI>(this,PlayerStateUIFactory);
+    		if (PlayerStateUIWidget)
+    		{
+    			PlayerStateUIWidget->AddToViewport();
+    			auto* playerState =(GetPlayerState<AHT_PlayerState>());
+    			if (playerState)
+    			{
+    				PlayerStateUIWidget->SetupCharacter(playerState);
+    			}
+    			
+    		}
+    	}
 }
 
 void AHT_PlayerController::SetupInputComponent()
