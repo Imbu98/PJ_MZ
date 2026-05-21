@@ -76,12 +76,17 @@ void UObscuraUI::UpdateAllPoints()
 		// 컴포넌트에 결과 전달
 		CameraObscuraComp->SetPointActive(i, bHit, HitActor);
 
+		// 메인액터로 저장
+		if (i==0)
+		{
+			CameraObscuraComp->MainPhotoActor = HitActor;
+		}
+
 		// 색상 변경
 		Point->SetColorAndOpacity(
 			bHit ? ActiveColor : DefaultColor
 		);
 	}
-
 }
 
 bool UObscuraUI::TraceFromScreenPoint(UImage* PointImage, AActor*& OutHitActor)

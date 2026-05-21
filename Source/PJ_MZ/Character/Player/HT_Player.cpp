@@ -18,6 +18,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "UI/ObscuraUI.h"
 #include "HT_PlayerState.h"
+#include "ImageUtils.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 AHT_Player::AHT_Player()
 {
@@ -33,6 +36,15 @@ AHT_Player::AHT_Player()
 	SpotLight->OuterConeAngle = 45.24f;
 	
 	ObscuraCameraComp = CreateDefaultSubobject<UObscuraCameraComponent>(TEXT("ObscuraCameraComp"));
+	
+	// 초기화
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
+	SceneCapture->SetupAttachment(RootComponent);
+
+	RenderTarget = NewObject<UTextureRenderTarget2D>();
+	RenderTarget->InitAutoFormat(1920, 1080);
+	SceneCapture->TextureTarget = RenderTarget;
+	SceneCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR; // HUD 제외
 }
 
 void AHT_Player::BeginPlay()
@@ -244,8 +256,15 @@ void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 				SpotLight->SetVisibility(false);
 				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 				ObscuraCameraComp->ApplyShutterDamage();
+				// 타이머 콜백 내부
 				ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
 				OnUpdateObscuraShotCount();
+
+				if (bObscuraReleased) // 촬영 중에 우클릭을 뗐었다면
+				{
+					OnOutObscuraMode(FInputActionValue()); // 이번엔 SHOTTING 아니므로 정상 동작
+				}
+				
 				GetWorldTimerManager().ClearTimer(ObscuraTimer);
 
 			}, 0.01f, false);
@@ -279,32 +298,22 @@ void AHT_Player::OnEnterObscuraMode(const FInputActionValue& Value)
 
 void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 {
-	// UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
- //    
-	// if (AnimInstance && AnimInstance->Montage_IsPlaying(EquipObscuraMontage))
-	// {
-	// 	// 장착 몽타주 재생 중이었다면 중단
-	// 	AnimInstance->Montage_Stop(0.2f, EquipObscuraMontage); // 0.2f = 블렌드아웃 시간
- //        
-	// 	if (UnEquipObscuraMontage)
-	// 	{
-	// 		AnimInstance->Montage_Play(UnEquipObscuraMontage,-1.0f);
-	// 	}
-	// }
-	if (ObscuraCameraComp&&ObscuraCameraComp->GetObscuraMode()!=EObscuraModeAction::SHOTTING)
+	if (ObscuraCameraComp==nullptr) return; 
+
+	if (ObscuraCameraComp->GetObscuraMode() == EObscuraModeAction::SHOTTING)
 	{
-		ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
-		
-		if (SpotLight->IsVisible())
-		{
-			SpotLight->SetVisibility(false);
-		}
-		RemoveObscuraWidget();
+		// 촬영 중에 우클릭을 뗐다면 플래그만 세워두고 대기
+		bObscuraReleased = true;
+		return;
 	}
 
-	
-	
+	ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
 
+	if (SpotLight->IsVisible())
+		SpotLight->SetVisibility(false);
+	RemoveObscuraWidget();
+    
+	bObscuraReleased = false;
 }
 
 void AHT_Player::CreateObscuraWidget()
@@ -328,6 +337,8 @@ void AHT_Player::RemoveObscuraWidget()
 		if (ObscuraCameraComp)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
+			ObscuraCameraComp->ClearMainPhotoActor();
 		}
 	}
 }
+
