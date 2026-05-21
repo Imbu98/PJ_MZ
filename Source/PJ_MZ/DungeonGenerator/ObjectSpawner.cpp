@@ -1,14 +1,11 @@
 
 
 #include "ObjectSpawner.h"
-
-#include "ImathMath.h"
-#include "ImathMath.h"
-#include "ImathMath.h"
+#include "MZ_Datas.h"
+#include "PJ_MZ.h"
 #include "RoomBase.h"
-#include "AI/Navigation/NavigationDataResolution.h"
-#include "Character/Enemy/EnemyBase.h"
-#include "Settings/HomeScreenCommon.h"
+#include "Components/PicturableComponent.h"
+#include "ETC/Picturable/PicturableBase.h"
 
 
 UObjectSpawner::UObjectSpawner()
@@ -16,8 +13,7 @@ UObjectSpawner::UObjectSpawner()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UObjectSpawner::SpawnObjects(
-	const TArray<AActor*> ItemTypeTable, const TArray<ARoomBase*>& SpawnedRooms, TArray<AActor*>& SpawnedItems)
+void UObjectSpawner::SpawnObjects(const TArray<FPicturableDatas> picturableDatas, const TArray<ARoomBase*>& SpawnedRooms, TArray<AActor*>& SpawnedItems)
 {
 	TArray<ARoomBase*> CanSpawnRooms = FilterSpawnableRooms(SpawnedRooms);
 	
@@ -36,7 +32,7 @@ void UObjectSpawner::SpawnObjects(
 		FVector ObjLocation;
 		bool bFound = false;
 
-	for (int32 i = 0; i < TotalItemCount; ++i)
+	for (int32 i = 0; i < picturableDatas.Num(); ++i)
 	{
 		
 		//랜덤 아이템 뽑아주는 함수 호출
@@ -74,23 +70,30 @@ void UObjectSpawner::SpawnObjects(
 				TEXT("[ObjSpawner] 위치 찾기 실패. 스킵."));
 			continue;
 		}
+		APicturableBase* spawnedPicturable = GetWorld()->SpawnActor<APicturableBase>(
+	SpawnClass,
+	ObjLocation,
+	FRotator::ZeroRotator,
+	SpawnParams);
 		
-		AActor* SpawnObj = GetWorld()->SpawnActor<AActor>(
-			////여기에 랜덤 오브젝트 class 뽑아서 넣기,
-			ObjLocation,
-			FRotator(0.0f, FMath::RandRange(0.0f, 360.0f), 0.0f),
-			SpawnParams);
-		
-		if (IsValid(SpawnObj))
+		if (spawnedPicturable)
 		{
-			SpawnedItems.Add(SpawnObj);
-			SpawnedItemLocations.Add(ObjLocation);
+			UPicturableComponent* PicturableComp =  spawnedPicturable->FindComponentByClass<UPicturableComponent>();
+			if (PicturableComp)
+			{
+				PicturableComp->SetInfo(picturableDatas[i]);
+				
+				if (IsValid(spawnedPicturable))
+				{
+					SpawnedItems.Add(spawnedPicturable);
+					SpawnedItemLocations.Add(ObjLocation);
 
-			UE_LOG(LogTemp, Log,
-				TEXT("[ObjSpawner] 아이템 스폰 (%d/%d)"),
-				SpawnedItems.Num(), TotalItemCount);
+					UE_LOG(LogPJ_MZ, Log,
+						TEXT("[ObjSpawner] 아이템 스폰 (%s)"),
+						*PicturableComp->PicturableDatas.PicturableName.ToString());
+				}
+			}
 		}
-		
 	}
 	UE_LOG(LogTemp, Log,
 		TEXT("[ObjSpawner] 스폰 완료. 총 %d개"),
@@ -110,8 +113,8 @@ void UObjectSpawner::ClearObjects(TArray<AActor*>& OutSpawnedItems)
 }
 
 TArray<ARoomBase*> UObjectSpawner::FilterSpawnableRooms(const TArray<ARoomBase*>& SpawnedRooms)
-{;
-	if (!SpawnedRooms.IsEmpty())
+{
+	if (SpawnedRooms.IsEmpty())
 	{
 		UE_LOG(LogTemp, Log, TEXT("[ObjSpawner] 던전 방이 존재하지 않습니다."));
 		return {};

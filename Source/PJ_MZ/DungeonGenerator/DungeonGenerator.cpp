@@ -1,5 +1,7 @@
 #include "DungeonGenerator.h"
 #include "RoomTypeEntry.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Engine/SCS_Node.h"
 #include "Engine/World.h"
 
 UDungeonGenerator::UDungeonGenerator()

@@ -76,6 +76,7 @@ DerivedDataCache/*
 
 #Rider Ignore
 .idea/*
+*.DotSettings.user
 
 # content big file ignore
 Content/DerelictCorridor/*

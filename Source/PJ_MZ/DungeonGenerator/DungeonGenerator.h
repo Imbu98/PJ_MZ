@@ -6,8 +6,6 @@
 #include "RoomBase.h"
 #include "DoorComponent.h"
 #include "Engine/BlueprintGeneratedClass.h"
-#include "Engine/SimpleConstructionScript.h"
-#include "Engine/SCS_Node.h"
 #include "DungeonGenerator.generated.h"
 
 USTRUCT()
