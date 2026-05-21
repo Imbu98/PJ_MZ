@@ -18,5 +18,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	
+public:
+	UPROPERTY()
+	TObjectPtr<class UPicturableComponent> PicturableComp;
 
 };

@@ -1,14 +1,13 @@
 #include "ObscuraCameraComponent.h"
 
 #include "Mz_GameInstance.h"
+#include "PicturableComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Character/Player/HT_PlayerState.h"
 #include "Character/Player/HT_Player.h"
 #include "Character/Player/HT_PlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
-#include "ETC/Picturable/PicturableBase.h"
-
 
 UObscuraCameraComponent::UObscuraCameraComponent()
 {
@@ -200,13 +199,12 @@ float UObscuraCameraComponent::GetPicturableScore()
 {
 	if (MainPhotoActor)
 	{
-		APicturableBase* PicturableBase = Cast<APicturableBase>(MainPhotoActor);
-		if (PicturableBase)
+		UPicturableComponent* picturableComp = MainPhotoActor->FindComponentByClass<UPicturableComponent>();
+		if (picturableComp)
 		{
-			return PicturableBase->GetScore();
+			return picturableComp->GetScore();
 		}
 	}
-	
 	return 0.f;
 }
 
