@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "MZ_Datas.generated.h"
 
 UENUM(BlueprintType)
@@ -16,7 +17,7 @@ enum class ERarity : uint8
 USTRUCT(BlueprintType)
 struct FPicturableDatas : public FTableRowBase
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	FName PicturableName;
@@ -33,7 +34,7 @@ public:
 USTRUCT(BlueprintType)
 struct FSetBonus : public FTableRowBase
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -46,10 +47,28 @@ public:
 USTRUCT(BlueprintType)
 struct FPicturableArray : public FTableRowBase
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 	
 public:
 	// Row Name = Rarity ("NORMAL", "RARE", "EPIC", "LEGENDARY")
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FName> PicturableRowNames; // FGuid 대신 Row Name(FName) 사용
+};
+
+USTRUCT(BlueprintType)
+struct FSpawnCountData : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 NormalSpawnCount;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 RareSpawnCount;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 EpicSpawnCount;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 LegendarySpawnCount;
 };

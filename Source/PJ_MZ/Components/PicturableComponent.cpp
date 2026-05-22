@@ -21,18 +21,23 @@ void UPicturableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 float UPicturableComponent::GetScore() const
 {
-	return  Picturable.PicturableMaxScore;
+	return  PicturableDatas.PicturableMaxScore;
 }
 
-void UPicturableComponent::SetStaticMesh()
+void UPicturableComponent::SetInfo(FPicturableDatas picturableDataVal)
 {
+	PicturableDatas = picturableDataVal;
+	
 	AEnemyBase* enemy =  Cast<AEnemyBase>(GetOwner());
 	if (!enemy)
 	{
 		UStaticMeshComponent* staticMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
-		if (staticMesh&&Picturable.PicturableStaticMesh.IsValid())
+		if (staticMesh&&PicturableDatas.PicturableStaticMesh.IsValid())
 		{
-			staticMesh->SetStaticMesh(Picturable.PicturableStaticMesh.Get());
+			staticMesh->SetStaticMesh(PicturableDatas.PicturableStaticMesh.Get());
+			staticMesh->SetCollisionProfileName(FName("Picturable"));
+			staticMesh->SetVisibility(true);
+			staticMesh->MarkRenderStateDirty();
 		}
 	}
 }

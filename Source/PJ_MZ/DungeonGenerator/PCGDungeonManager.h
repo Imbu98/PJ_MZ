@@ -6,6 +6,7 @@
 #include "DungeonGenerator.h"
 #include "ObjectSpawner.h"
 #include "RoomBase.h"
+#include "MZ_Datas.h"
 #include "PCGDungeonManager.generated.h"
 
 UCLASS()
@@ -25,8 +26,8 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
     TArray<FRoomTypeEntry> RoomTypeTable;
-    
-    //수정필요 HT
+
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
     TArray<AActor*> ObjTypeTable;
     
@@ -55,12 +56,33 @@ public:
 
     UFUNCTION(BlueprintCallable, Category="Dungeon")
     void ClearObjects();
-
+    
+    
+    // ===============================
+    // 관련 데이터 테이블
+    // ===============================
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    TObjectPtr<UDataTable> DT_PicturableNameArray;
+    
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    TObjectPtr<UDataTable> DT_PicturableDatas;
+    
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
+    TObjectPtr<UDataTable> DT_SpawnCount;
+    
+    UFUNCTION()
+    TArray<FPicturableDatas> GetSpawnList();
+    
+    UFUNCTION()
+    TArray<FPicturableDatas> GetRandomPicturablesByRarity(ERarity Rarity, int32 Count);
+    
+    
 
 private:
     UPROPERTY()
     TObjectPtr<UDungeonGenerator> Generator;
     
-    UPROPERTY()
+public:
+    UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TObjectPtr<UObjectSpawner> Spawner;
 };

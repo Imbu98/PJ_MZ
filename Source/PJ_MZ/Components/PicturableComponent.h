@@ -27,10 +27,10 @@ public:
 	float GetScore() const;
 	
 	UFUNCTION()
-	void SetStaticMesh();
+	void SetInfo(FPicturableDatas picturableDatas);
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FPicturableDatas Picturable;
+	FPicturableDatas PicturableDatas;
 	
 	
 };

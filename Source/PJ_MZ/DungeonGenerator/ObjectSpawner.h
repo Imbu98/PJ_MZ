@@ -20,21 +20,24 @@ public:
 	UObjectSpawner();
 	
 	//(아이템 총 스폰 개수) HT
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ObjectSpawner",
-		meta=(ClampMin=0))
-	int32 TotalItemCount = 5;
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ObjectSpawner",
+	// 	meta=(ClampMin=0))
+	// int32 TotalItemCount = 5;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class APicturableBase> SpawnClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ObjectSpawner",
 		meta=(ClampMin=1))
 	int32 MaxPlacementRetries = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ObjectSpawner")
-	float MinDistanceBetweenItems = 100.0f;
+	float MinDistanceBetweenItems = 1000.0f;
 	
 	//수정필요 HT
 	UFUNCTION(BlueprintCallable, Category="ObjectSpawner")
 	void SpawnObjects(
-		const TArray<AActor*> ItemTypeTable, 
+		const TArray<FPicturableDatas> picturableDatas,
 		const TArray<ARoomBase*>& SpawnedRooms, 
 		TArray<AActor*>& SpawnedItems);
 	
