@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -14,14 +13,28 @@ class PJ_MZ_API AEnemyBase : public ACharacter
 public:
 	AEnemyBase();
 	
-	virtual void Tick(float DeltaTime) override;
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UPicturableComponent> PicturableComp;
+	
+	// 공격 - 자식 클래스에서 오버라이드 가능
+	UFUNCTION(BlueprintCallable)
+	virtual void Attack();
+
+	// 공격 성공 후 사라지기
+	UFUNCTION(BlueprintCallable)
+	void OnAttackSuccess();
+
+	// 스폰 매니저에 재스폰 요청
+	void RequestRespawn();
 
 protected:
 	virtual void BeginPlay() override;
 	
-	
-public:
-	UPROPERTY()
-	TObjectPtr<class UPicturableComponent> PicturableComp;
+	// 재스폰까지 대기 시간 - 에디터에서 조정 가능
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float RespawnDelay = 5.f;
 
+private:
+	void DisappearAndRespawn();
 };

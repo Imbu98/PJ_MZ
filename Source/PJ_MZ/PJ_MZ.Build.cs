@@ -17,6 +17,7 @@ public class PJ_MZ : ModuleRules
 			"AIModule",
 			"StateTreeModule",
 			"GameplayStateTreeModule",
+			"NavigationSystem",
 			"UMG",
 			"Slate",
 			"SlateCore"
