@@ -1,11 +1,11 @@
-#include "PhotoResultUI.h"
+#include "ResultUI.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Styling/SlateBrush.h"
 
 
-void UPhotoResultUI::SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTarget,float scoreVal)
+void UResultUI::SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTarget,float scoreVal,const FString Formattedstring)
 {
 	if (renderTarget)
 	{
@@ -43,5 +43,10 @@ void UPhotoResultUI::SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTa
 		default:
 			break;
 		}
+	}
+	
+	if (Text_PlayTimeResult)
+	{
+Text_PlayTimeResult->SetText(FText::FromString(Formattedstring));		
 	}
 }

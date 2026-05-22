@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PhotoResultUI.generated.h"
+#include "ResultUI.generated.h"
 
 UCLASS()
-class PJ_MZ_API UPhotoResultUI : public UUserWidget
+class PJ_MZ_API UResultUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -27,7 +27,10 @@ class PJ_MZ_API UPhotoResultUI : public UUserWidget
 	UPROPERTY(meta =(BindWidget))
 	TObjectPtr<class UTextBlock> ScoreText3;
 	
+	UPROPERTY(meta =(BindWidget))
+	TObjectPtr<class UTextBlock> Text_PlayTimeResult;
+	
 public:
 	UFUNCTION()
-	void SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTarget,float scoreVal);
+	void SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTarget,float scoreVal,const FString Formattedstring);
 };
