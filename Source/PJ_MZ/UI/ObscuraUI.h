@@ -69,13 +69,25 @@ private:
 
 	APlayerController* PC;
 
-	// 라인 트레이스 관련 함수들
+	
+	// ===============================
+	// 라인 트레이스관련
+	// ===============================
 	void UpdateAllPoints();
 	bool TraceFromScreenPoint(UImage* PointImage, AActor*& OutHitActor);
 	FVector2D GetPointScreenCenter(UImage* PointImage);
 	void ResetObscura();
 	
 	void BindingEvent();
+	
+	// ===============================
+	// 타켓액터 Widget
+	// ===============================
+public:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UUserWidget> TargetIndicatorWidget;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<UWidgetAnimation> TargetIndicatorAnim;
 	
 	
 };

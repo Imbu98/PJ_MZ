@@ -13,7 +13,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Character/Player/HT_PlayerState.h"
-
+#include "Components/CanvasPanelSlot.h"
 
 
 void UObscuraUI::NativeConstruct()
@@ -65,6 +65,15 @@ void UObscuraUI::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 
 void UObscuraUI::UpdateAllPoints()
 {
+	// 1단계: 0번(가운데) 포인트로 Main 결정
+	AActor* MainHitActor = nullptr;
+	if (FinderPoints.Num() > 0 && FinderPoints[0])
+	{
+		TraceFromScreenPoint(FinderPoints[0], MainHitActor);
+	}
+	CameraObscuraComp->MainPhotoActor = MainHitActor;
+
+	// 2단계: 전체 포인트 처리
 	for (int32 i = 0; i < FinderPoints.Num(); i++)
 	{
 		UImage* Point = FinderPoints[i];
@@ -73,19 +82,61 @@ void UObscuraUI::UpdateAllPoints()
 		AActor* HitActor = nullptr;
 		bool bHit = TraceFromScreenPoint(Point, HitActor);
 
-		// 컴포넌트에 결과 전달
-		CameraObscuraComp->SetPointActive(i, bHit, HitActor);
-
-		// 메인액터로 저장
-		if (i==0)
+		// Main 액터가 아니면 무시
+		if (HitActor != MainHitActor)
 		{
-			CameraObscuraComp->MainPhotoActor = HitActor;
+			bHit = false;
+			HitActor = nullptr;
 		}
 
-		// 색상 변경
-		Point->SetColorAndOpacity(
-			bHit ? ActiveColor : DefaultColor
-		);
+		CameraObscuraComp->SetPointActive(i, bHit, HitActor);
+		Point->SetColorAndOpacity(bHit ? ActiveColor : DefaultColor);
+	}
+
+	// 3단계: HeadSocket 위치에 UI 표시
+	if (TargetIndicatorWidget)
+	{
+		if (MainHitActor)
+		{
+			FVector TargetWorldPos;
+
+			USkeletalMeshComponent* SkelMesh =
+				MainHitActor->FindComponentByClass<USkeletalMeshComponent>();
+
+			if (SkelMesh && SkelMesh->DoesSocketExist(FName("HeadSocket")))
+			{
+				// HeadSocket 위치 사용
+				TargetWorldPos = SkelMesh->GetSocketLocation(FName("HeadSocket"));
+			}
+			else
+			{
+				// SkelMesh 없으면 액터 중앙 사용
+				TargetWorldPos = MainHitActor->GetActorLocation();
+			}
+
+			FVector2D ScreenPos;
+			if (PC->ProjectWorldLocationToScreen(TargetWorldPos, ScreenPos))
+			{
+				TargetIndicatorWidget->SetVisibility(ESlateVisibility::Visible);
+
+				UCanvasPanelSlot* CanvasSlot =
+					Cast<UCanvasPanelSlot>(TargetIndicatorWidget->Slot);
+				if (CanvasSlot)
+				{
+					CanvasSlot->SetPosition(ScreenPos);
+				}
+				
+				if (TargetIndicatorAnim)
+				{
+					TargetIndicatorWidget->PlayAnimation(TargetIndicatorAnim);	
+				}
+				
+			}
+		}
+		else
+		{
+			TargetIndicatorWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 

@@ -8,7 +8,7 @@
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
 #include "UI/PlayerStateUI.h"
-#include "UI/PhotoResultUI.h"
+#include "UI/ResultUI.h"
 
 AHT_PlayerController::AHT_PlayerController()
 {
@@ -159,7 +159,7 @@ void AHT_PlayerController::SetResultUI()
 	
 	if (PhotoResultUIFactory)
 	{
-		PhotoResultUIWidget = CreateWidget<UPhotoResultUI>(this, PhotoResultUIFactory);
+		PhotoResultUIWidget = CreateWidget<UResultUI>(this, PhotoResultUIFactory);
 		if (PhotoResultUIWidget)
 		{
 			PhotoResultUIWidget->AddToViewport();
@@ -170,7 +170,7 @@ void AHT_PlayerController::SetResultUI()
 					float score = Ps->GetCachedScore(i);
 					if (RenderTarget)
 					{
-						PhotoResultUIWidget->SetPhotoImage(i,RenderTarget,score);	
+						PhotoResultUIWidget->SetPhotoImage(i,RenderTarget,score,Ps->GetFormattedTime());	
 					}
 				}
 		}
