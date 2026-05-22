@@ -1,7 +1,8 @@
 
 #include "Enemy02AIController.h"
-#include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "GameFramework/Character.h"
 
 #include "Perception/AISense_Hearing.h"
 
@@ -13,42 +14,70 @@ AEnemy02AIController::AEnemy02AIController()
 void AEnemy02AIController::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// AIPerception->OnTargetPerceptionUpdated.AddDynamic(
-	// 	this, &AEnemy02AIController::OnPerceptionUpdated);
-	
-	if (AIPerception)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AIPerception 있음"));
-		AIPerception->OnTargetPerceptionUpdated.AddDynamic(
-			this, &AEnemy02AIController::OnPerceptionUpdated);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AIPerception 없음"));
-	}
 }
 
 void AEnemy02AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	
+	if (AIPerception)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AIPerception 유효!!!")); 
+		AAIController* ExistingController = Cast<AAIController>(InPawn->GetController());
+		UE_LOG(LogTemp, Warning, TEXT("기존 컨트롤러: %s"), ExistingController ? *ExistingController->GetName() : TEXT("없음"));
+		AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemy02AIController::OnPerceptionUpdated);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AIPerception NULL"));
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Perception 바인딩 완료"));
+	
 	SetGenericTeamId(FGenericTeamId(1));
+	
+	GetWorldTimerManager().SetTimer(
+	DebugTimerHandle,
+	[this]()
+	{
+		if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		{
+			UAISense_Hearing::ReportNoiseEvent(
+				GetWorld(),
+				PlayerPawn->GetActorLocation(),
+				1.0f,
+				PlayerPawn,
+				0.0f,
+				NAME_None
+			);
+		}
+	},
+	1.0f,
+	true
+);
 }
 
 void AEnemy02AIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
-	{
-		if (Stimulus.WasSuccessfullySensed())
-		{
-			if (GetBlackboardComponent())
-			{
-				GetBlackboardComponent()->SetValueAsVector(BB_SoundLocation, Stimulus.StimulusLocation);
-				GetBlackboardComponent()->SetValueAsObject(BB_TargetActor, Actor);
-				UE_LOG(LogTemp, Warning, TEXT("소리 감지됨: %s"), *Stimulus.StimulusLocation.ToString());
-			}
-		}
-	}
+	UE_LOG(LogTemp, Warning, TEXT("OnPerceptionUpdated 호출됨"));
 }
+
+// void AEnemy02AIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("호출 OnPerceptionUpdated: "));
+// 	
+// 	if (Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
+// 	{
+// 		if (Stimulus.WasSuccessfullySensed())
+// 		{
+// 			if (GetBlackboardComponent())
+// 			{
+// 				GetBlackboardComponent()->SetValueAsVector(BB_SoundLocation, Stimulus.StimulusLocation);
+// 				GetBlackboardComponent()->SetValueAsObject(BB_TargetActor, Actor);
+// 				UE_LOG(LogTemp, Warning, TEXT("소리 감지됨: %s"), *Stimulus.StimulusLocation.ToString());
+// 			}
+// 		}
+// 	}
+// }
 
 

@@ -153,6 +153,9 @@ void UDungeonGenerator::GenerateDungeon(
     UE_LOG(LogTemp, Log,
         TEXT("[Generator] 던전 생성 완료. 총 %d개 방"),
         OutSpawnedRooms.Num());
+    
+    bGenerationComplete = true;
+    OnDungeonGenerationComplete.Broadcast();
 }
 
 void UDungeonGenerator::ClearDungeon(TArray<ARoomBase*>& SpawnedRooms)

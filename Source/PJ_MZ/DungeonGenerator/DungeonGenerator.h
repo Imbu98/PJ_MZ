@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -5,6 +6,7 @@
 #include "RoomTypeEntry.h"
 #include "RoomBase.h"
 #include "DoorComponent.h"
+#include "../PJ_MZ_Delegates.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "DungeonGenerator.generated.h"
 
@@ -66,4 +68,9 @@ private:
 		UDoorComponent* FromDoor,
 		TSubclassOf<ARoomBase> RoomClass,
 		const TArray<ARoomBase*>& SpawnedRooms);
+
+public:
+	FOnDungeonGenerationComplete OnDungeonGenerationComplete;
+	
+	bool bGenerationComplete = false;
 };

@@ -1,7 +1,15 @@
 
 
+#include "Components/StaticMeshComponent.h"
 #include "Enemy02Character.h"
 
+#include "Enemy02AIController.h"
+
+AEnemy02Character::AEnemy02Character()
+{
+	AIControllerClass = AEnemy02AIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+}
 
 void AEnemy02Character::Attack()
 {

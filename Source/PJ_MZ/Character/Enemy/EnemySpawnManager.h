@@ -4,6 +4,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "EnemyBase.h"
+#include "DungeonGenerator/DungeonGenerator.h"
+#include "DungeonGenerator/PCGDungeonManager.h"
 #include "EnemySpawnManager.generated.h"
 
 UCLASS()
@@ -35,6 +37,8 @@ private:
 
 	// 실제 스폰 처리
 	void SpawnEnemy(TSubclassOf<AEnemyBase> EnemyClass);
+	
+	void SpawnAllEnemy();
 
 	// NavMesh 위 랜덤 위치 반환
 	FVector GetRandomSpawnLocation();
@@ -42,4 +46,7 @@ private:
 	// 재스폰 대기 중인 적 목록
 	UPROPERTY()
 	TMap<AEnemyBase*, FTimerHandle> PendingRespawns;
+	
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	TObjectPtr<APCGDungeonManager> PCGDungeonManager;
 };

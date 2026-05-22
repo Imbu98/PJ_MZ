@@ -85,4 +85,6 @@ private:
 public:
     UPROPERTY(EditAnywhere,BlueprintReadWrite)
     TObjectPtr<UObjectSpawner> Spawner;
+    
+    UDungeonGenerator* GetDungeonGenerator() const { return Generator; }
 };

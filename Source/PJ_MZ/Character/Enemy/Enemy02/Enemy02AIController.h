@@ -2,8 +2,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Perception/AISense_Hearing.h"
 #include "Character/Enemy/EnemyAIControllerBase.h"
 #include "Enemy02AIController.generated.h"
+
+struct FActorPerceptionUpdateInfo;
 
 UCLASS()
 class PJ_MZ_API AEnemy02AIController : public AEnemyAIControllerBase
@@ -26,4 +29,6 @@ protected:
 
 	UFUNCTION()
 	void OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	
+	FTimerHandle DebugTimerHandle;
 };
