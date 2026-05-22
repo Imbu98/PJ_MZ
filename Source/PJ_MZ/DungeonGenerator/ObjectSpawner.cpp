@@ -27,16 +27,13 @@ void UObjectSpawner::SpawnObjects(const TArray<FPicturableDatas> picturableDatas
 	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		FVector ObjLocation;
-		bool bFound = false;
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	for (int32 i = 0; i < picturableDatas.Num(); ++i)
 	{
-		
-		//랜덤 아이템 뽑아주는 함수 호출
-		
+		bool bFound = false; // ← 루프 안으로 이동
+		FVector ObjLocation;
+
 		for (int32 Retry = 0; Retry < MaxPlacementRetries; Retry++)
 		{
 			if (CanSpawnRooms.IsEmpty())
@@ -44,37 +41,37 @@ void UObjectSpawner::SpawnObjects(const TArray<FPicturableDatas> picturableDatas
 				UE_LOG(LogTemp, Warning, TEXT("[ObjSpawner] 스폰 가능한 방이 없음!"));
 				return;
 			}
-			
-			if (ARoomBase* Room = PickRandomRoom(CanSpawnRooms))
+
+			ARoomBase* Room = PickRandomRoom(CanSpawnRooms);
+			if (!Room) continue;
+
+			if (!FindRandomLocationInRoom(Room, ObjLocation))
 			{
-				if (!FindRandomLocationInRoom(Room, ObjLocation))
-				{
-					CanSpawnRooms.Remove(Room);
-					continue;
-				}
-
-				if (IsTooCloseToOtherItems(ObjLocation, SpawnedItemLocations))
-				{
-					CanSpawnRooms.Remove(Room);
-					continue;
-				}
-
-				bFound = true;
-				break;
+				UE_LOG(LogTemp, Warning, TEXT("[ObjSpawner] Retry %d: FindRandomLocation 실패 - Room: %s"),
+					Retry, *Room->GetName());
+				CanSpawnRooms.Remove(Room);
+				continue;
 			}
+
+			if (IsTooCloseToOtherItems(ObjLocation, SpawnedItemLocations))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[ObjSpawner] Retry %d: TooClose 실패 - Location: %s"),
+					Retry, *ObjLocation.ToString());
+				continue;
+			}
+
+			bFound = true;
+			break;
 		}
-		
+
 		if (!bFound)
 		{
-			UE_LOG(LogTemp, Warning,
-				TEXT("[ObjSpawner] 위치 찾기 실패. 스킵."));
+			UE_LOG(LogTemp, Warning, TEXT("[ObjSpawner] 위치 찾기 실패. 스킵."));
 			continue;
 		}
+
 		APicturableBase* spawnedPicturable = GetWorld()->SpawnActor<APicturableBase>(
-	SpawnClass,
-	ObjLocation,
-	FRotator::ZeroRotator,
-	SpawnParams);
+			SpawnClass, ObjLocation, FRotator::ZeroRotator, SpawnParams);
 		
 		if (spawnedPicturable)
 		{
@@ -137,22 +134,28 @@ bool UObjectSpawner::FindRandomLocationInRoom(ARoomBase* Room, FVector& OutLocat
 	if (!IsValid(Room) || !Room->RoomBounds) return false;
 
 	FVector Extent = Room->RoomBounds->GetScaledBoxExtent();
+	FVector BoxWorldCenter = Room->RoomBounds->GetComponentLocation();
 	float Margin = 100.0f;
 
 	float RandX = FMath::RandRange(-Extent.X + Margin, Extent.X - Margin);
 	float RandY = FMath::RandRange(-Extent.Y + Margin, Extent.Y - Margin);
 
-	FVector LocalOffset = FVector(RandX, RandY, 0.0f);
+	FVector WorldPosition = FVector(
+		BoxWorldCenter.X + RandX,
+		BoxWorldCenter.Y + RandY,
+		BoxWorldCenter.Z
+	);
 
-	FVector WorldPosition = Room->GetActorTransform()
-		.TransformPosition(LocalOffset);
+	FVector TraceStart = FVector(WorldPosition.X, WorldPosition.Y, BoxWorldCenter.Z + Extent.Z);
+	FVector TraceEnd   = FVector(WorldPosition.X, WorldPosition.Y, BoxWorldCenter.Z - Extent.Z);
 
-	FVector TraceStart = WorldPosition + FVector(0, 0, Extent.Z);
-	FVector TraceEnd   = WorldPosition - FVector(0, 0, Extent.Z);
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 10.0f, 0, 3.0f);
+	DrawDebugSphere(GetWorld(), BoxWorldCenter, 50.f, 8, FColor::Green, false, 10.0f);
 
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(Room);
+	// AddIgnoredActor 제거하고 테스트
+	// QueryParams.AddIgnoredActor(Room);
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(
 		HitResult,
@@ -160,6 +163,11 @@ bool UObjectSpawner::FindRandomLocationInRoom(ARoomBase* Room, FVector& OutLocat
 		TraceEnd,
 		ECC_Visibility,
 		QueryParams);
+
+	UE_LOG(LogTemp, Warning, TEXT("[Trace] bHit: %s | HitActor: %s | ImpactPoint: %s"),
+		bHit ? TEXT("true") : TEXT("false"),
+		HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("None"),
+		*HitResult.ImpactPoint.ToString());
 
 	if (!bHit) return false;
 

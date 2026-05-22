@@ -32,7 +32,7 @@ public:
 	int32 MaxPlacementRetries = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ObjectSpawner")
-	float MinDistanceBetweenItems = 100.0f;
+	float MinDistanceBetweenItems = 1000.0f;
 	
 	//수정필요 HT
 	UFUNCTION(BlueprintCallable, Category="ObjectSpawner")
