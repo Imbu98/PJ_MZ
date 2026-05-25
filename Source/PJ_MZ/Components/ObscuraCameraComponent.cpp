@@ -7,7 +7,9 @@
 #include "Character/Player/HT_Player.h"
 #include "Character/Player/HT_PlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Default/PJ_MZGameMode.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "Kismet/GameplayStatics.h"
 
 UObscuraCameraComponent::UObscuraCameraComponent()
 {
@@ -42,7 +44,8 @@ void UObscuraCameraComponent::BeginPlay()
 void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
+	// 쿨타임 처리
 	if (Cached_PS&&Cached_PS->IsObscraCooltime)
 		
 		Cached_PS->currentObscuraCooltime += DeltaTime;
@@ -53,8 +56,24 @@ void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		Cached_PS->currentObscuraCooltime = 0.f;
 			
 	}
-		
 	Cached_PS->OnObscuraCooltimeFinished.Broadcast();
+
+	// FOV Lerp
+	if (CurrentMode == EObscuraModeAction::CAMERAMODE)
+	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, ZoomInterpSpeed);
+
+		AHT_Player* Player = Cast<AHT_Player>(GetOwner());
+		if (Player)
+		{
+			UCameraComponent* Cam = Player->GetFirstPersonCameraComponent();
+			if (Cam)
+			{
+				Cam->SetFieldOfView(CurrentFOV);
+				SceneCapture->FOVAngle = CurrentFOV;
+			}
+		}
+	}
 	
 }
 
@@ -91,7 +110,7 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	{
 		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
 		
-		SetResultUI();
+		OnGameEnd();
 		
 		return;
 	}
@@ -157,6 +176,37 @@ void UObscuraCameraComponent::SetResultUI()
 	if (!Pc) return;
 	
 	Pc->SetResultUI();
+}
+
+void UObscuraCameraComponent::OnGameEnd()
+{
+	APJ_MZGameMode* GameMode = Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!GameMode)
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameMode를 찾을 수 없음"));
+		return;
+	}
+
+	if (!Cached_PS) return;
+
+	SetResultUI();
+	
+
+	// 임시 플레이어 정보 - 나중에 교체
+	FString GameId    = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	FString PlayerId  = Cached_PS->MZ_PlayerID;
+	FString PlayerName = Cached_PS->MZ_PlayerName;
+
+	// 점수 다 더하기
+	float totalScore = 0.f;
+	for (auto score : Cached_PS->CachedScoreArray)
+	{
+		totalScore += score;
+	}
+	// 끝나는데 걸린 시간
+	float endTime = Cached_PS->GetElapsedSeconds();
+
+	GameMode->SubmitScore(GameId, PlayerId, PlayerName, totalScore, endTime);
 }
 
 void UObscuraCameraComponent::AddCurrentScoreToArray(float scoreVal)

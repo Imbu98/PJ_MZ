@@ -112,6 +112,8 @@ void AHT_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Completed, this, &AHT_Player::OnOutObscuraMode);
 			
 			EnhancedInputComponent->BindAction(ShotObscuraAction, ETriggerEvent::Completed, this, &AHT_Player::OnShotObscura);
+
+			EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AHT_Player::OnZoomObscura);
 			
 		}
 	}
@@ -314,6 +316,24 @@ void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 	RemoveObscuraWidget();
     
 	bObscuraReleased = false;
+
+	// 카메라 줌 초기화
+	ObscuraCameraComp->TargetFOV = 90.f;
+}
+
+void AHT_Player::OnZoomObscura(const FInputActionValue& Value)
+{
+	if (!ObscuraCameraComp) return;
+	if (ObscuraCameraComp->GetObscuraMode() != EObscuraModeAction::CAMERAMODE) return;
+
+	float ScrollValue = Value.Get<float>();
+
+	// TargetFOV만 변경
+	ObscuraCameraComp->TargetFOV = FMath::Clamp(
+		ObscuraCameraComp->TargetFOV - ScrollValue * ObscuraCameraComp->ZoomStep,
+		ObscuraCameraComp->MinFOV,
+		ObscuraCameraComp->MaxFOV
+	);
 }
 
 void AHT_Player::CreateObscuraWidget()

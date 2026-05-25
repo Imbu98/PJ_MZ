@@ -20,7 +20,10 @@ public class PJ_MZ : ModuleRules
 			"NavigationSystem",
 			"UMG",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"HTTP",
+			"Json",
+			"JsonUtilities",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Imath", "Imath", "Imath" });

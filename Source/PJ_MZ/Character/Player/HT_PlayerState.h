@@ -42,12 +42,24 @@ public:
 	TArray<UTextureRenderTarget2D*> PhotoList;	// 찍은 사진들 저장
 	
 	UTextureRenderTarget2D* GetPhotoTexture(int32 index);
+
+	// ===============================
+	// 임시 아이디 및 닉네임 
+	// ===============================
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FString MZ_PlayerID;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FString MZ_PlayerName;
+	
 	
 	// ===============================
 	// 플레이어 플레이타임
 	// ===============================
 	UPROPERTY()
 	float ElapsedSeconds = 0.f;
+
+	float GetElapsedSeconds() const { return ElapsedSeconds; }
 	
 	FString GetFormattedTime() const;
 	

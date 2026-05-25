@@ -54,6 +54,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	TObjectPtr<UInputAction> EnterCameraModeAction;
 
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> ZoomAction;
+
+	
+
 	/** If true, we're sprinting */
 	bool bSprinting = false;
 
@@ -169,6 +174,9 @@ public:
 	
 	UFUNCTION()
 	void OnOutObscuraMode(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnZoomObscura(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	void CreateObscuraWidget();

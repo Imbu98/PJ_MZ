@@ -87,6 +87,9 @@ public:
 	// 결과 창 (임시)
 	UFUNCTION()
 	void SetResultUI();
+
+	UFUNCTION()
+	void OnGameEnd();
 	
 	// 현재 찍은 Picturable오브젝트의 점수를 저장
 	UFUNCTION()
@@ -120,6 +123,19 @@ public:
 	void ClearMainPhotoActor(){MainPhotoActor = nullptr;}
 	
 	UFUNCTION()
-	float GetPicturableScore();
+		float GetPicturableScore();
+
+	// ===============================
+	// Zoom In & Out
+	// ===============================
+public:
+	float TargetFOV = 90.f;
+	float CurrentFOV = 90.f;
+	float MinFOV = 30.f;
+	float MaxFOV = 100.f;
+	float ZoomStep = 10.f;
+	float ZoomInterpSpeed = 10.f;
+
+	
 	
 };
