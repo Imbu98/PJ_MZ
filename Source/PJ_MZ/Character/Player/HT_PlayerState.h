@@ -86,6 +86,7 @@ public:
 	FMentalityChangedDelegate OnMentalityChangeDelegate;
 	FShotCountChangeDelegate OnShotCountChangeDelegate;
 	FObscuraCooltimeFinished OnObscuraCooltimeFinished;
+	FCameraFOVChangeDelegate OnCameraFOVChangeDelegate;
 
 	
 	

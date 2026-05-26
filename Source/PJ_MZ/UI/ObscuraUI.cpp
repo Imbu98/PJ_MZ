@@ -3,6 +3,7 @@
 
 #include "ObscuraUI.h"
 
+#include "PJ_MZ.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
@@ -14,6 +15,7 @@
 #include "Components/TextBlock.h"
 #include "Character/Player/HT_PlayerState.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/PicturableComponent.h"
 
 
 void UObscuraUI::NativeConstruct()
@@ -51,9 +53,7 @@ void UObscuraUI::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 	
 	// 감지 비활성화 상태면 스킵
 	if (!bDetectionActive || !PC || !CameraObscuraComp) return;
-
 	UpdateAllPoints();
-	
 	if (CameraObscuraComp)
 	{
 		if (CameraObscuraComp->ObscuraCanShot())
@@ -63,27 +63,101 @@ void UObscuraUI::NativeTick(const FGeometry& MyGeometry, float DeltaTime)
 	}
 }
 
+void UObscuraUI::BindingEvent()
+{
+	// 기존 CameraObscuraComp 대신 PlayerState에서 읽기
+	AHT_PlayerState* PS = GetOwningPlayer()->GetPlayerState<AHT_PlayerState>();
+	if (PS)
+	{
+		if (PS)
+		{
+			PS->OnShotCountChangeDelegate.RemoveAll(this);
+			PS->OnShotCountChangeDelegate.AddUObject(this, &UObscuraUI::OnShotCountUpdated);
+			
+			PS->OnMentalityChangeDelegate.RemoveAll(this);
+			PS->OnMentalityChangeDelegate.AddUObject(this, &UObscuraUI::OnPlayerMentalityBarUpdated);
+			
+			PS->OnObscuraCooltimeFinished.RemoveAll(this);
+			PS->OnObscuraCooltimeFinished.AddUObject(this,&UObscuraUI::OnObscuraBarReset);
+			
+			PS->OnStaminaBarUpdated.RemoveAll(this);
+			PS->OnStaminaBarUpdated.AddUObject(this, &UObscuraUI::OnStaminaBarUpdated);
+			
+			PS->OnCameraFOVChangeDelegate.RemoveAll(this);
+			PS->OnCameraFOVChangeDelegate.AddUObject(this, &UObscuraUI::OnCameraFOVUpdated);
+		
+		}
+	
+	}
+	
+}
+
 void UObscuraUI::UpdateAllPoints()
 {
-	// 1단계: 0번(가운데) 포인트로 Main 결정
-	AActor* MainHitActor = nullptr;
-	if (FinderPoints.Num() > 0 && FinderPoints[0])
-	{
-		TraceFromScreenPoint(FinderPoints[0], MainHitActor);
-	}
-	CameraObscuraComp->MainPhotoActor = MainHitActor;
+    // 1단계: 모든 포인트 트레이스 결과 캐싱
+    TArray<TPair<bool, AActor*>> TraceResults;
+    TSet<AActor*> UniqueActors;
 
-	// 2단계: 전체 포인트 처리
+    for (UImage* Point : FinderPoints)
+    {
+        AActor* HitActor = nullptr;
+        bool bHit = Point ? TraceFromScreenPoint(Point, HitActor) : false;
+    	
+        TraceResults.Add(TPair<bool, AActor*>(bHit, HitActor));
+        if (bHit && HitActor) UniqueActors.Add(HitActor);
+    }
+
+    // 2단계: 잡힌 액터가 2개 이상이면 0번 포인트에 가장 가까운 액터를 Main으로
+    AActor* MainHitActor = nullptr;
+    if (UniqueActors.Num() >= 2)
+    {
+        FVector2D CenterScreenPos = GetPointScreenCenter(FinderPoints[0]);
+        float MinDist = FLT_MAX;
+
+        for (auto& Result : TraceResults)
+        {
+            if (!Result.Key || !Result.Value) continue;
+
+            FVector2D ActorScreenPos;
+            if (!PC->ProjectWorldLocationToScreen(
+                Result.Value->GetActorLocation(), ActorScreenPos)) continue;
+
+            float Dist = FVector2D::Distance(ActorScreenPos, CenterScreenPos);
+            if (Dist < MinDist)
+            {
+                MinDist = Dist;
+                MainHitActor = Result.Value;
+            }
+        }
+    }
+	// MainPhotoActor 설정
+	if (UniqueActors.Num() == 0)
+	{
+		// 아무것도 안 잡힘
+		CameraObscuraComp->MainPhotoActor = nullptr;
+	}
+	else if (UniqueActors.Num() == 1)
+	{
+		// 1개면 그 액터가 Main
+		CameraObscuraComp->MainPhotoActor = *UniqueActors.begin();
+	}
+	else
+	{
+		// 2개 이상이면 0번 포인트에 가장 가까운 액터가 Main
+		CameraObscuraComp->MainPhotoActor = MainHitActor;
+	}
+	AActor* FinalMainActor = CameraObscuraComp->MainPhotoActor;
+    // 3단계: 포인트 활성화 처리
 	for (int32 i = 0; i < FinderPoints.Num(); i++)
 	{
 		UImage* Point = FinderPoints[i];
 		if (!Point) continue;
 
-		AActor* HitActor = nullptr;
-		bool bHit = TraceFromScreenPoint(Point, HitActor);
+		bool bHit = TraceResults[i].Key;
+		AActor* HitActor = TraceResults[i].Value;
 
-		// Main 액터가 아니면 무시
-		if (HitActor != MainHitActor)
+		// 2개 이상일 때만 필터링
+		if (UniqueActors.Num() >= 2 && HitActor != FinalMainActor)
 		{
 			bHit = false;
 			HitActor = nullptr;
@@ -93,87 +167,103 @@ void UObscuraUI::UpdateAllPoints()
 		Point->SetColorAndOpacity(bHit ? ActiveColor : DefaultColor);
 	}
 
-	// 3단계: HeadSocket 위치에 UI 표시
-	if (TargetIndicatorWidget)
-	{
-		if (MainHitActor)
-		{
-			FVector TargetWorldPos;
+    // 4단계: HeadSocket 또는 액터 중앙에 UI 표시
+    AActor* TargetActor = CameraObscuraComp->MainPhotoActor;
+    if (TargetIndicatorWidget)
+    {
+        if (TargetActor)
+        {
+            FVector TargetWorldPos;
+            USkeletalMeshComponent* SkelMesh =
+                TargetActor->FindComponentByClass<USkeletalMeshComponent>();
 
-			USkeletalMeshComponent* SkelMesh =
-				MainHitActor->FindComponentByClass<USkeletalMeshComponent>();
+            if (SkelMesh && SkelMesh->DoesSocketExist(FName("HeadSocket")))
+            {
+                TargetWorldPos = SkelMesh->GetSocketLocation(FName("HeadSocket"));
+            }
+            else
+            {
+                TargetWorldPos = TargetActor->GetActorLocation();
+            }
+        	
+        	// 가시성이 이미 Visible이 아닐 때만 초기화 및 재생
+        	if (TargetIndicatorWidget && TargetIndicatorWidget->GetVisibility() != ESlateVisibility::Visible)
+        	{
+        		TargetIndicatorWidget->SetVisibility(ESlateVisibility::Visible);
+        		
+        		if (TargetIndicatorAnim && !IsAnimationPlaying(TargetIndicatorAnim))
+        		{
+        			PlayAnimation(TargetIndicatorAnim,0.0f,0);
+        		}
+        	}
+        	
+        	// 애니메이션이 적용한 현재 Scale 가져오기
+        	FVector2D AnimScale = TargetIndicatorWidget->GetRenderTransform().Scale;
+        
+        	// FOV Scale 보간
+        	float NewScaleValue = FMath::FInterpTo(CurrentFOVScale, TargetFOVScale, GetWorld()->GetDeltaSeconds(), 10.0f);
+        	CurrentFOVScale = NewScaleValue;
 
-			if (SkelMesh && SkelMesh->DoesSocketExist(FName("HeadSocket")))
-			{
-				// HeadSocket 위치 사용
-				TargetWorldPos = SkelMesh->GetSocketLocation(FName("HeadSocket"));
-			}
-			else
-			{
-				// SkelMesh 없으면 액터 중앙 사용
-				TargetWorldPos = MainHitActor->GetActorLocation();
-			}
-
-			FVector2D ScreenPos;
-			if (PC->ProjectWorldLocationToScreen(TargetWorldPos, ScreenPos))
-			{
-				TargetIndicatorWidget->SetVisibility(ESlateVisibility::Visible);
-
-				UCanvasPanelSlot* CanvasSlot =
-					Cast<UCanvasPanelSlot>(TargetIndicatorWidget->Slot);
-				if (CanvasSlot)
-				{
-					CanvasSlot->SetPosition(ScreenPos);
-				}
-				
-				if (TargetIndicatorAnim)
-				{
-					TargetIndicatorWidget->PlayAnimation(TargetIndicatorAnim);	
-				}
-				
-			}
-		}
-		else
-		{
-			TargetIndicatorWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
+        	// 애니메이션 Scale에 FOV Scale 곱하기
+        	TargetIndicatorWidget->SetRenderScale(AnimScale * CurrentFOVScale);
+        	
+        	
+        	// UI 위치
+            FVector2D ScreenPos;
+            if (PC->ProjectWorldLocationToScreen(TargetWorldPos, ScreenPos))
+            {
+            	float DPIScale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+            	FVector2D AdjustedPos = ScreenPos / DPIScale;
+            	
+            	
+                UCanvasPanelSlot* CanvasSlot =
+                    Cast<UCanvasPanelSlot>(TargetIndicatorWidget->Slot);
+            	if (CanvasSlot)
+            	{
+            		// Alignment (0.5, 0.5)이므로 위젯 중앙이 AdjustedPos에 정확히 위치
+            		CanvasSlot->SetPosition(AdjustedPos);
+            		CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f)); // 혹시 코드에서도 보장
+            	}
+            }
+        }
+        else
+        {
+            TargetIndicatorWidget->SetVisibility(ESlateVisibility::Hidden);
+        }
+    }
 }
 
 bool UObscuraUI::TraceFromScreenPoint(UImage* PointImage, AActor*& OutHitActor)
 {
-	// 포인트 화면 중심 좌표 계산
-	FVector2D ScreenPos = GetPointScreenCenter(PointImage);
+    FVector2D ScreenPos = GetPointScreenCenter(PointImage);
 
-	// 화면 좌표 → 월드 레이 변환
-	FVector WorldOrigin, WorldDir;
-	if (!PC->DeprojectScreenPositionToWorld(
-		ScreenPos.X, ScreenPos.Y,
-		WorldOrigin, WorldDir))
-	{
-		return false;
-	}
+    FVector WorldOrigin, WorldDir;
+    if (!PC->DeprojectScreenPositionToWorld(
+        ScreenPos.X, ScreenPos.Y,
+        WorldOrigin, WorldDir))
+    {
+        return false;
+    }
 
-	// 레이캐스트
-	FHitResult Hit;
-	FVector TraceEnd = WorldOrigin + WorldDir * TraceDistance;
+    FVector TraceEnd = WorldOrigin + WorldDir * TraceDistance;
 
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(PC->GetPawn()); // 플레이어 본인 무시
-	Params.bTraceComplex = true;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(PC->GetPawn());
+    Params.bTraceComplex = true;
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(
-		Hit, WorldOrigin, TraceEnd, ECC_GameTraceChannel5, Params
-	);
+    FHitResult Hit;
+    bool bHit = GetWorld()->LineTraceSingleByChannel(
+        Hit, WorldOrigin, TraceEnd, ECC_GameTraceChannel5, Params
+    );
 
-	if (bHit && Hit.GetActor())
-	{
-		OutHitActor = Hit.GetActor();
-		return true;
-	}
+    if (bHit && Hit.GetActor()&&Hit.GetActor()->ActorHasTag(FName("Picturable")))
+    {
+        OutHitActor = Hit.GetActor();
+        return true;
+    }
 
-	OutHitActor = nullptr;
-	return false;
+    OutHitActor = nullptr;
+    return false;
 }
 
 FVector2D UObscuraUI::GetPointScreenCenter(UImage* PointImage)
@@ -205,30 +295,9 @@ void UObscuraUI::ResetObscura()
 	
 }
 
-void UObscuraUI::BindingEvent()
+void UObscuraUI::OnCameraFOVUpdated(float FOV)
 {
-	// 기존 CameraObscuraComp 대신 PlayerState에서 읽기
-	AHT_PlayerState* PS = GetOwningPlayer()->GetPlayerState<AHT_PlayerState>();
-	if (PS)
-	{
-		if (PS)
-		{
-			PS->OnShotCountChangeDelegate.RemoveAll(this);
-			PS->OnShotCountChangeDelegate.AddUObject(this, &UObscuraUI::OnShotCountUpdated);
-			
-			PS->OnMentalityChangeDelegate.RemoveAll(this);
-			PS->OnMentalityChangeDelegate.AddUObject(this, &UObscuraUI::OnPlayerMentalityBarUpdated);
-			
-			PS->OnObscuraCooltimeFinished.RemoveAll(this);
-			PS->OnObscuraCooltimeFinished.AddUObject(this,&UObscuraUI::OnObscuraBarReset);
-			
-			PS->OnStaminaBarUpdated.RemoveAll(this);
-			PS->OnStaminaBarUpdated.AddUObject(this, &UObscuraUI::OnStaminaBarUpdated);
-		
-		}
-	
-	}
-	
+	TargetFOVScale = 90.0f / FOV;
 }
 
 
@@ -275,7 +344,6 @@ void UObscuraUI::OnObscuraBarReset()
 	{
 		PB_ObscuraCooltimeBar->SetPercent(0.f);	
 	}
-	
 }
 
 
