@@ -36,25 +36,7 @@ void AEnemy02AIController::OnPossess(APawn* InPawn)
 	
 	SetGenericTeamId(FGenericTeamId(1));
 	
-	GetWorldTimerManager().SetTimer(
-	DebugTimerHandle,
-	[this]()
-	{
-		if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-		{
-			UAISense_Hearing::ReportNoiseEvent(
-				GetWorld(),
-				PlayerPawn->GetActorLocation(),
-				1.0f,
-				PlayerPawn,
-				0.0f,
-				NAME_None
-			);
-		}
-	},
-	1.0f,
-	true
-);
+
 }
 
 void AEnemy02AIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

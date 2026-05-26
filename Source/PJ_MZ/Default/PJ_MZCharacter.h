@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "PJ_MZCharacter.generated.h"
@@ -19,7 +20,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  A basic first person character
  */
 UCLASS(abstract)
-class APJ_MZCharacter : public ACharacter
+class APJ_MZCharacter : public ACharacter , public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -90,6 +91,12 @@ public:
 
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	
+public:
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	FGenericTeamId TeamId=0;
 
 };
 

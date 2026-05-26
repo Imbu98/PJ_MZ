@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
+#include "GenericTeamAgentInterface.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PJ_MZ.h"
@@ -43,6 +44,8 @@ APJ_MZCharacter::APJ_MZCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+	
+	TeamId = FGenericTeamId(1);
 }
 
 void APJ_MZCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -66,6 +69,8 @@ void APJ_MZCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		UE_LOG(LogPJ_MZ, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+
+
 
 
 void APJ_MZCharacter::MoveInput(const FInputActionValue& Value)
@@ -120,4 +125,9 @@ void APJ_MZCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+FGenericTeamId APJ_MZCharacter::GetGenericTeamId() const
+{
+	return TeamId;
 }
