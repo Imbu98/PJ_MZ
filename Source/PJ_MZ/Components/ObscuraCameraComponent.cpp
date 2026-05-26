@@ -31,13 +31,6 @@ void UObscuraCameraComponent::BeginPlay()
 	if (!PS) return;
 	
 	Cached_PS = PS;
-        
-	UCameraComponent* MainCam = Player->GetFirstPersonCameraComponent();
-	if (MainCam)
-	{
-		SceneCapture->AttachToComponent(MainCam, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		SceneCapture->FOVAngle = MainCam->FieldOfView; // FOV 맞추기
-	}
 	
 }
 
@@ -228,22 +221,64 @@ float UObscuraCameraComponent::GetScoreArrayValue(int32 index)
 
 void UObscuraCameraComponent::CapturePhoto()
 {
-	if (Cached_PS==nullptr) return;
-	
-	// 새 RenderTarget 생성
-	UTextureRenderTarget2D* NewRT = NewObject<UTextureRenderTarget2D>();
-	NewRT->InitAutoFormat(1920, 1080);
-	NewRT->UpdateResourceImmediate();
+    AHT_PlayerController* PC = Cast<AHT_PlayerController>(GetWorld()->GetFirstPlayerController());
+    if (!PC) return;
 
-	SceneCapture->TextureTarget = NewRT;
-	SceneCapture->CaptureScene(); // 캡처
+    // 한 프레임 뒤 캡처
+    GetWorld()->GetTimerManager().SetTimerForNextTick([this, PC]()
+    {
+        // 1. 유효성 검사
+        ULocalPlayer* LocalPlayer = PC->GetLocalPlayer();
+        if (!LocalPlayer || !LocalPlayer->ViewportClient || !LocalPlayer->ViewportClient->Viewport) return;
 
-	
-	Cached_PS->PhotoList.Add(NewRT); // 앨범에 저장
-	
-	// 캡처 후 연결 끊기
-	SceneCapture->TextureTarget = nullptr;
+        FViewport* Viewport = LocalPlayer->ViewportClient->Viewport;
+
+        TArray<FColor> Pixels;
+        
+        // 🚨 실패 시 왜 실패했는지 디버그 메시지를 띄우도록 수정
+        if (!Viewport->ReadPixels(Pixels))
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Viewport ReadPixels 실패! (화면을 읽어오지 못함)"));
+            return;
+        }
+
+        int32 Width = Viewport->GetSizeXY().X;
+        int32 Height = Viewport->GetSizeXY().Y;
+
+        // 💡 [핵심 1] 뷰포트에서 읽어온 픽셀은 Alpha가 0일 확률이 매우 높습니다. 
+        // UI에서 투명하게 보이는 것을 막기 위해 강제로 불투명(255)하게 만듭니다.
+        for (FColor& Pixel : Pixels)
+        {
+            Pixel.A = 255;
+        }
+
+        // 2. 가벼운 UTexture2D 생성 (CreateTransient가 이미 필요한 메모리를 할당함)
+        UTexture2D* Photo = UTexture2D::CreateTransient(Width, Height, PF_B8G8R8A8);
+        if (!Photo) return;
+
+        Photo->SRGB = true;
+        // Photo->AddToRoot(); // ⚠️ [주의] AddToRoot는 메모리 누수를 유발할 수 있습니다!
+        // Cached_PS->PhotoList에 UPROPERTY() 매크로가 있다면 굳이 AddToRoot()를 안 써도 가비지 컬렉션(GC)에 날아가지 않습니다.
+
+        // 3. 💡 [핵심 2] Realloc을 지우고, 할당된 메모리에 안전하게 덮어쓰기만 합니다.
+        void* TextureData = Photo->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+        FMemory::Memcpy(TextureData, Pixels.GetData(), Pixels.Num() * sizeof(FColor));
+        Photo->GetPlatformData()->Mips[0].BulkData.Unlock();
+
+        // 강제로 GPU에 올리기
+        Photo->UpdateResource();
+
+        // 4. 안전하게 배열에 저장
+        // (타이머(람다) 안에서 실행되므로, 그 1프레임 사이에 플레이어가 죽거나 PS가 파괴됐을 수 있어 체크 필요)
+        if (Cached_PS)
+        {
+            Cached_PS->PhotoList.Add(Photo);
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, 
+                FString::Printf(TEXT("찰칵! 앨범 저장 완료 W:%d H:%d"), Width, Height));
+        }
+    });
 }
+
 
 float UObscuraCameraComponent::GetPicturableScore()
 {

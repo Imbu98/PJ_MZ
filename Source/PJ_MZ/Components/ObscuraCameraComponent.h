@@ -132,7 +132,7 @@ public:
 	float TargetFOV = 90.f;
 	float CurrentFOV = 90.f;
 	float MinFOV = 30.f;
-	float MaxFOV = 100.f;
+	float MaxFOV = 90.f;
 	float ZoomStep = 10.f;
 	float ZoomInterpSpeed = 10.f;
 
