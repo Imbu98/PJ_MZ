@@ -36,7 +36,7 @@ protected:
 	TObjectPtr<UPawnSensingComponent> PawnSensing;
 
 	UFUNCTION()
-	void OnSeePawn(APawn* SensedPawn);
+	virtual void OnSeePawn(APawn* SensedPawn);
 
 
 private:

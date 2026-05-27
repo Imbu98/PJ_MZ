@@ -1,9 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Character/Enemy/EnemyBase.h"
+#include "Components/StateTreeComponent.h"
 #include "Enemy03Character.generated.h"
 
 UCLASS()
@@ -14,10 +14,8 @@ class PJ_MZ_API AEnemy03Character : public AEnemyBase
 public:
 	AEnemy03Character();
 
+	virtual void Attack() override;
+
 protected:
-	virtual void BeginPlay() override;
-
-public:
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void OnSeePawn(APawn* SensedPawn) override;
 };

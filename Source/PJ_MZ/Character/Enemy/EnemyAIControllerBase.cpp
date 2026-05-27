@@ -47,6 +47,8 @@ void AEnemyAIControllerBase::OnPossess(APawn* InPawn)
     UE_LOG(LogTemp, Warning, TEXT("BB초기화: %s, BT실행: %s"),
         bBBResult ? TEXT("성공") : TEXT("실패"),
         bBTResult ? TEXT("성공") : TEXT("실패"));
+    
+    SetGenericTeamId(FGenericTeamId(1));
 }
 
 

@@ -3,6 +3,7 @@
 #include "EnemyBase.h"
 #include <Components/PicturableComponent.h>
 #include "EnemySpawnManager.h"
+#include "GenericTeamAgentInterface.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 

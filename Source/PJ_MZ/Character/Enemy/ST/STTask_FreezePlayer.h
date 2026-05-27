@@ -3,45 +3,33 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "StateTreeTaskBase.h"
 #include "Blueprint/StateTreeTaskBlueprintBase.h"
-#include "STTask_ChasePlayer.generated.h"
+#include "STTask_FreezePlayer.generated.h"
 
 
 USTRUCT()
-struct FSTTask_ChasePlayerInstanceData
+struct FFreezePlayerInstanceData
 {
 	GENERATED_BODY()
-
-	UPROPERTY()
-	TObjectPtr<AActor> TargetActor = nullptr;
 };
 
-USTRUCT(DisplayName = "Chase Player")
-struct PJ_MZ_API FSTTask_ChasePlayer : public FStateTreeTaskCommonBase
+USTRUCT(DisplayName = "Freeze Player")
+struct PJ_MZ_API FSTTask_FreezePlayer : public FStateTreeTaskCommonBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FSTTask_ChasePlayerInstanceData;
+	using FInstanceDataType = FFreezePlayerInstanceData;
 
 	virtual bool Link(FStateTreeLinker& Linker) override;
-	
 	virtual EStateTreeRunStatus EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const override;
-	
-	virtual EStateTreeRunStatus Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const override;
-	
 	virtual void ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const override;
-	
 	virtual const UStruct* GetInstanceDataType() const override
 	{
 		return FInstanceDataType::StaticStruct();
 	}
 
-	UPROPERTY(EditAnywhere, Category = "Chase")
-	float ChaseSpeed = 600.f;
-
-	UPROPERTY(EditAnywhere, Category = "Chase")
-	float AttackRange = 150.f;
+	UPROPERTY(EditAnywhere, Category = "Freeze")
+	float FrozenSpeed = 0.f;
 
 private:
 	TStateTreeExternalDataHandle<AAIController> ControllerHandle;

@@ -26,6 +26,7 @@ public class PJ_MZ : ModuleRules
 			"JsonUtilities",
 			"RenderCore", 
 			"Renderer",   
+			"GameplayTags",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Imath", "Imath", "Imath" });

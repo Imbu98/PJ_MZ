@@ -33,8 +33,6 @@ void AEnemy02AIController::OnPossess(APawn* InPawn)
 	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("Perception 바인딩 완료"));
-	
-	SetGenericTeamId(FGenericTeamId(1));
 }
 
 void AEnemy02AIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
