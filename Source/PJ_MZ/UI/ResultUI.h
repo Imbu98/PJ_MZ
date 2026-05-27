@@ -9,6 +9,11 @@ class PJ_MZ_API UResultUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void NativeConstruct() override;
+public:
+	
+	
 	UPROPERTY(meta =(BindWidget))
 	TObjectPtr<class UImage> PhotoImage1;
 	
@@ -42,8 +47,16 @@ class PJ_MZ_API UResultUI : public UUserWidget
 	UPROPERTY(meta =(BindWidget))
 	TObjectPtr<class UTextBlock> Text_ScoreResult;
 	
+	UPROPERTY(meta =(BindWidget))
+	TObjectPtr<class UButton> Button_ShowLeaderboard;
+
+	
+	
 public:
 	UFUNCTION()
 	void SetPhotoImage(int32 index, const FOwningPictureData& pictureData,const FString& timeString,bool IsDuplicate);
 	void SetTotalScoreText(float totalScore);
+	
+	UFUNCTION()
+	void OnClickedButton_ShowLeaderboard();
 };

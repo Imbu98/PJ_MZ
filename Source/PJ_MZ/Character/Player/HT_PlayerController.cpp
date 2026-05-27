@@ -12,6 +12,7 @@
 #include "UI/ObscuraUI.h"
 #include "UI/PlayerStateUI.h"
 #include "UI/ResultUI.h"
+#include "UI/ScoreLeaderboardUI.h"
 
 AHT_PlayerController::AHT_PlayerController()
 {
@@ -189,8 +190,18 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 
 void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries)
 {
-	for (auto& Entry : Entries)
+	if (ScoreLeaderboardUIFactory)
 	{
-		UE_LOG(LogTemp, Log, TEXT("%s | %d | %.2f"), *Entry.PlayerName, Entry.Score, Entry.ClearTime);
+		ScoreLeaderboardUIWidget = CreateWidget<UScoreLeaderboardUI>(this,ScoreLeaderboardUIFactory);
+		if (ScoreLeaderboardUIWidget)
+		{
+			ScoreLeaderboardUIWidget->AddToViewport();
+			
+			for (int32 i=0;i<Entries.Num();i++)
+			{
+				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i);
+				UE_LOG(LogTemp, Log, TEXT("%s | %d | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+			}
+		}
 	}
 }

@@ -1,11 +1,26 @@
 #include "ResultUI.h"
 
 #include "MZ_Datas.h"
+#include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Default/PJ_MZGameMode.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "Kismet/GameplayStatics.h"
 #include "Styling/SlateBrush.h"
 
+
+void UResultUI::NativeConstruct()
+{
+    Super::NativeConstruct();
+    
+    if (Button_ShowLeaderboard)
+    {
+        Button_ShowLeaderboard->OnClicked.RemoveAll(this);
+        Button_ShowLeaderboard->OnClicked.AddDynamic(this, &UResultUI::OnClickedButton_ShowLeaderboard);
+    }
+        
+}
 
 void UResultUI::SetPhotoImage(int32 index, const FOwningPictureData& pictureData, const FString& timeString, bool bIsDuplicate)
 {
@@ -76,4 +91,14 @@ void UResultUI::SetTotalScoreText(float totalScore)
 				FText::AsNumber(totalScore, &Options));	
 	}
 	
+}
+
+void UResultUI::OnClickedButton_ShowLeaderboard()
+{
+    auto* gameMode= Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+    if (gameMode)
+    {
+        gameMode->FetchLeaderboard(UGameplayStatics::GetCurrentLevelName(GetWorld()));    
+    }
+    
 }

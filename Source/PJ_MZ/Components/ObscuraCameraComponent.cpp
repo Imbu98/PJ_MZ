@@ -199,8 +199,7 @@ void UObscuraCameraComponent::OnGameEnd()
 	
 	SetResultUI(totalScore);
 	
-	// 리더보드 조회
-	GameMode->FetchLeaderboard(UGameplayStatics::GetCurrentLevelName(GetWorld()));
+	
 }
 
 void UObscuraCameraComponent::AddCurrentDataToArray(FOwningPictureData datas)
@@ -335,11 +334,11 @@ float UObscuraCameraComponent::CalculateSetBonus(float totalScore)
 		SetIDCountMap.FindOrAdd(owningData.PicturableDatas.SetID)++;
 	}
 
-	if (DT_SetInfo)
+	if (DT_SetBonusInfo)
 	{
 		for (const auto& Pair : SetIDCountMap)
 		{
-			if (FSetBonus* SetBonus = DT_SetInfo->FindRow<FSetBonus>(Pair.Key, TEXT("SetBonusDT Missed")))
+			if (FSetBonus* SetBonus = DT_SetBonusInfo->FindRow<FSetBonus>(Pair.Key, TEXT("SetBonusDT Missed")))
 			{
 				if (Pair.Value >= 3)
 					totalScore += SetBonus->Set3BonusScore;

@@ -72,7 +72,7 @@ public:
 	void InitPoints(int32 PointCount);	// 포인트 배열 초기화 (위젯이 포인트 수 알려줄 때 호출)
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<class UDataTable> DT_SetInfo;
+	TObjectPtr<class UDataTable> DT_SetBonusInfo;
 	
 	// ===============================
 	// 현재 카메라 모드 관련 정보 

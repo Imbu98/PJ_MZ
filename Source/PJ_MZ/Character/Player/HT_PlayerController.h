@@ -39,6 +39,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<UResultUI> PhotoResultUIWidget;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class UScoreLeaderboardUI> ScoreLeaderboardUIFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UScoreLeaderboardUI> ScoreLeaderboardUIWidget;
+	
 	UFUNCTION()
 	void CreateObscuraWidget();
 	
