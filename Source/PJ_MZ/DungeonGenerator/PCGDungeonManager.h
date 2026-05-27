@@ -38,6 +38,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup",
         meta=(ClampMin=1))
     int32 MaxRooms = 12;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup",
+    meta=(ClampMin=1))
+    int32 MaxRegenerateAttempts = 5;
 
     UPROPERTY(BlueprintReadOnly, Category="Dungeon|Runtime")
     TArray<ARoomBase*> SpawnedRooms;

@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Perception/PawnSensingComponent.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
@@ -13,7 +14,6 @@ class PJ_MZ_API AEnemyBase : public ACharacter
 public:
 	AEnemyBase();
 	
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	
@@ -25,9 +25,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnAttackSuccess();
 
-	// 스폰 매니저에 재스폰 요청
-	void RequestRespawn();
-
 protected:
 	virtual void BeginPlay() override;
 	
@@ -35,6 +32,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	float RespawnDelay = 5.f;
 
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	TObjectPtr<UPawnSensingComponent> PawnSensing;
+
+	UFUNCTION()
+	void OnSeePawn(APawn* SensedPawn);
+
+
 private:
-	void DisappearAndRespawn();
+	void DistoryAndRequestRespawn();
 };

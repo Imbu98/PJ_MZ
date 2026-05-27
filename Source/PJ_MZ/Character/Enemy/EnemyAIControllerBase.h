@@ -1,10 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/PawnSensingComponent.h"
 #include "EnemyAIControllerBase.generated.h"
 
 UCLASS()
@@ -19,9 +19,11 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 
-	// 자식 클래스에서 BT/ST 에셋 경로 지정
-	virtual FString GetBehaviorTreePath() const { return TEXT(""); }
-	virtual FString GetBlackboardPath() const { return TEXT(""); }
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TObjectPtr<UBlackboardData> BlackboardAsset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAIPerceptionComponent* AIPerception;

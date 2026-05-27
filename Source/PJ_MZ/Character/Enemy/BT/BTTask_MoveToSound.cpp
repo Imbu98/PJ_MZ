@@ -1,7 +1,11 @@
 #include "BTTask_MoveToSound.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Navigation/PathFollowingComponent.h"
+
+class UCharacterMovementComponent;
 
 UBTTask_MoveToSound::UBTTask_MoveToSound()
 {
@@ -18,8 +22,13 @@ EBTNodeResult::Type UBTTask_MoveToSound::ExecuteTask(UBehaviorTreeComponent& Own
 
 	// Blackboard에서 소리 위치 읽기
 	FVector SoundLocation = Blackboard->GetValueAsVector(SoundLocationKey.SelectedKeyName);
-
 	if (SoundLocation == FVector::ZeroVector) return EBTNodeResult::Failed;
+	
+	if (UCharacterMovementComponent* Movement = Cast<UCharacterMovementComponent>(
+	Cast<ACharacter>(AIController->GetPawn())->GetMovementComponent()))
+	{
+		Movement->MaxWalkSpeed = 800.f;
+	}
 
 	// 소리 위치로 이동
 	EPathFollowingRequestResult::Type MoveResult = AIController->MoveToLocation(

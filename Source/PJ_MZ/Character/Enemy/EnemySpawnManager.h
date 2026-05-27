@@ -17,18 +17,18 @@ public:
 	AEnemySpawnManager();
 	
 	// EnemyBase에서 호출하는 재스폰 요청
-	void RequestRespawn(AEnemyBase* Enemy);
+	void RequestRespawn(AEnemyBase* Enemy, float RespawnDelay);
 
 protected:
 	virtual void BeginPlay() override;
 	
 	// 재스폰 최소 거리 - 플레이어로부터 이 거리 이상 떨어진 곳에 스폰
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float MinSpawnDistanceFromPlayer = 1000.f;
+	float MinSpawnDistanceFromPlayer = 3000.f;
 
 	// 랜덤 위치 탐색 반경
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float SpawnSearchRadius = 5000.f;
+	float SpawnSearchRadius = 10000.f;
 
 private:
 	// PCG 맵 생성 완료 이벤트 바인딩

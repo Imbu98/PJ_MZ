@@ -1,11 +1,9 @@
 
 
 #include "EnemyBase.h"
-
 #include <Components/PicturableComponent.h>
-
 #include "EnemySpawnManager.h"
-
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -14,11 +12,19 @@ AEnemyBase::AEnemyBase()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	PicturableComp = CreateDefaultSubobject<UPicturableComponent>("PicturableComp");
+	
+	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
+	PawnSensing->SightRadius = 200.f;
+	PawnSensing->SetPeripheralVisionAngle(180.f);
+	PawnSensing->bSeePawns = true;
+	PawnSensing->bHearNoises = false;
 }
 
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+    PawnSensing->OnSeePawn.AddDynamic(this, &AEnemyBase::OnSeePawn);
 }
 
 void AEnemyBase::Attack()
@@ -28,35 +34,37 @@ void AEnemyBase::Attack()
 
 void AEnemyBase::OnAttackSuccess()
 {
-	DisappearAndRespawn();
+	UE_LOG(LogTemp, Warning, TEXT("공격성공"));
+	DistoryAndRequestRespawn();
 }
 
-void AEnemyBase::DisappearAndRespawn()
+void AEnemyBase::DistoryAndRequestRespawn()
 {
-	// 콜리전 끄고 숨기기
+	UE_LOG(LogTemp, Warning, TEXT("액터 숨기기 및 재스폰 요청"));
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 
-	// n초 후 재스폰 요청
-	FTimerHandle RespawnTimer;
-	GetWorldTimerManager().SetTimer(
-		RespawnTimer,
-		this,
-		&AEnemyBase::RequestRespawn,
-		RespawnDelay,
-		false
-	);
-}
-
-void AEnemyBase::RequestRespawn()
-{
 	AEnemySpawnManager* SpawnManager = Cast<AEnemySpawnManager>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), AEnemySpawnManager::StaticClass())
 	);
 
 	if (SpawnManager)
 	{
-		SpawnManager->RequestRespawn(this);
+		SpawnManager->RequestRespawn(this, RespawnDelay);
+	}
+	
+	Destroy();
+}
+
+void AEnemyBase::OnSeePawn(APawn* SensedPawn)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnSeePawn 호출됨"));
+    
+	if (!SensedPawn) return;
+    
+	if (SensedPawn->IsPlayerControlled())
+	{
+		Attack();
 	}
 }
 

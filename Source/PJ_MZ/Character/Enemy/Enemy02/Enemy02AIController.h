@@ -17,11 +17,6 @@ public:
 	AEnemy02AIController();
 
 protected:
-	virtual FString GetBehaviorTreePath() const override
-	{ return TEXT("/Game/SY/Enemy/Enemy02/BT_Enemy02"); }
-
-	virtual FString GetBlackboardPath() const override
-	{ return TEXT("/Game/SY/Enemy/Enemy02/BB_Enemy02"); }
 
 	virtual void BeginPlay() override;
 	
@@ -29,6 +24,4 @@ protected:
 
 	UFUNCTION()
 	void OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-	
-	FTimerHandle DebugTimerHandle;
 };

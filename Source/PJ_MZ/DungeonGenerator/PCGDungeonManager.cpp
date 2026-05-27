@@ -26,16 +26,42 @@ void APCGDungeonManager::GenerateDungeon()
 			TEXT("[DungeonManager] Generator가 없음!"));
 		return;
 	}
-
-	Generator->GenerateDungeon(
-		StartRoomClass,
-		RoomTypeTable,
-		MinRooms,
-		MaxRooms,
-		SpawnedRooms);
 	
+	for (int32 Attempt = 0; Attempt < MaxRegenerateAttempts; Attempt++)
+	{
+		ClearDungeon();
+
+		Generator->GenerateDungeon(
+			StartRoomClass,
+			RoomTypeTable,
+			MinRooms,
+			MaxRooms,
+			SpawnedRooms);
+
+		if (SpawnedRooms.Num() >= MinRooms)
+		{
+			UE_LOG(LogTemp, Log,
+				TEXT("[DungeonManager] 던전 생성 성공. 시도 횟수: %d"), Attempt + 1);
+			break;
+		}
+
+		UE_LOG(LogTemp, Warning,
+			TEXT("[DungeonManager] 방 개수 부족 (%d/%d). 재생성 시도 %d/%d"),
+			SpawnedRooms.Num(), MinRooms,
+			Attempt + 1, MaxRegenerateAttempts);
+	}
+
+	if (SpawnedRooms.Num() < MinRooms)
+	{
+		UE_LOG(LogTemp, Warning,
+			TEXT("[DungeonManager] 최대 재시도 초과. 현재 상태로 사용. (%d개)"),
+			SpawnedRooms.Num());
+	}
+
 	SpawnObjects();
 }
+	
+
 
 void APCGDungeonManager::ClearDungeon()
 {

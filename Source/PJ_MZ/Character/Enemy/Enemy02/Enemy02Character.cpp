@@ -4,7 +4,6 @@
 
 AEnemy02Character::AEnemy02Character()
 {
-	AIControllerClass = AEnemy02AIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
@@ -14,6 +13,8 @@ void AEnemy02Character::Attack()
 	
 	// 부모의 OnAttackSuccess 호출해서 사라지기 처리
 	Super::Attack();
+	
+	UE_LOG(LogTemp, Warning, TEXT("공격"));
 	OnAttackSuccess();
 }
 
