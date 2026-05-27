@@ -8,6 +8,15 @@ AHT_PlayerState::AHT_PlayerState()
 	PrimaryActorTick.bCanEverTick = true; 
 }
 
+FOwningPictureData AHT_PlayerState::GetOwningPictureData(int32 index)
+{
+	if (OwningPictureArray.IsValidIndex(index))
+	{
+		return OwningPictureArray[index];		
+	}
+	return FOwningPictureData();
+}
+
 void AHT_PlayerState::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -15,24 +24,6 @@ void AHT_PlayerState::Tick(float DeltaTime)
 	ElapsedSeconds += DeltaTime;
 }
 
-float AHT_PlayerState::GetCachedScore(int32 index)
-{
-	if (CachedScoreArray.IsValidIndex(index))
-	{
-		return CachedScoreArray[index];		
-	}
-	return 0.f;
-}
-
-UTexture2D* AHT_PlayerState::GetPhotoTexture(int32 index)
-{
-	if (PhotoList.IsValidIndex(index))
-	{
-		return PhotoList[index];
-	}
-	
-	return nullptr;
-}
 
 FString AHT_PlayerState::GetFormattedTime() const
 {

@@ -152,11 +152,11 @@ void AHT_PlayerController::SetFadeOutWhiteUI()
 	}
 }
 
-void AHT_PlayerController::SetResultUI()
+void AHT_PlayerController::SetResultUI(const float totalScore)
 {
 	AHT_PlayerState* Ps=  GetPlayerState<AHT_PlayerState>();
 	if (Ps==nullptr) return;
-	
+
 	if (PhotoResultUIFactory)
 	{
 		PhotoResultUIWidget = CreateWidget<UResultUI>(this, PhotoResultUIFactory);
@@ -166,13 +166,14 @@ void AHT_PlayerController::SetResultUI()
 			
 				for (int32 i=0;i<Ps->MaxCanShotCount;i++)
 				{
-					UTexture2D* RenderTarget = Ps->GetPhotoTexture(i);
-					float score = Ps->GetCachedScore(i);
-					if (RenderTarget)
+					FOwningPictureData PictureData = Ps->GetOwningPictureData(i);
+					if (PictureData.PhotoImage!=nullptr)
 					{
-						PhotoResultUIWidget->SetPhotoImage(i,RenderTarget,score,Ps->GetFormattedTime());	
+						PhotoResultUIWidget->SetPhotoImage(i,PictureData,Ps->GetFormattedTime());	
 					}
 				}
+			// 최종 점수 표시
+			PhotoResultUIWidget->SetTotalScoreText(totalScore);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MZ_Datas.h"
 #include "GameFramework/PlayerState.h"
 #include "PJ_MZ_Delegates.h"
 #include "HT_PlayerState.generated.h"
@@ -33,16 +34,12 @@ public:
 	// ===============================
 	// 점수 및 사진 저장
 	// ===============================
-	UPROPERTY()
-	TArray<float> CachedScoreArray;
-	
-	float GetCachedScore(int32 index);
+	FOwningPictureData GetOwningPictureData(int32 index);
 
 	// HT_PlayerState.h
 	UPROPERTY(BlueprintReadWrite, Category = "Photo")
-	TArray<UTexture2D*> PhotoList; // 기존 UTextureRenderTarget2D* 에서 변경!
+	TArray<FOwningPictureData> OwningPictureArray; // 기존 UTextureRenderTarget2D* 에서 변경!
 	
-	UTexture2D* GetPhotoTexture(int32 index);
 
 	// ===============================
 	// 임시 아이디 및 닉네임 

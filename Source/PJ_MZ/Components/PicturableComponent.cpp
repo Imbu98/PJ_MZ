@@ -19,9 +19,9 @@ void UPicturableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 }
 
-float UPicturableComponent::GetScore() const
+FPicturableDatas UPicturableComponent::GetDatas() const
 {
-	return  PicturableDatas.PicturableMaxScore;
+	return  PicturableDatas;
 }
 
 void UPicturableComponent::SetInfo(FPicturableDatas picturableDataVal)

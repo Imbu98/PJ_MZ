@@ -52,7 +52,7 @@ public:
 	void SetFadeOutWhiteUI();
 	
 	UFUNCTION()
-	void SetResultUI();
+	void SetResultUI(const float totalScore);
 	
 
 protected:

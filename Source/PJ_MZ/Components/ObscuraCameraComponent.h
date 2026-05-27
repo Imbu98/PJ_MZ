@@ -52,66 +52,74 @@ private:
 	int32 ActivePointCount = 0;
 	
 public:
-	// 위젯에서 포인트별 결과를 전달받아 저장
-	UFUNCTION(BlueprintCallable)
-	void SetPointActive(int32 Index, bool bActive, AActor* HitActor);
-
-	// 활성화된 포인트 수 반환
-	UFUNCTION(BlueprintCallable)
-	int32 GetActivePointCount() const { return ActivePointCount; }
-
-	// 포인트 수 기반 데미지 배율 반환
-	UFUNCTION(BlueprintCallable)
-	float GetFinalScore(float score) const;
-
-	// 셔터 시 가장 많이 걸린 몹에게 데미지 적용
-	UFUNCTION(BlueprintCallable)
-	void ApplyShutterDamage();
-
-	// 포인트 배열 초기화 (위젯이 포인트 수 알려줄 때 호출)
-	UFUNCTION(BlueprintCallable)
-	void InitPoints(int32 PointCount);
 	
+	// ===============================
+	// UI의 각 점에 대한 정보
+	// ===============================
+	UFUNCTION(BlueprintCallable)
+	void SetPointActive(int32 Index, bool bActive, AActor* HitActor); // 위젯에서 포인트별 결과를 전달받아 저장
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetActivePointCount() const { return ActivePointCount; } 	// 활성화된 포인트 수 반환
+
+	UFUNCTION(BlueprintCallable)
+	float GetFinalScore(float score) const; 	// 포인트 수 기반 데미지 배율 반환
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyShutterDamage(); 	// 셔터 시 가장 많이 걸린 몹에게 데미지 적용
+
+	UFUNCTION(BlueprintCallable)
+	void InitPoints(int32 PointCount);	// 포인트 배열 초기화 (위젯이 포인트 수 알려줄 때 호출)
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<class UDataTable> DT_SetInfo;
+	
+	// ===============================
+	// 현재 카메라 모드 관련 정보 
+	// ===============================
 	UFUNCTION()
 	void SetObscuraMode(EObscuraModeAction mode){ CurrentMode = mode;};
 	
 	UFUNCTION()
 	EObscuraModeAction GetObscuraMode(){ return CurrentMode;};
 	
+	// ===============================
+	// 카메라 촬영 쿨타임 및 횟수
+	// ===============================
 	UFUNCTION()
 	bool ObscuraCanShot();
 	
 	UFUNCTION()
 	float GetObscuraCooltimePercent();
 	
-	// 결과 창 (임시)
+	// ===============================
+	// 결과창 정보 표시
+	// ===============================
 	UFUNCTION()
-	void SetResultUI();
+	void SetResultUI(const float totalScore);
 
 	UFUNCTION()
 	void OnGameEnd();
 	
-	// 현재 찍은 Picturable오브젝트의 점수를 저장
+	// ===============================
+	// 배열에 사진 정보 저장 및 가져오기
+	// ===============================
 	UFUNCTION()
-	void AddCurrentScoreToArray(float scoreVal);
+	void AddCurrentDataToArray(FOwningPictureData datas); // 현재 찍은 Picturable오브젝트의 점수를 저장
 	
-	// 현재 Playerstate의 점수배열의 점수 가져오기
-	float GetScoreArrayValue(int32 index);
+	UFUNCTION()
+	FOwningPictureData GetOwningPictureDataInArray(int32 index); // 현재 Playerstate의 사진배열의 데이터 가져오기
 	
 	
 	// ===============================
 	// 캡쳐 관련
 	// ===============================
 private:
-	UPROPERTY(VisibleAnywhere)
-	USceneCaptureComponent2D* SceneCapture;
-
-	UPROPERTY()
-	UTextureRenderTarget2D* RenderTarget;
+	
 
 public:
 	UFUNCTION()
-	void CapturePhoto();
+	void CapturePhoto(FOwningPictureData& datas);
 	
 	// ===============================
 	// 사진 액터 저장
@@ -123,7 +131,7 @@ public:
 	void ClearMainPhotoActor(){MainPhotoActor = nullptr;}
 	
 	UFUNCTION()
-		float GetPicturableScore();
+		FPicturableDatas GetPicturableData();
 
 	// ===============================
 	// Zoom In & Out
