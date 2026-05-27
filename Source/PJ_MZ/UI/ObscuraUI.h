@@ -15,7 +15,7 @@ public:
 	
 	// 레이 최대 거리
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Obscura")
-	float TraceDistance = 5000.f;
+	float TraceDistance = 1000.f;
 	
 	// 포인트 기본 색상
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Obscura")
@@ -66,6 +66,8 @@ private:
 	
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float DeltaTime) override;
+	
+	void BindingEvent();
 
 	APlayerController* PC;
 
@@ -77,8 +79,9 @@ private:
 	bool TraceFromScreenPoint(UImage* PointImage, AActor*& OutHitActor);
 	FVector2D GetPointScreenCenter(UImage* PointImage);
 	void ResetObscura();
+
+	void OnCameraFOVUpdated(float FOV);
 	
-	void BindingEvent();
 	
 	// ===============================
 	// 타켓액터 Widget
@@ -89,5 +92,10 @@ public:
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	TObjectPtr<UWidgetAnimation> TargetIndicatorAnim;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LerpSpeed = 10.0f;
+	
+	float CurrentFOVScale = 1.0f;
+	float TargetFOVScale = 1.0f;
 	
 };

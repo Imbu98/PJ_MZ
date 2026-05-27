@@ -318,7 +318,7 @@ void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 	bObscuraReleased = false;
 
 	// 카메라 줌 초기화
-	ObscuraCameraComp->TargetFOV = 90.f;
+	GetFirstPersonCameraComponent()->SetFieldOfView(90.f);
 }
 
 void AHT_Player::OnZoomObscura(const FInputActionValue& Value)
@@ -328,12 +328,16 @@ void AHT_Player::OnZoomObscura(const FInputActionValue& Value)
 
 	float ScrollValue = Value.Get<float>();
 
-	// TargetFOV만 변경
-	ObscuraCameraComp->TargetFOV = FMath::Clamp(
+	float targetFOV = FMath::Clamp(
 		ObscuraCameraComp->TargetFOV - ScrollValue * ObscuraCameraComp->ZoomStep,
 		ObscuraCameraComp->MinFOV,
 		ObscuraCameraComp->MaxFOV
 	);
+	// TargetFOV만 변경
+	ObscuraCameraComp->TargetFOV = targetFOV;
+	
+	// FOV변경 시 델리게이트 알림
+	Cached_PS->OnCameraFOVChangeDelegate.Broadcast(targetFOV);
 }
 
 void AHT_Player::CreateObscuraWidget()

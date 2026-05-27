@@ -5,7 +5,7 @@
 #include "Styling/SlateBrush.h"
 
 
-void UResultUI::SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTarget,float scoreVal,const FString Formattedstring)
+void UResultUI::SetPhotoImage(int32 index, UTexture2D* renderTarget,float scoreVal,const FString Formattedstring)
 {
 	if (renderTarget)
 	{

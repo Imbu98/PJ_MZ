@@ -24,6 +24,8 @@ public class PJ_MZ : ModuleRules
 			"HTTP",
 			"Json",
 			"JsonUtilities",
+			"RenderCore", 
+			"Renderer",   
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "Imath", "Imath", "Imath" });

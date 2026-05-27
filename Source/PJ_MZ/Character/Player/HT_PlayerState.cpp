@@ -24,7 +24,7 @@ float AHT_PlayerState::GetCachedScore(int32 index)
 	return 0.f;
 }
 
-UTextureRenderTarget2D* AHT_PlayerState::GetPhotoTexture(int32 index)
+UTexture2D* AHT_PlayerState::GetPhotoTexture(int32 index)
 {
 	if (PhotoList.IsValidIndex(index))
 	{

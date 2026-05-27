@@ -32,5 +32,5 @@ class PJ_MZ_API UResultUI : public UUserWidget
 	
 public:
 	UFUNCTION()
-	void SetPhotoImage(int32 index, UTextureRenderTarget2D* renderTarget,float scoreVal,const FString Formattedstring);
+	void SetPhotoImage(int32 index, UTexture2D* renderTarget,float scoreVal,const FString Formattedstring);
 };

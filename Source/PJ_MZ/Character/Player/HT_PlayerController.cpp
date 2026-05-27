@@ -166,7 +166,7 @@ void AHT_PlayerController::SetResultUI()
 			
 				for (int32 i=0;i<Ps->MaxCanShotCount;i++)
 				{
-					UTextureRenderTarget2D* RenderTarget = Ps->GetPhotoTexture(i);
+					UTexture2D* RenderTarget = Ps->GetPhotoTexture(i);
 					float score = Ps->GetCachedScore(i);
 					if (RenderTarget)
 					{

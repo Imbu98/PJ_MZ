@@ -38,10 +38,11 @@ public:
 	
 	float GetCachedScore(int32 index);
 
-	UPROPERTY()
-	TArray<UTextureRenderTarget2D*> PhotoList;	// 찍은 사진들 저장
+	// HT_PlayerState.h
+	UPROPERTY(BlueprintReadWrite, Category = "Photo")
+	TArray<UTexture2D*> PhotoList; // 기존 UTextureRenderTarget2D* 에서 변경!
 	
-	UTextureRenderTarget2D* GetPhotoTexture(int32 index);
+	UTexture2D* GetPhotoTexture(int32 index);
 
 	// ===============================
 	// 임시 아이디 및 닉네임 
@@ -69,7 +70,7 @@ public:
 	// ===============================
 	bool IsObscraCooltime = false;
 	float currentObscuraCooltime = 0.f;
-	float MaxObscuraCooltime = 3.f;
+	float MaxObscuraCooltime = 1.f;
 
 	// ===============================
 	// 플레이어 정신력
@@ -86,6 +87,7 @@ public:
 	FMentalityChangedDelegate OnMentalityChangeDelegate;
 	FShotCountChangeDelegate OnShotCountChangeDelegate;
 	FObscuraCooltimeFinished OnObscuraCooltimeFinished;
+	FCameraFOVChangeDelegate OnCameraFOVChangeDelegate;
 
 	
 	
