@@ -185,10 +185,50 @@ void UObscuraCameraComponent::OnGameEnd()
 
 	// 점수 다 더하기
 	float totalScore = 0.f;
+	
+	TMap<FName,int32> SetIDCountMap;
+	
 	for (auto owningData : Cached_PS->OwningPictureArray)
 	{
 		totalScore += owningData.FinalScore;
+		
+		if (SetIDCountMap.Contains(owningData.PicturableDatas.SetID))
+		{
+			SetIDCountMap[owningData.PicturableDatas.SetID]++;
+		}
+		else
+		{
+			SetIDCountMap.Add(owningData.PicturableDatas.SetID, 1);
+		}
 	}
+	// Set Object인지 확인
+	if (DT_SetInfo)
+	{
+		for (const auto& Pair : SetIDCountMap)
+		{
+			const FName& SetID = Pair.Key;
+			int32 SetCount = Pair.Value;
+
+			if (FSetBonus* SetBonus = DT_SetInfo->FindRow<FSetBonus>(SetID, TEXT("SetBonusDT Missed")))
+			{
+				// 세트보너스 점수
+				// 2세트일때는 2세트 점수를 더하기, 3세트 일때는 3세트 점수를 더하기
+				if (SetCount >= 3)
+				{
+					totalScore += SetBonus->Set3BonusScore;
+				}
+				else if (SetCount >= 2)
+				{
+					totalScore += SetBonus->Set2BonusScore;
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	
 	// 끝나는데 걸린 시간
 	float endTime = Cached_PS->GetElapsedSeconds();
 
