@@ -86,32 +86,28 @@ public:
 	
 	// 결과 창 (임시)
 	UFUNCTION()
-	void SetResultUI();
+	void SetResultUI(const float totalScore);
 
 	UFUNCTION()
 	void OnGameEnd();
 	
 	// 현재 찍은 Picturable오브젝트의 점수를 저장
 	UFUNCTION()
-	void AddCurrentScoreToArray(float scoreVal);
+	void AddCurrentDataToArray(FOwningPictureData datas);
 	
-	// 현재 Playerstate의 점수배열의 점수 가져오기
-	float GetScoreArrayValue(int32 index);
+	// 현재 Playerstate의 사진배열의 데이터 가져오기
+	FOwningPictureData GetOwningPictureDataInArray(int32 index);
 	
 	
 	// ===============================
 	// 캡쳐 관련
 	// ===============================
 private:
-	UPROPERTY(VisibleAnywhere)
-	USceneCaptureComponent2D* SceneCapture;
-
-	UPROPERTY()
-	UTextureRenderTarget2D* RenderTarget;
+	
 
 public:
 	UFUNCTION()
-	void CapturePhoto();
+	void CapturePhoto(FOwningPictureData& datas);
 	
 	// ===============================
 	// 사진 액터 저장
@@ -123,7 +119,7 @@ public:
 	void ClearMainPhotoActor(){MainPhotoActor = nullptr;}
 	
 	UFUNCTION()
-		float GetPicturableScore();
+		FPicturableDatas GetPicturableData();
 
 	// ===============================
 	// Zoom In & Out

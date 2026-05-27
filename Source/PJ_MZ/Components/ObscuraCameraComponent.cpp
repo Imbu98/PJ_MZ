@@ -14,10 +14,6 @@
 UObscuraCameraComponent::UObscuraCameraComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	
-	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
-	SceneCapture->bCaptureEveryFrame = false; // 촬영할 때만 캡처
-	SceneCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR; // HUD 제외
 }
 
 void UObscuraCameraComponent::BeginPlay()
@@ -63,7 +59,6 @@ void UObscuraCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType
 			if (Cam)
 			{
 				Cam->SetFieldOfView(CurrentFOV);
-				SceneCapture->FOVAngle = CurrentFOV;
 			}
 		}
 	}
@@ -110,14 +105,14 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	
 	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);
 	
+	FOwningPictureData PictureData;
+	PictureData.PicturableDatas = GetPicturableData();
+	PictureData.FinalScore = GetFinalScore(PictureData.PicturableDatas.PicturableMaxScore);
+	PictureData.PhotoImage=nullptr;
 	
-	float FinalScore = GetFinalScore(GetPicturableScore());
+	CapturePhoto(PictureData);
 	
-	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("Score:%f"),FinalScore));
-	
-	AddCurrentScoreToArray(FinalScore);
-	
-	CapturePhoto();
+	AddCurrentDataToArray(PictureData);
 	
 	// AActor* Target = GetPrimaryTarget();
 	// if (!Target) return;
@@ -160,7 +155,7 @@ float UObscuraCameraComponent::GetObscuraCooltimePercent()
 	return Cached_PS->currentObscuraCooltime/Cached_PS->MaxObscuraCooltime;
 }
 
-void UObscuraCameraComponent::SetResultUI()
+void UObscuraCameraComponent::SetResultUI(const float totalScore)
 {
 	AHT_Player* Player = Cast<AHT_Player>(GetOwner());
 	if (!Player) return;
@@ -168,7 +163,7 @@ void UObscuraCameraComponent::SetResultUI()
 	AHT_PlayerController* Pc=  Cast<AHT_PlayerController>(Player->GetController());
 	if (!Pc) return;
 	
-	Pc->SetResultUI();
+	Pc->SetResultUI(totalScore);
 }
 
 void UObscuraCameraComponent::OnGameEnd()
@@ -181,8 +176,6 @@ void UObscuraCameraComponent::OnGameEnd()
 	}
 
 	if (!Cached_PS) return;
-
-	SetResultUI();
 	
 
 	// 임시 플레이어 정보 - 나중에 교체
@@ -192,41 +185,43 @@ void UObscuraCameraComponent::OnGameEnd()
 
 	// 점수 다 더하기
 	float totalScore = 0.f;
-	for (auto score : Cached_PS->CachedScoreArray)
+	for (auto owningData : Cached_PS->OwningPictureArray)
 	{
-		totalScore += score;
+		totalScore += owningData.FinalScore;
 	}
 	// 끝나는데 걸린 시간
 	float endTime = Cached_PS->GetElapsedSeconds();
 
 	GameMode->SubmitScore(GameId, PlayerId, PlayerName, totalScore, endTime);
+	
+	SetResultUI(totalScore);
 }
 
-void UObscuraCameraComponent::AddCurrentScoreToArray(float scoreVal)
+void UObscuraCameraComponent::AddCurrentDataToArray(FOwningPictureData datas)
 {
 	if (Cached_PS)
 	{
-		Cached_PS->CachedScoreArray.Add(scoreVal);
+		Cached_PS->OwningPictureArray.Add(datas);
 	}
 }
 
-float UObscuraCameraComponent::GetScoreArrayValue(int32 index)
+FOwningPictureData UObscuraCameraComponent::GetOwningPictureDataInArray(int32 index)
 {
 	if (Cached_PS)
 	{
-		return Cached_PS->CachedScoreArray[index];
+		return Cached_PS->OwningPictureArray[index];
 	}
-	return 0.f;
+	return FOwningPictureData();
 }
 
-void UObscuraCameraComponent::CapturePhoto()
+void UObscuraCameraComponent::CapturePhoto(FOwningPictureData& datas)
 {
     AHT_PlayerController* PC = Cast<AHT_PlayerController>(GetWorld()->GetFirstPlayerController());
     if (!PC) return;
 
-    // 한 프레임 뒤 캡처
-    GetWorld()->GetTimerManager().SetTimerForNextTick([this, PC]()
-    {
+    // // 한 프레임 뒤 캡처
+    // GetWorld()->GetTimerManager().SetTimerForNextTick([this, PC]()
+    // {
         // 1. 유효성 검사
         ULocalPlayer* LocalPlayer = PC->GetLocalPlayer();
         if (!LocalPlayer || !LocalPlayer->ViewportClient || !LocalPlayer->ViewportClient->Viewport) return;
@@ -272,25 +267,25 @@ void UObscuraCameraComponent::CapturePhoto()
         // (타이머(람다) 안에서 실행되므로, 그 1프레임 사이에 플레이어가 죽거나 PS가 파괴됐을 수 있어 체크 필요)
         if (Cached_PS)
         {
-            Cached_PS->PhotoList.Add(Photo);
+        	datas.PhotoImage = Photo;
             GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, 
                 FString::Printf(TEXT("찰칵! 앨범 저장 완료 W:%d H:%d"), Width, Height));
         }
-    });
+    // });
 }
 
 
-float UObscuraCameraComponent::GetPicturableScore()
+FPicturableDatas UObscuraCameraComponent::GetPicturableData()
 {
 	if (MainPhotoActor)
 	{
 		UPicturableComponent* picturableComp = MainPhotoActor->FindComponentByClass<UPicturableComponent>();
 		if (picturableComp)
 		{
-			return picturableComp->GetScore();
+			return picturableComp->GetDatas();
 		}
 	}
-	return 0.f;
+	return FPicturableDatas();
 }
 
 

@@ -72,3 +72,19 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 LegendarySpawnCount;
 };
+
+USTRUCT(BlueprintType)
+struct FOwningPictureData
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FPicturableDatas PicturableDatas;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UTexture2D* PhotoImage;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float FinalScore;
+};

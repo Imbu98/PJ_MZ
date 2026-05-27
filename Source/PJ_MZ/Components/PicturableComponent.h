@@ -24,7 +24,7 @@ protected:
 	
 public:
 	UFUNCTION()
-	float GetScore() const;
+	FPicturableDatas GetDatas() const;
 	
 	UFUNCTION()
 	void SetInfo(FPicturableDatas picturableDatas);
