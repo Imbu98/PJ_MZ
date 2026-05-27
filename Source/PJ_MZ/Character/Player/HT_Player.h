@@ -26,8 +26,8 @@ class PJ_MZ_API AHT_Player : public APJ_MZCharacter , public IInteract_Interface
 	/** Player light source */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpotLightComponent* SpotLight;
-	
-	UPROPERTY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<class UObscuraCameraComponent> ObscuraCameraComp;
 	
 	// 헤더

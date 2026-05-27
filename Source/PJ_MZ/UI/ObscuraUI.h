@@ -53,6 +53,7 @@ private:
 	// 스프린트 게이지
 	UFUNCTION()
 	void OnStaminaBarUpdated(float percent);
+
 	
 	UFUNCTION()
 	void OnShotCountUpdated(int shotCount);
@@ -62,6 +63,9 @@ private:
 	
 	UFUNCTION()
 	void OnObscuraBarReset();
+	
+	UFUNCTION()
+	void ResetCachedActor();
 	
 	
 	virtual void NativeConstruct() override;
@@ -97,5 +101,12 @@ public:
 	
 	float CurrentFOVScale = 1.0f;
 	float TargetFOVScale = 1.0f;
+	
+	bool bIsAlreadyCaptured=false;
+	
+	// 타겟 변경 여부를 체크하기 위한 캐싱 변수
+	UPROPERTY()
+	AActor* LastCheckedActor = nullptr;
+	
 	
 };

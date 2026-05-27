@@ -101,6 +101,10 @@ public:
 	UFUNCTION()
 	void OnGameEnd();
 	
+	UFUNCTION()
+	float CalculateTotalScore();
+	float CalculateSetBonus(float totalScore);
+
 	// ===============================
 	// 배열에 사진 정보 저장 및 가져오기
 	// ===============================

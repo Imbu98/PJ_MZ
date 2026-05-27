@@ -4,7 +4,10 @@
 #include "HT_Player.h"
 #include "HT_PlayerState.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/DynamoDBComponent.h"
 #include "Components/ObscuraCameraComponent.h"
+#include "Default/PJ_MZGameMode.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
 #include "UI/PlayerStateUI.h"
@@ -19,6 +22,13 @@ AHT_PlayerController::AHT_PlayerController()
 void AHT_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	APJ_MZGameMode* GameMode = Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		// 델리게이트 바인딩
+		GameMode->DynamoDBComp->OnLeaderboardFetched.AddUObject(this, &AHT_PlayerController::OnLeaderboardReceived);
+	}
 	
 }
 
@@ -156,7 +166,8 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 {
 	AHT_PlayerState* Ps=  GetPlayerState<AHT_PlayerState>();
 	if (Ps==nullptr) return;
-
+	
+	
 	if (PhotoResultUIFactory)
 	{
 		PhotoResultUIWidget = CreateWidget<UResultUI>(this, PhotoResultUIFactory);
@@ -166,14 +177,20 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 			
 				for (int32 i=0;i<Ps->MaxCanShotCount;i++)
 				{
-					FOwningPictureData PictureData = Ps->GetOwningPictureData(i);
-					if (PictureData.PhotoImage!=nullptr)
-					{
-						PhotoResultUIWidget->SetPhotoImage(i,PictureData,Ps->GetFormattedTime());	
-					}
+					const FOwningPictureData& Data =Ps->GetOwningPictureData(i);
+					bool bIsDuplicate = Data.IsDuplicate;
+					PhotoResultUIWidget->SetPhotoImage(i, Data, Ps->GetFormattedTime(), bIsDuplicate);
 				}
 			// 최종 점수 표시
 			PhotoResultUIWidget->SetTotalScoreText(totalScore);
 		}
+	}
+}
+
+void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries)
+{
+	for (auto& Entry : Entries)
+	{
+		UE_LOG(LogTemp, Log, TEXT("%s | %d | %.2f"), *Entry.PlayerName, Entry.Score, Entry.ClearTime);
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MZ_Datas.h"
 #include "CoreMinimal.h"
 
 // 정신력 변경 델리게이트
@@ -14,5 +15,8 @@ DECLARE_MULTICAST_DELEGATE(FObscuraCooltimeFinished);
 DECLARE_MULTICAST_DELEGATE(FOnDungeonGenerationComplete);
 // 카메라 줌인 , 줌아웃 델리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FCameraFOVChangeDelegate,float);
+
+// 델리게이트 선언
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeaderboardFetched, const TArray<FLeaderboardEntry>&);
 
 

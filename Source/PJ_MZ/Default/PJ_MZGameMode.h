@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PJ_MZ_Delegates.h"
 #include "GameFramework/GameModeBase.h"
 #include "Interfaces/IHttpRequest.h"
 #include "PJ_MZGameMode.generated.h"
@@ -12,16 +13,18 @@ class APJ_MZGameMode : public AGameModeBase
 
 public:
 	APJ_MZGameMode();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UDynamoDBComponent> DynamoDBComp;
 
 	void OnSubmitComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
-
-	void SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime);
-
-	void OnFetchComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
-
-	UPROPERTY()
-	FString DBUrl = "https://gj2xbjow98.execute-api.ap-northeast-2.amazonaws.com/Prod";
 	
+	void SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime);
+	
+	//void OnFetchComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
+	
+	UFUNCTION()
+	void FetchLeaderboard(FString GameId);
 	
 };
 

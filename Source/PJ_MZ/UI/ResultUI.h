@@ -44,6 +44,6 @@ class PJ_MZ_API UResultUI : public UUserWidget
 	
 public:
 	UFUNCTION()
-	void SetPhotoImage(int32 index, const FOwningPictureData& pictureData,const FString& timeString);
+	void SetPhotoImage(int32 index, const FOwningPictureData& pictureData,const FString& timeString,bool IsDuplicate);
 	void SetTotalScoreText(float totalScore);
 };

@@ -54,6 +54,8 @@ public:
 	UFUNCTION()
 	void SetResultUI(const float totalScore);
 	
+	UFUNCTION()
+	void OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries);
 
 protected:
 	virtual void BeginPlay() override;
