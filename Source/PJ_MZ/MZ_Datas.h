@@ -87,4 +87,24 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float FinalScore;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool IsDuplicate=false;
 };
+
+// 리더보드 데이터 구조체
+USTRUCT(BlueprintType)
+struct FLeaderboardEntry
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FString PlayerName;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 Score;
+
+	UPROPERTY(BlueprintReadOnly)
+	float ClearTime;
+};
+

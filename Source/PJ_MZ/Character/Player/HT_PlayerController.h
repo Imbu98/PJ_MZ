@@ -39,6 +39,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<UResultUI> PhotoResultUIWidget;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class UScoreLeaderboardUI> ScoreLeaderboardUIFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UScoreLeaderboardUI> ScoreLeaderboardUIWidget;
+	
 	UFUNCTION()
 	void CreateObscuraWidget();
 	
@@ -54,6 +60,8 @@ public:
 	UFUNCTION()
 	void SetResultUI(const float totalScore);
 	
+	UFUNCTION()
+	void OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries);
 
 protected:
 	virtual void BeginPlay() override;

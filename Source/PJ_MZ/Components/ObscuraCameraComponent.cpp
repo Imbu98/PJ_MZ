@@ -2,6 +2,7 @@
 
 #include "Mz_GameInstance.h"
 #include "PicturableComponent.h"
+#include "PJ_MZ.h"
 #include "Camera/CameraComponent.h"
 #include "Character/Player/HT_PlayerState.h"
 #include "Character/Player/HT_Player.h"
@@ -100,6 +101,8 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 		
 		OnGameEnd();
 		
+		
+		
 		return;
 	}
 	
@@ -182,52 +185,12 @@ void UObscuraCameraComponent::OnGameEnd()
 	FString GameId    = UGameplayStatics::GetCurrentLevelName(GetWorld());
 	FString PlayerId  = Cached_PS->MZ_PlayerID;
 	FString PlayerName = Cached_PS->MZ_PlayerName;
-
-	// 점수 다 더하기
-	float totalScore = 0.f;
 	
-	TMap<FName,int32> SetIDCountMap;
+	// 총 점수 계산
+	float totalScore = CalculateTotalScore();
 	
-	for (auto owningData : Cached_PS->OwningPictureArray)
-	{
-		totalScore += owningData.FinalScore;
-		
-		if (SetIDCountMap.Contains(owningData.PicturableDatas.SetID))
-		{
-			SetIDCountMap[owningData.PicturableDatas.SetID]++;
-		}
-		else
-		{
-			SetIDCountMap.Add(owningData.PicturableDatas.SetID, 1);
-		}
-	}
-	// Set Object인지 확인
-	if (DT_SetInfo)
-	{
-		for (const auto& Pair : SetIDCountMap)
-		{
-			const FName& SetID = Pair.Key;
-			int32 SetCount = Pair.Value;
-
-			if (FSetBonus* SetBonus = DT_SetInfo->FindRow<FSetBonus>(SetID, TEXT("SetBonusDT Missed")))
-			{
-				// 세트보너스 점수
-				// 2세트일때는 2세트 점수를 더하기, 3세트 일때는 3세트 점수를 더하기
-				if (SetCount >= 3)
-				{
-					totalScore += SetBonus->Set3BonusScore;
-				}
-				else if (SetCount >= 2)
-				{
-					totalScore += SetBonus->Set2BonusScore;
-				}
-			}
-		}
-	}
-	
-	
-	
-	
+	// 세트 보너스 적용
+	totalScore = CalculateSetBonus(totalScore);
 	
 	// 끝나는데 걸린 시간
 	float endTime = Cached_PS->GetElapsedSeconds();
@@ -235,14 +198,33 @@ void UObscuraCameraComponent::OnGameEnd()
 	GameMode->SubmitScore(GameId, PlayerId, PlayerName, totalScore, endTime);
 	
 	SetResultUI(totalScore);
+	
+	
 }
 
 void UObscuraCameraComponent::AddCurrentDataToArray(FOwningPictureData datas)
 {
-	if (Cached_PS)
+	if (!Cached_PS) return;
+
+	FName NewName = datas.PicturableDatas.PicturableName;
+
+	for (FOwningPictureData& Existing : Cached_PS->OwningPictureArray)
 	{
-		Cached_PS->OwningPictureArray.Add(datas);
+		if (Existing.PicturableDatas.PicturableName != NewName) continue;
+
+		// 같은 이름 발견 → 점수 비교
+		if (datas.FinalScore >= Existing.FinalScore)
+		{
+			// 새거가 더 높으면 기존꺼를 중복으로
+			Existing.IsDuplicate = true;
+		}
+		else
+		{
+			// 기존꺼가 더 높으면 새거를 중복으로
+			datas.IsDuplicate = true;
+		}
 	}
+	Cached_PS->OwningPictureArray.Add(datas);
 }
 
 FOwningPictureData UObscuraCameraComponent::GetOwningPictureDataInArray(int32 index)
@@ -326,6 +308,46 @@ FPicturableDatas UObscuraCameraComponent::GetPicturableData()
 		}
 	}
 	return FPicturableDatas();
+}
+
+float UObscuraCameraComponent::CalculateTotalScore()
+{
+	float TotalScore = 0.f;
+	
+	for (const FOwningPictureData& Data : Cached_PS->OwningPictureArray)
+	{
+		if (!Data.IsDuplicate)
+			TotalScore += Data.FinalScore;
+	}
+	return TotalScore;
+}
+
+float UObscuraCameraComponent::CalculateSetBonus(float totalScore)
+{
+	TMap<FName, int32> SetIDCountMap;
+
+	for (const FOwningPictureData& owningData : Cached_PS->OwningPictureArray)
+	{
+		// 중복 제외
+		if (owningData.IsDuplicate) continue;
+
+		SetIDCountMap.FindOrAdd(owningData.PicturableDatas.SetID)++;
+	}
+
+	if (DT_SetBonusInfo)
+	{
+		for (const auto& Pair : SetIDCountMap)
+		{
+			if (FSetBonus* SetBonus = DT_SetBonusInfo->FindRow<FSetBonus>(Pair.Key, TEXT("SetBonusDT Missed")))
+			{
+				if (Pair.Value >= 3)
+					totalScore += SetBonus->Set3BonusScore;
+				else if (Pair.Value >= 2)
+					totalScore += SetBonus->Set2BonusScore;
+			}
+		}
+	}
+	return totalScore;
 }
 
 

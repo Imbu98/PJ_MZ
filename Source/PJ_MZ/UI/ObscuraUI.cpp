@@ -108,45 +108,37 @@ void UObscuraUI::UpdateAllPoints()
     }
 
     // 2단계: 잡힌 액터가 2개 이상이면 0번 포인트에 가장 가까운 액터를 Main으로
-    AActor* MainHitActor = nullptr;
-    if (UniqueActors.Num() >= 2)
-    {
-        FVector2D CenterScreenPos = GetPointScreenCenter(FinderPoints[0]);
-        float MinDist = FLT_MAX;
+	// 2단계: Main Photo Actor 선정 로직 간소화
+	AActor* FinalMainActor = nullptr;
 
-        for (auto& Result : TraceResults)
-        {
-            if (!Result.Key || !Result.Value) continue;
+	if (UniqueActors.Num() == 1)
+	{
+		FinalMainActor = *UniqueActors.begin(); // 1개면 바로 확정
+	}
+	else if (UniqueActors.Num() >= 2)
+	{
+		FVector2D CenterScreenPos = GetPointScreenCenter(FinderPoints[0]);
+		float MinDist = FLT_MAX;
 
-            FVector2D ActorScreenPos;
-            if (!PC->ProjectWorldLocationToScreen(
-                Result.Value->GetActorLocation(), ActorScreenPos)) continue;
-
-            float Dist = FVector2D::Distance(ActorScreenPos, CenterScreenPos);
-            if (Dist < MinDist)
-            {
-                MinDist = Dist;
-                MainHitActor = Result.Value;
-            }
-        }
-    }
-	// MainPhotoActor 설정
-	if (UniqueActors.Num() == 0)
-	{
-		// 아무것도 안 잡힘
-		CameraObscuraComp->MainPhotoActor = nullptr;
+		// 최적화: TraceResults 전체가 아니라 '중복 제거된 액터(UniqueActors)'만 순회합니다.
+		for (AActor* Actor : UniqueActors) 
+		{
+			FVector2D ActorScreenPos;
+			if (PC->ProjectWorldLocationToScreen(Actor->GetActorLocation(), ActorScreenPos))
+			{
+				float Dist = FVector2D::Distance(ActorScreenPos, CenterScreenPos);
+				if (Dist < MinDist)
+				{
+					MinDist = Dist;
+					FinalMainActor = Actor;
+				}
+			}
+		}
 	}
-	else if (UniqueActors.Num() == 1)
-	{
-		// 1개면 그 액터가 Main
-		CameraObscuraComp->MainPhotoActor = *UniqueActors.begin();
-	}
-	else
-	{
-		// 2개 이상이면 0번 포인트에 가장 가까운 액터가 Main
-		CameraObscuraComp->MainPhotoActor = MainHitActor;
-	}
-	AActor* FinalMainActor = CameraObscuraComp->MainPhotoActor;
+    
+	// 컴포넌트에 최종 저장
+	CameraObscuraComp->MainPhotoActor = FinalMainActor;
+	
     // 3단계: 포인트 활성화 처리
 	for (int32 i = 0; i < FinderPoints.Num(); i++)
 	{
@@ -167,15 +159,44 @@ void UObscuraUI::UpdateAllPoints()
 		Point->SetColorAndOpacity(bHit ? ActiveColor : DefaultColor);
 	}
 
-    // 4단계: HeadSocket 또는 액터 중앙에 UI 표시
-    AActor* TargetActor = CameraObscuraComp->MainPhotoActor;
+    // // 4단계: HeadSocket 또는 액터 중앙에 UI 표시
+    // AActor* TargetActor = CameraObscuraComp->MainPhotoActor;
     if (TargetIndicatorWidget)
     {
-        if (TargetActor)
+        if (FinalMainActor)
         {
+        	// 타겟이 이전과 달라졌을 때만 (새로운 타겟이 들어왔을 때만) 상태를 초기화하고 다시 검사합니다.
+        	if (FinalMainActor != LastCheckedActor)
+        	{
+        		bIsAlreadyCaptured = false;      // 1. 여기서 false로 초기화
+        		LastCheckedActor = FinalMainActor; // 2. 현재 타겟을 이전 타겟으로 덮어씌움
+
+        		FName ActorName = NAME_None;
+        		UPicturableComponent* PicturableComp = FinalMainActor->FindComponentByClass<UPicturableComponent>();
+        		if (PicturableComp)
+        		{
+        			ActorName = PicturableComp->GetDatas().PicturableName;
+        		}
+                
+        		// 저장된 배열에서 같은 이름 찾기
+        		if (CameraObscuraComp->Cached_PS)
+        		{
+        			for (const FOwningPictureData& Data : CameraObscuraComp->Cached_PS->OwningPictureArray)
+        			{
+        				if (Data.PicturableDatas.PicturableName == ActorName && !Data.IsDuplicate)
+        				{
+        					bIsAlreadyCaptured = true;
+        					break;
+        				}
+        			}
+        		}
+        		TargetIndicatorWidget->SetColorAndOpacity(bIsAlreadyCaptured ? FLinearColor::Green : FLinearColor::Red);
+
+        	}
+        	
             FVector TargetWorldPos;
             USkeletalMeshComponent* SkelMesh =
-                TargetActor->FindComponentByClass<USkeletalMeshComponent>();
+                FinalMainActor->FindComponentByClass<USkeletalMeshComponent>();
 
             if (SkelMesh && SkelMesh->DoesSocketExist(FName("HeadSocket")))
             {
@@ -183,7 +204,7 @@ void UObscuraUI::UpdateAllPoints()
             }
             else
             {
-                TargetWorldPos = TargetActor->GetActorLocation();
+                TargetWorldPos = FinalMainActor->GetActorLocation();
             }
         	
         	// 가시성이 이미 Visible이 아닐 때만 초기화 및 재생
@@ -229,6 +250,7 @@ void UObscuraUI::UpdateAllPoints()
         else
         {
             TargetIndicatorWidget->SetVisibility(ESlateVisibility::Hidden);
+        	ResetCachedActor();
         }
     }
 }
@@ -322,6 +344,9 @@ void UObscuraUI::OnShotCountUpdated(int shotCount)
 	if (Text_ObscuraCount)
 	{
 		Text_ObscuraCount->SetText(FText::AsNumber(shotCount));
+		
+		ResetCachedActor();
+		
 	}
 }
 
@@ -344,6 +369,13 @@ void UObscuraUI::OnObscuraBarReset()
 	{
 		PB_ObscuraCooltimeBar->SetPercent(0.f);	
 	}
+}
+
+void UObscuraUI::ResetCachedActor()
+{
+	// 촬영 후에 가지고 있던 액터 초기화 시켜주기
+	LastCheckedActor = nullptr; // 다음 번에 같은 액터가 잡혀도 다시 검사하도록 nullptr로 초기화
+	bIsAlreadyCaptured = false; // 상태도 덩달아 초기화
 }
 
 
