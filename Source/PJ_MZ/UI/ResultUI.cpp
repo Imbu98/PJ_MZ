@@ -3,6 +3,7 @@
 #include "MZ_Datas.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 #include "Default/PJ_MZGameMode.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -20,6 +21,11 @@ void UResultUI::NativeConstruct()
         Button_ShowLeaderboard->OnClicked.AddDynamic(this, &UResultUI::OnClickedButton_ShowLeaderboard);
     }
         
+    if (Overlay_Result1&&Overlay_Result2)
+    {
+        Overlay_Result1->SetVisibility(ESlateVisibility::Visible);
+        Overlay_Result2->SetVisibility(ESlateVisibility::Collapsed);
+    }
 }
 
 void UResultUI::SetPhotoImage(int32 index, const FOwningPictureData& pictureData, const FString& timeString, bool bIsDuplicate)
@@ -95,6 +101,13 @@ void UResultUI::SetTotalScoreText(float totalScore)
 
 void UResultUI::OnClickedButton_ShowLeaderboard()
 {
+    // if (Overlay_Result1&&Overlay_Result2)
+    // {
+    //     Overlay_Result1->SetVisibility(ESlateVisibility::Collapsed);
+    //     Overlay_Result2->SetVisibility(ESlateVisibility::Visible);
+    // }
+    RemoveFromParent();
+    
     auto* gameMode= Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     if (gameMode)
     {

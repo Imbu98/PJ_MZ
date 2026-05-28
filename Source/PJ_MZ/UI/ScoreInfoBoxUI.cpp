@@ -20,11 +20,11 @@ void UScoreInfoBoxUI::SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,i
 	
 	if (Text_Score)
 	{
-		Text_Score->SetText(FText::AsNumber(leaderboardInfo.Score));
+		Text_Score->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.Score)));
 	}
 	
 	if (Text_ClearTime)
 	{
-		Text_ClearTime->SetText(FText::AsNumber(leaderboardInfo.ClearTime));
+		Text_ClearTime->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.ClearTime)));
 	}
 }

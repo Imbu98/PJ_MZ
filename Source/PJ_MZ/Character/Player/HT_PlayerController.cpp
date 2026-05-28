@@ -168,6 +168,7 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 	AHT_PlayerState* Ps=  GetPlayerState<AHT_PlayerState>();
 	if (Ps==nullptr) return;
 	
+	SetInputMode(FInputModeUIOnly());
 	
 	if (PhotoResultUIFactory)
 	{
@@ -199,7 +200,7 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 			
 			for (int32 i=0;i<Entries.Num();i++)
 			{
-				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i);
+				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i+1);
 				UE_LOG(LogTemp, Log, TEXT("%s | %d | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
 			}
 		}

@@ -213,7 +213,7 @@ void UObscuraCameraComponent::AddCurrentDataToArray(FOwningPictureData datas)
 		if (Existing.PicturableDatas.PicturableName != NewName) continue;
 
 		// 같은 이름 발견 → 점수 비교
-		if (datas.FinalScore >= Existing.FinalScore)
+		if (datas.FinalScore > Existing.FinalScore)
 		{
 			// 새거가 더 높으면 기존꺼를 중복으로
 			Existing.IsDuplicate = true;
