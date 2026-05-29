@@ -5,7 +5,7 @@
 #include "Components/Image.h"
 #include "Components/Overlay.h"
 #include "Components/TextBlock.h"
-#include "Default/PJ_MZGameMode.h"
+#include "../Framework/PJ_MZGameMode.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/GameplayStatics.h"
 #include "Styling/SlateBrush.h"
@@ -31,7 +31,7 @@ void UResultUI::NativeConstruct()
 void UResultUI::SetPhotoImage(int32 index, const FOwningPictureData& pictureData, const FString& timeString, bool bIsDuplicate)
 {
     // 중복 여부에 따라 색상 결정
-    FSlateColor ScoreColor = bIsDuplicate ? FSlateColor(FLinearColor::Red) : FSlateColor(FLinearColor::Green);
+    FSlateColor ScoreColor = (bIsDuplicate || pictureData.FinalScore <= 0.f) ? FSlateColor(FLinearColor::Red) : FSlateColor(FLinearColor::Green);
 
     if (pictureData.PhotoImage)
     {

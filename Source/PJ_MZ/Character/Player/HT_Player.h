@@ -82,7 +82,7 @@ protected:
 
 	/** Walk speed while sprinting */
 	UPROPERTY(EditAnywhere, Category="Sprint", meta = (ClampMin = 0, ClampMax = 10, Units = "cm/s"))
-	float SprintSpeed = 250.0f;
+	float SprintSpeed = 800.0f;
 
 	/** Walk speed while recovering stamina */
 	UPROPERTY(EditAnywhere, Category="Recovery", meta = (ClampMin = 0, ClampMax = 10, Units = "cm/s"))

@@ -81,16 +81,16 @@ void AEnemySpawnManager::SpawnAllEnemy()
 	
 	TSubclassOf<AEnemy03Character> Enemy03 = LoadObject<UClass>(
 		nullptr, TEXT("/Game/SY/Enemy/Enemy03/BP_Enemy03.BP_Enemy03_C"));
-	//
-	// if (Enemy02)
-	// {
-	// 	SpawnEnemy(Enemy02);
-	// }
-	//
-	if (Enemy03)
+	
+	if (Enemy02)
 	{
-		SpawnEnemy(Enemy03);
+		SpawnEnemy(Enemy02);
 	}
+	
+	// if (Enemy03)
+	// {
+	// 	SpawnEnemy(Enemy03);
+	// }
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("BP_Enemy02 로드 실패"));

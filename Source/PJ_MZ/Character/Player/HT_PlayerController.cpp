@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/DynamoDBComponent.h"
 #include "Components/ObscuraCameraComponent.h"
-#include "Default/PJ_MZGameMode.h"
+#include "../../Framework/PJ_MZGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
@@ -201,7 +201,7 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 			for (int32 i=0;i<Entries.Num();i++)
 			{
 				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i+1);
-				UE_LOG(LogTemp, Log, TEXT("%s | %d | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+				UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
 			}
 		}
 	}

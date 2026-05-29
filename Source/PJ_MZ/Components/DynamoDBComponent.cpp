@@ -103,3 +103,86 @@ void UDynamoDBComponent::OnFetchComplete(FHttpRequestPtr Request, FHttpResponseP
 	}
 }
 
+void UDynamoDBComponent::Login(FString UserId, FString Password)
+{
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	Request->SetURL(DBUrl + TEXT("/login"));
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FString Body = FString::Printf(
+		TEXT("{\"user_id\":\"%s\",\"password\":\"%s\"}"),
+		*UserId, *Password
+	);
+
+	Request->SetContentAsString(Body);
+	Request->OnProcessRequestComplete().BindUObject(this, &UDynamoDBComponent::OnLoginComplete_Internal);
+	Request->ProcessRequest();
+}
+
+void UDynamoDBComponent::OnLoginComplete_Internal(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess)
+{
+	if (!bSuccess || !Response.IsValid())
+	{
+		OnLoginComplete.Broadcast(false, TEXT(""), TEXT("서버 오류"));
+		return;
+	}
+
+	int32 StatusCode = Response->GetResponseCode();
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+
+	if (FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		if (StatusCode == 200)
+		{
+			FString UserId = JsonObject->GetStringField(TEXT("user_id"));
+			FString Nickname = JsonObject->GetStringField(TEXT("nickname"));
+			OnLoginComplete.Broadcast(true, UserId, Nickname);
+		}
+		else
+		{
+			FString ErrorMsg = JsonObject->GetStringField(TEXT("message"));
+			OnLoginComplete.Broadcast(false, TEXT(""), ErrorMsg);
+		}
+	}
+}
+
+void UDynamoDBComponent::Register(FString UserId, FString Password, FString Nickname)
+{
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
+	Request->SetURL(DBUrl + TEXT("/register"));
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+
+	FString Body = FString::Printf(
+		TEXT("{\"user_id\":\"%s\",\"password\":\"%s\",\"nickname\":\"%s\"}"),
+		*UserId, *Password, *Nickname
+	);
+
+	Request->SetContentAsString(Body);
+	Request->OnProcessRequestComplete().BindUObject(this, &UDynamoDBComponent::OnRegisterComplete_Internal);
+	Request->ProcessRequest();
+}
+
+
+
+void UDynamoDBComponent::OnRegisterComplete_Internal(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess)
+{
+	if (!bSuccess || !Response.IsValid())
+	{
+		OnRegisterComplete.Broadcast(false, TEXT("서버 오류"));
+		return;
+	}
+
+	int32 StatusCode = Response->GetResponseCode();
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+
+	if (FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		FString Message = JsonObject->GetStringField(TEXT("message"));
+		OnRegisterComplete.Broadcast(StatusCode == 200, Message);
+	}
+}
+
