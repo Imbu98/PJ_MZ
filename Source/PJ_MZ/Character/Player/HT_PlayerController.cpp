@@ -24,6 +24,8 @@ void AHT_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetInputMode(FInputModeGameOnly());
+	
 	APJ_MZGameMode* GameMode = Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{

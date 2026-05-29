@@ -19,7 +19,7 @@ void ALoginPlayerController::BeginPlay()
 		LoginUIWidget = CreateWidget<ULoginUI>(this, LoginUIFactory);
 		if (LoginUIWidget)
 		{
-			LoginUIWidget->AddToViewport();			
+			LoginUIWidget->AddToViewport();
 		}
 	}
 }

@@ -15,6 +15,8 @@ protected:
 	virtual  void Tick(float DeltaTime) override;
 	
 	AHT_PlayerState();
+	
+	virtual void CopyProperties(class APlayerState* PlayerState) override;
 
 public:
 
@@ -42,12 +44,12 @@ public:
 	
 
 	// ===============================
-	// 임시 아이디 및 닉네임 
+	// 아이디 및 닉네임 
 	// ===============================
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	FString MZ_PlayerID;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	FString MZ_PlayerName;
 	
 	
