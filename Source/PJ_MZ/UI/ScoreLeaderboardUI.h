@@ -11,7 +11,10 @@ class PJ_MZ_API UScoreLeaderboardUI : public UUserWidget
 	
 public:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UVerticalBox> VerticalBox_Leaderboard;
+	TObjectPtr<class UScrollBox> ScrollBox_LeaderBoard;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UScoreInfoBoxUI> ScoreInfoBoxFactory;
 
 	UFUNCTION()
 	void GenerateScoreList(const FLeaderboardEntry& leaderboardInfo,int32 rank);

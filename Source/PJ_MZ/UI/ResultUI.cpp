@@ -3,8 +3,9 @@
 #include "MZ_Datas.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
-#include "Default/PJ_MZGameMode.h"
+#include "../Framework/PJ_MZGameMode.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/GameplayStatics.h"
 #include "Styling/SlateBrush.h"
@@ -20,12 +21,17 @@ void UResultUI::NativeConstruct()
         Button_ShowLeaderboard->OnClicked.AddDynamic(this, &UResultUI::OnClickedButton_ShowLeaderboard);
     }
         
+    if (Overlay_Result1&&Overlay_Result2)
+    {
+        Overlay_Result1->SetVisibility(ESlateVisibility::Visible);
+        Overlay_Result2->SetVisibility(ESlateVisibility::Collapsed);
+    }
 }
 
 void UResultUI::SetPhotoImage(int32 index, const FOwningPictureData& pictureData, const FString& timeString, bool bIsDuplicate)
 {
     // 중복 여부에 따라 색상 결정
-    FSlateColor ScoreColor = bIsDuplicate ? FSlateColor(FLinearColor::Red) : FSlateColor(FLinearColor::Green);
+    FSlateColor ScoreColor = (bIsDuplicate || pictureData.FinalScore <= 0.f) ? FSlateColor(FLinearColor::Red) : FSlateColor(FLinearColor::Green);
 
     if (pictureData.PhotoImage)
     {
@@ -95,6 +101,13 @@ void UResultUI::SetTotalScoreText(float totalScore)
 
 void UResultUI::OnClickedButton_ShowLeaderboard()
 {
+    // if (Overlay_Result1&&Overlay_Result2)
+    // {
+    //     Overlay_Result1->SetVisibility(ESlateVisibility::Collapsed);
+    //     Overlay_Result2->SetVisibility(ESlateVisibility::Visible);
+    // }
+    RemoveFromParent();
+    
     auto* gameMode= Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
     if (gameMode)
     {

@@ -102,7 +102,7 @@ struct FLeaderboardEntry
 	FString PlayerName;
 
 	UPROPERTY(BlueprintReadOnly)
-	int32 Score;
+	float Score;
 
 	UPROPERTY(BlueprintReadOnly)
 	float ClearTime;

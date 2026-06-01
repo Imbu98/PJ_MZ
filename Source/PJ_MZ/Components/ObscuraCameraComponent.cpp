@@ -8,7 +8,7 @@
 #include "Character/Player/HT_Player.h"
 #include "Character/Player/HT_PlayerController.h"
 #include "Components/SceneCaptureComponent2D.h"
-#include "Default/PJ_MZGameMode.h"
+#include "../Framework/PJ_MZGameMode.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -213,7 +213,7 @@ void UObscuraCameraComponent::AddCurrentDataToArray(FOwningPictureData datas)
 		if (Existing.PicturableDatas.PicturableName != NewName) continue;
 
 		// 같은 이름 발견 → 점수 비교
-		if (datas.FinalScore >= Existing.FinalScore)
+		if (datas.FinalScore > Existing.FinalScore)
 		{
 			// 새거가 더 높으면 기존꺼를 중복으로
 			Existing.IsDuplicate = true;
@@ -252,7 +252,7 @@ void UObscuraCameraComponent::CapturePhoto(FOwningPictureData& datas)
 
         TArray<FColor> Pixels;
         
-        // 🚨 실패 시 왜 실패했는지 디버그 메시지를 띄우도록 수정
+        
         if (!Viewport->ReadPixels(Pixels))
         {
             GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Viewport ReadPixels 실패! (화면을 읽어오지 못함)"));

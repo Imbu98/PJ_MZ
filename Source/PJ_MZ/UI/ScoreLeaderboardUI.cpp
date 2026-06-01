@@ -1,21 +1,20 @@
 #include "ScoreLeaderboardUI.h"
 
 #include "MZ_Datas.h"
-#include "Components/VerticalBox.h"
+#include "Components/ScrollBox.h"
 #include "UI/ScoreInfoBoxUI.h"
 
 void UScoreLeaderboardUI::GenerateScoreList(const FLeaderboardEntry& leaderboardInfo,int32 rank)
 {
-	UScoreInfoBoxUI* scoreInfoBox = CreateWidget<UScoreInfoBoxUI>(GetOwningPlayer());
+	UScoreInfoBoxUI* scoreInfoBox = CreateWidget<UScoreInfoBoxUI>(this, ScoreInfoBoxFactory);
 	if (scoreInfoBox)
 	{
 		scoreInfoBox->SetScoreBoxInfo(leaderboardInfo,rank);
 		
-		if (VerticalBox_Leaderboard)
+		if (ScrollBox_LeaderBoard)
 		{
-			VerticalBox_Leaderboard->AddChild(scoreInfoBox);
+			UPanelSlot* slot = ScrollBox_LeaderBoard->AddChild(scoreInfoBox);
+			UE_LOG(LogTemp, Warning, TEXT("slot: %s"), slot ? TEXT("Added") : TEXT("Failed"));
 		}
 	}
-	
-	
 }

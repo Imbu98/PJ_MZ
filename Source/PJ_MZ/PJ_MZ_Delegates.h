@@ -16,7 +16,12 @@ DECLARE_MULTICAST_DELEGATE(FOnDungeonGenerationComplete);
 // 카메라 줌인 , 줌아웃 델리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FCameraFOVChangeDelegate,float);
 
-// 델리게이트 선언
+// DB 랭킹데이터 Get 성공 델리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeaderboardFetched, const TArray<FLeaderboardEntry>&);
+
+// 로그인 성공 델리게이트
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnLoginComplete, bool, const FString&,const FString&);
+// 회원가입 성공 델리게이트
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRegisterComplete, bool,const FString&);
 
 

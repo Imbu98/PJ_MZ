@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/DynamoDBComponent.h"
 #include "Components/ObscuraCameraComponent.h"
-#include "Default/PJ_MZGameMode.h"
+#include "../../Framework/PJ_MZGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
@@ -23,6 +23,8 @@ AHT_PlayerController::AHT_PlayerController()
 void AHT_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SetInputMode(FInputModeGameOnly());
 	
 	APJ_MZGameMode* GameMode = Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
@@ -168,6 +170,7 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 	AHT_PlayerState* Ps=  GetPlayerState<AHT_PlayerState>();
 	if (Ps==nullptr) return;
 	
+	SetInputMode(FInputModeUIOnly());
 	
 	if (PhotoResultUIFactory)
 	{
@@ -199,8 +202,8 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 			
 			for (int32 i=0;i<Entries.Num();i++)
 			{
-				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i);
-				UE_LOG(LogTemp, Log, TEXT("%s | %d | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i+1);
+				UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
 			}
 		}
 	}

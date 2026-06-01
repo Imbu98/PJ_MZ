@@ -8,6 +8,18 @@ AHT_PlayerState::AHT_PlayerState()
 	PrimaryActorTick.bCanEverTick = true; 
 }
 
+void AHT_PlayerState::CopyProperties(class APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+	
+	AHT_PlayerState* MyPlayerState = Cast<AHT_PlayerState>(PlayerState);
+	if (MyPlayerState)
+	{
+		MyPlayerState->MZ_PlayerID = MZ_PlayerID;
+		MyPlayerState->MZ_PlayerName = MZ_PlayerName;
+	}
+}
+
 FOwningPictureData AHT_PlayerState::GetOwningPictureData(int32 index)
 {
 	if (OwningPictureArray.IsValidIndex(index))

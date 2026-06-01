@@ -49,6 +49,14 @@ public:
 	
 	UPROPERTY(meta =(BindWidget))
 	TObjectPtr<class UButton> Button_ShowLeaderboard;
+	
+	UPROPERTY(meta =(BindWidget))
+	TObjectPtr<class UOverlay> Overlay_Result1;
+	
+	UPROPERTY(meta =(BindWidget))
+	TObjectPtr<class UOverlay> Overlay_Result2;
+	
+	
 
 	
 	

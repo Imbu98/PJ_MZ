@@ -30,6 +30,9 @@ public:
 	FOnLeaderboardFetched OnLeaderboardFetched;
 
 public:
+	// ===============================
+	// 랭킹 저장 및 불러오기
+	// ===============================
 	void FetchLeaderboard(FString GameId); 
 	
 	void OnSubmitComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
@@ -37,6 +40,23 @@ public:
 	void SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime);
 
 	void OnFetchComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
+	
+	// ===============================
+	// 로그인 및 회원가입
+	// ===============================
+	UFUNCTION(BlueprintCallable)
+	void Login(FString UserId, FString Password);
+
+	UFUNCTION(BlueprintCallable)
+	void Register(FString UserId, FString Password, FString Nickname);
+
+	FOnLoginComplete OnLoginComplete;
+
+	FOnRegisterComplete OnRegisterComplete;
+
+private:
+	void OnLoginComplete_Internal(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
+	void OnRegisterComplete_Internal(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 
 	UPROPERTY()
 	FString DBUrl = "https://gj2xbjow98.execute-api.ap-northeast-2.amazonaws.com/Prod";
