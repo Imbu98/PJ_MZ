@@ -26,7 +26,6 @@ EStateTreeRunStatus FSTTask_RandomPatrol::EnterState(FStateTreeExecutionContext&
 		Character->GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
 	}
 
-	// 랜덤 위치 탐색
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(Controller.GetWorld());
 	if (!NavSystem) return EStateTreeRunStatus::Failed;
