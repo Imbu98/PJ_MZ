@@ -16,61 +16,46 @@ bool FSTTask_ChasePlayer::Link(FStateTreeLinker& Linker)
 
 EStateTreeRunStatus FSTTask_ChasePlayer::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("쫒는모드 On"));
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
+	
 	APawn* Pawn = Controller.GetPawn();
-	if (!Pawn)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("폰 존재 X"));
-		return EStateTreeRunStatus::Failed;
-	}
-	// 이동 속도 빠르게
-	if (ACharacter* Character = Cast<ACharacter>(Pawn))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("이동속도업"));
+	if (!Pawn) return EStateTreeRunStatus::Failed;
+	
+	if (ACharacter* Character = Cast<ACharacter>(Pawn)) 
 		Character->GetCharacterMovement()->MaxWalkSpeed = ChaseSpeed;
-	}
-
+	
 	return EStateTreeRunStatus::Running;
 }
 
 EStateTreeRunStatus FSTTask_ChasePlayer::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("쫒는모드 틱"));
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
+	
 	APawn* Pawn = Controller.GetPawn();
-	if (!Pawn)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("틱 폰 없음"));
-		return EStateTreeRunStatus::Failed;
-	}
+	if (!Pawn) return EStateTreeRunStatus::Failed;
+	
 	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Controller.GetWorld(), 0);
-	if (!Player)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("틱 플레이어없음"));
-		return EStateTreeRunStatus::Running;
-	}
-	// 플레이어 쪽으로 이동
-	Controller.MoveToActor(Player, AttackRange);
-
-	// 공격 범위 안에 있으면 공격
+	if (!Player) return EStateTreeRunStatus::Running;
+	
 	float Distance = FVector::Dist(Pawn->GetActorLocation(), Player->GetActorLocation());
 	if (Distance <= AttackRange)
 	{
 		if (AEnemyBase* Enemy = Cast<AEnemyBase>(Pawn))
 		{
+			Controller.StopMovement();
 			Enemy->Attack();
 		}
 		return EStateTreeRunStatus::Succeeded;
 	}
-
+	
+	const float AcceptanceRadius = AttackRange * 0.5f;
+	Controller.MoveToActor(Player, AcceptanceRadius);
+	
 	return EStateTreeRunStatus::Running;
 }
 
 void FSTTask_ChasePlayer::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("쫒는모드 종료"));
-
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	Controller.StopMovement();
 }

@@ -18,8 +18,6 @@ void AEnemySpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    UE_LOG(LogTemp, Warning, TEXT("SpawnManager BeginPlay"));
-
     if (!PCGDungeonManager)
     {
         PCGDungeonManager = Cast<APCGDungeonManager>(
@@ -28,18 +26,14 @@ void AEnemySpawnManager::BeginPlay()
 
     if (PCGDungeonManager)
     {
-    	UE_LOG(LogTemp, Warning, TEXT("PCGDungeonManager 찾음"));
-    
     	UDungeonGenerator* Generator = PCGDungeonManager->GetDungeonGenerator();
     	if (Generator)
     	{
-    		UE_LOG(LogTemp, Warning, TEXT("Generator 찾음 - 바인딩 시작"));
     		Generator->OnDungeonGenerationComplete.AddUObject(
 				this, &AEnemySpawnManager::OnMapGenerationComplete);
     		
     		if (Generator->bGenerationComplete)
     		{
-    			UE_LOG(LogTemp, Warning, TEXT("이미 생성 완료 - 바로 스폰"));
     			OnMapGenerationComplete();
     		}
     	}
@@ -81,19 +75,22 @@ void AEnemySpawnManager::SpawnAllEnemy()
 	
 	TSubclassOf<AEnemy03Character> Enemy03 = LoadObject<UClass>(
 		nullptr, TEXT("/Game/SY/Enemy/Enemy03/BP_Enemy03.BP_Enemy03_C"));
-	//
-	// if (Enemy02)
-	// {
-	// 	SpawnEnemy(Enemy02);
-	// }
-	//
+	
+	if (Enemy02)
+	{
+		SpawnEnemy(Enemy02);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BP_Enemy02 로드 실패"));
+	}
 	if (Enemy03)
 	{
 		SpawnEnemy(Enemy03);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BP_Enemy02 로드 실패"));
+		UE_LOG(LogTemp, Warning, TEXT("BP_Enemy03 로드 실패"));
 	}
 }
 

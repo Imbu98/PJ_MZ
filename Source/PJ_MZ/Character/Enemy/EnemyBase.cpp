@@ -19,6 +19,7 @@ AEnemyBase::AEnemyBase()
 	PawnSensing->SetPeripheralVisionAngle(180.f);
 	PawnSensing->bSeePawns = true;
 	PawnSensing->bHearNoises = false;
+	PawnSensing->SensingInterval = 0.1f;
 }
 
 void AEnemyBase::BeginPlay()
@@ -59,8 +60,7 @@ void AEnemyBase::DistoryAndRequestRespawn()
 
 void AEnemyBase::OnSeePawn(APawn* SensedPawn)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnSeePawn 호출됨"));
-    
+	// UE_LOG(LogTemp, Warning, TEXT("OnSeePawn 호출됨"));
 	if (!SensedPawn) return;
     
 	if (SensedPawn->IsPlayerControlled())

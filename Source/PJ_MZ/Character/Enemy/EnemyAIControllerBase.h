@@ -31,7 +31,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAISenseConfig_Hearing* HearingConfig;
 
-	// 에디터에서 조정 가능한 청각 설정
 	UPROPERTY(EditAnywhere, Category = "AI|Hearing")
 	float HearingRange = 1500.f;
 

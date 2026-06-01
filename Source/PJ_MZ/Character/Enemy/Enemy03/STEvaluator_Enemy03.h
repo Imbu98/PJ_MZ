@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -37,11 +36,6 @@ struct  PJ_MZ_API FSTEvaluator_Enemy03 : public FStateTreeEvaluatorCommonBase
 		return FInstanceDataType::StaticStruct();
 	}
 
-	// 플레이어가 적을 바라보는 판정 각도
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float LookAtAngleThreshold = 30.f;
-
-	// 추적 포기 거리
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float LoseTargetDistance = 3000.f;
 	

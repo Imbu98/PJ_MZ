@@ -32,7 +32,7 @@ void AEnemyAIControllerBase::BeginPlay()
 void AEnemyAIControllerBase::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
-    UE_LOG(LogTemp, Warning, TEXT("OnPossess 호출됨"));
+    // UE_LOG(LogTemp, Warning, TEXT("OnPossess 호출됨"));
 
     if (!BlackboardAsset || !BehaviorTreeAsset)
     {

@@ -16,7 +16,6 @@ class PJ_MZ_API AEnemySpawnManager : public AActor
 public:
 	AEnemySpawnManager();
 	
-	// EnemyBase에서 호출하는 재스폰 요청
 	void RequestRespawn(AEnemyBase* Enemy, float RespawnDelay);
 
 protected:

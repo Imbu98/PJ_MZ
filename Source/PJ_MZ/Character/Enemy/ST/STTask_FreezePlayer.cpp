@@ -19,7 +19,6 @@ EStateTreeRunStatus FSTTask_FreezePlayer::EnterState(FStateTreeExecutionContext&
 	APawn* Pawn = Controller.GetPawn();
 	if (!Pawn) return EStateTreeRunStatus::Failed;
 
-	// 이동 완전 정지
 	Controller.StopMovement();
 
 	if (ACharacter* Character = Cast<ACharacter>(Pawn))
@@ -32,13 +31,12 @@ EStateTreeRunStatus FSTTask_FreezePlayer::EnterState(FStateTreeExecutionContext&
 
 void FSTTask_FreezePlayer::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	AAIController& Controller = Context.GetExternalData(ControllerHandle);
-	APawn* Pawn = Controller.GetPawn();
-	if (!Pawn) return;
-
-	// 이동 속도 복구
-	if (ACharacter* Character = Cast<ACharacter>(Pawn))
-	{
-		Character->GetCharacterMovement()->MaxWalkSpeed = 600.f;
-	}
+	// AAIController& Controller = Context.GetExternalData(ControllerHandle);
+	// APawn* Pawn = Controller.GetPawn();
+	// if (!Pawn) return;
+	//
+	// if (ACharacter* Character = Cast<ACharacter>(Pawn))
+	// {
+	// 	Character->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	// }
 }

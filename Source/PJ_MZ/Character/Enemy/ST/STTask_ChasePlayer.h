@@ -38,7 +38,7 @@ struct PJ_MZ_API FSTTask_ChasePlayer : public FStateTreeTaskCommonBase
 	}
 
 	UPROPERTY(EditAnywhere, Category = "Chase")
-	float ChaseSpeed = 600.f;
+	float ChaseSpeed = 700.f;
 
 	UPROPERTY(EditAnywhere, Category = "Chase")
 	float AttackRange = 150.f;
