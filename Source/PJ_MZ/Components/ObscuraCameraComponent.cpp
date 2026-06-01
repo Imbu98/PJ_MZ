@@ -101,9 +101,16 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 		
 		OnGameEnd();
 		
-		
-		
 		return;
+	}
+	
+	if (MainPhotoActor)
+	{
+		UPicturableComponent* picturableComp = MainPhotoActor->FindComponentByClass<UPicturableComponent>();
+		if (picturableComp)
+		{
+			picturableComp->PictureTaken();
+		}
 	}
 	
 	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);
@@ -117,23 +124,6 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	
 	AddCurrentDataToArray(PictureData);
 	
-	// AActor* Target = GetPrimaryTarget();
-	// if (!Target) return;
-	//
-	
-	//
-	// UGameplayStatics::ApplyDamage(
-	// 	Target,
-	// 	FinalDamage,
-	// 	GetOwner()->GetInstigatorController(),
-	// 	GetOwner(),
-	// 	DamageTypeClass
-	// );
-	//
-	// UE_LOG(LogTemp, Log,
-	// 	TEXT("Shutter! Target: %s | Points: %d | Multiplier: %.1fx | Damage: %.1f"),
-	// 	*Target->GetName(), ActivePointCount,
-	// 	GetDamageMultiplier(), FinalDamage);
 }
 
 float UObscuraCameraComponent::GetFinalScore(float score) const

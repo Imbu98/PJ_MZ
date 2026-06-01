@@ -18,6 +18,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
+	
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TObjectPtr<UBlackboardData> BlackboardAsset;
@@ -40,4 +41,8 @@ protected:
 	// Blackboard 키 이름 - 공통
 	const FName BB_SoundLocation = TEXT("SoundLocation");
 	const FName BB_TargetActor   = TEXT("TargetActor");
+	
+public:
+	// 사진 찍힐 때 불릴 함수
+	void PictureTaken();
 };

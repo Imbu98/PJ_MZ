@@ -48,14 +48,20 @@ void UPicturableComponent::SetInfo(FPicturableDatas picturableDataVal)
 void UPicturableComponent::PictureTaken()
 {
 	AEnemyBase* enemy =  Cast<AEnemyBase>(GetOwner());
+	// 적이면 AIController에서 적에 대한 처리
 	if (enemy)
 	{
 		AEnemyAIControllerBase* aiController =  Cast<AEnemyAIControllerBase>(enemy->GetController());
 		
 		if (aiController)
 		{
-			//aiController->
+			aiController->PictureTaken();
 		}
+	}
+	// 아니면 오브젝트에 대한 처리
+	else
+	{
+		
 	}
 }
 

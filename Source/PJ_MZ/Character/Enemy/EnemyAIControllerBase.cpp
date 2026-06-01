@@ -51,4 +51,10 @@ void AEnemyAIControllerBase::OnPossess(APawn* InPawn)
     SetGenericTeamId(FGenericTeamId(1));
 }
 
+void AEnemyAIControllerBase::PictureTaken()
+{
+    
+}
+
+
 
