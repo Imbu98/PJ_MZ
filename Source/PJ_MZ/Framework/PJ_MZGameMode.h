@@ -19,7 +19,7 @@ public:
 
 	void OnSubmitComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 	
-	void SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime);
+	void SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime,int32 stageIndex);
 	
 	//void OnFetchComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 	

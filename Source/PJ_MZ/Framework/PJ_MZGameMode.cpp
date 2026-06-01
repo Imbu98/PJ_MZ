@@ -11,11 +11,11 @@ APJ_MZGameMode::APJ_MZGameMode()
 }
 
 
-void APJ_MZGameMode::SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime)
+void APJ_MZGameMode::SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime,int32 stageIndex)
 {
 	if (!DynamoDBComp) return;
 	
-	DynamoDBComp->SubmitScore(GameId, PlayerId, PlayerName, Score, ClearTime);
+	DynamoDBComp->SubmitScore(GameId, PlayerId, PlayerName, Score, ClearTime,stageIndex);
 }
 
 void APJ_MZGameMode::OnSubmitComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess)

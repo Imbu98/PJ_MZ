@@ -5,9 +5,9 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData)
+void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData,bool isLocked)
 {
-	StageName = stageSelectData.StageName;
+	StageData = stageSelectData;
 	
 	if (Image_StageSelect)
 	{
@@ -21,21 +21,27 @@ void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData)
 		}
 	}
 	
-	if (Btn_StageSelect)
+	if (Btn_ShowLeaderBoard)
 	{
-		Btn_StageSelect->OnClicked.RemoveAll(this);
-		Btn_StageSelect->OnClicked.AddDynamic(this,&UStageSelectUI::MoveLevel);
+		Btn_ShowLeaderBoard->OnClicked.RemoveAll(this);
+		Btn_ShowLeaderBoard->OnClicked.AddDynamic(this,&UStageSelectUI::ShowLeaderBoard);
 	}
 	
 	if (Text_StageName)
 	{
-		Text_StageName->SetText(FText::FromName(StageName));
+		Text_StageName->SetText(FText::FromName(StageData.StageName));
+	}
+	
+	if (Image_LockImage)
+	{
+		isLocked ? Image_LockImage->SetVisibility(ESlateVisibility::Visible) : Image_LockImage->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
-void UStageSelectUI::MoveLevel()
+// 해당 레벨의 리더보드 가져와서 보여주기
+void UStageSelectUI::ShowLeaderBoard()
 {
-	FString LevelPath = FString::Printf(TEXT("/Game/HT/Levels/%s"), *StageName.ToString());
-	
-	GetWorld()->SeamlessTravel(LevelPath);
+	// FString LevelPath = FString::Printf(TEXT("/Game/HT/Levels/%s"), *StageData.StageName.ToString());
+	//
+	// GetWorld()->SeamlessTravel(LevelPath);
 }

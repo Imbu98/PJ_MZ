@@ -29,6 +29,8 @@ public:
 	UPROPERTY()
 	int32 CurrentCanShotCount;
 	
+	
+
 	void InitShotCount() { CurrentCanShotCount = MaxCanShotCount; }
 	void SetCurrentCanShotCount(int32 newCount) { CurrentCanShotCount = newCount; }
 	int32 GetCurrentCanShotCount() { return CurrentCanShotCount; }
@@ -44,7 +46,7 @@ public:
 	
 
 	// ===============================
-	// 아이디 및 닉네임 
+	// 아이디 및 닉네임, 스테이지 클리어 여부
 	// ===============================
 	UPROPERTY()
 	FString MZ_PlayerID;
@@ -52,6 +54,8 @@ public:
 	UPROPERTY()
 	FString MZ_PlayerName;
 	
+	UPROPERTY()
+	int32 MZ_StageFlags;
 	
 	// ===============================
 	// 플레이어 플레이타임

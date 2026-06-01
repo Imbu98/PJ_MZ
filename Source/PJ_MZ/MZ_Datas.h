@@ -120,5 +120,9 @@ struct FStageSelectData : public FTableRowBase
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSoftObjectPtr<UTexture2D> StageImage;
 	
+	// 다음스테이지 해금을 위한 점수
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float UnLockScore;
+	
 };
 

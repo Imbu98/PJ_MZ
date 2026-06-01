@@ -74,6 +74,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<class UDataTable> DT_SetBonusInfo;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<class UDataTable> DT_StageSelectData;
+	
 	// ===============================
 	// 현재 카메라 모드 관련 정보 
 	// ===============================
@@ -98,12 +101,16 @@ public:
 	UFUNCTION()
 	void SetResultUI(const float totalScore);
 
+	
 	UFUNCTION()
 	void OnGameEnd();
 	
 	UFUNCTION()
 	float CalculateTotalScore();
+	UFUNCTION()
 	float CalculateSetBonus(float totalScore);
+	UFUNCTION()
+	int32 CheckIsUnLocked(float score);
 
 	// ===============================
 	// 배열에 사진 정보 저장 및 가져오기

@@ -28,17 +28,20 @@ void UDynamoDBComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UDynamoDBComponent::SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime)
+void UDynamoDBComponent::SubmitScore(FString GameId, FString PlayerId, FString PlayerName, int32 Score, float ClearTime,int32 stageIndex)
 {
+	
+	
 	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
 	Request->SetURL(DBUrl + TEXT("/scores"));
-	Request->SetVerb("POST");
-	Request->SetHeader("Content-Type", "application/json");
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	FString Body = FString::Printf(
-		TEXT("{\"game_id\":\"%s\",\"player_id\":\"%s\",\"player_name\":\"%s\",\"score\":%d,\"clear_time\":%.2f}"),
-		*GameId, *PlayerId, *PlayerName, Score, ClearTime
+		TEXT("{\"game_id\":\"%s\",\"player_id\":\"%s\",\"player_name\":\"%s\",\"score\":%d,\"clear_time\":%.2f,\"stage_index\":%d}"),
+		*GameId, *PlayerId, *PlayerName, Score, ClearTime, stageIndex
 	);
+
 	Request->SetContentAsString(Body);
 	Request->OnProcessRequestComplete().BindUObject(this, &UDynamoDBComponent::OnSubmitComplete);
 	Request->ProcessRequest();
@@ -124,26 +127,26 @@ void UDynamoDBComponent::OnLoginComplete_Internal(FHttpRequestPtr Request, FHttp
 {
 	if (!bSuccess || !Response.IsValid())
 	{
-		OnLoginComplete.Broadcast(false, TEXT(""), TEXT("서버 오류"));
+		OnLoginComplete.Broadcast(false, TEXT(""), TEXT(""), 0);
 		return;
 	}
 
-	int32 StatusCode = Response->GetResponseCode();
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		if (StatusCode == 200)
+		FString Message = JsonObject->GetStringField(TEXT("message"));
+		if (Message == TEXT("SUCCESS"))
 		{
 			FString UserId = JsonObject->GetStringField(TEXT("user_id"));
 			FString Nickname = JsonObject->GetStringField(TEXT("nickname"));
-			OnLoginComplete.Broadcast(true, UserId, Nickname);
+			int32 StageFlags = (int32)JsonObject->GetNumberField(TEXT("stage_flags"));
+			OnLoginComplete.Broadcast(true, UserId, Nickname, StageFlags);
 		}
 		else
 		{
-			FString ErrorMsg = JsonObject->GetStringField(TEXT("message"));
-			OnLoginComplete.Broadcast(false, TEXT(""), ErrorMsg);
+			OnLoginComplete.Broadcast(false, TEXT(""), TEXT(""), 0);
 		}
 	}
 }
