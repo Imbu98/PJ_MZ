@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MZ_Datas.h"
 #include "Blueprint/UserWidget.h"
 #include "LoginUI.generated.h"
 
@@ -17,6 +18,8 @@ class PJ_MZ_API ULoginUI : public UUserWidget
 	
 protected:
 	virtual  void NativeConstruct() override;
+	
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 public:
 	// ===============================
@@ -90,6 +93,60 @@ public:
 	UFUNCTION()
 	void OnRegisterResult(bool bSuccess, const FString& ErrorMessage);
 	
+	// ===============================
+	// 스테이지 선택
+	// ===============================
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UOverlay> StageSelectOverlay;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Btn_Prev;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Btn_Next;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UScrollBox> ScrollBox_StageSelect;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UTextBlock> TextBlock_UserName;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	TObjectPtr<class UDataTable> DT_StageSelectInfo;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	TSubclassOf<class UStageSelectUI> StageSelectUIFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UStageSelectUI> StageSelectUIWidget;
+	
+	UPROPERTY()
+	TArray<FStageSelectData> StageSelectData;
+	
+	UPROPERTY()
+	TArray<TObjectPtr<UStageSelectUI>> StageSelectUIArray;
+	
+	UFUNCTION()
+	void SetStageSelectOverlay();
+	
+	int32 CurrentIndex = 0;
+	
+	const float Padding = 350.f;
+
+	UFUNCTION()
+	void OnClickNext();
+
+	UFUNCTION()
+	void OnClickPrev();
+
+	void ScrollToIndex(int32 Index);
+	void UpdateArrowVisibility();
+	
+	// 목표 오프셋
+	float TargetScrollOffset = 0.f;
+	bool bIsScrolling = false;
+
+	// 보간 속도
+	UPROPERTY(EditDefaultsOnly, Category = "Scroll")
+	float ScrollInterpSpeed = 8.f;
 };

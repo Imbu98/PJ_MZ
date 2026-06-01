@@ -17,11 +17,5 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UDynamoDBComponent> DynamoDBComp;
-	
-	UFUNCTION()
-	void Login(FString Id, FString Password);
-
-	UFUNCTION()
-	void Register(FString Id, FString Password, FString Nickname);
 
 };

@@ -32,5 +32,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FPicturableDatas PicturableDatas;
 	
+	UFUNCTION()
+	void PictureTaken();
+	
 	
 };

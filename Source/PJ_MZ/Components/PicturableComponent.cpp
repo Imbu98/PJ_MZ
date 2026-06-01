@@ -1,4 +1,7 @@
 #include "PicturableComponent.h"
+
+#include "AIController.h"
+#include "Character/Enemy/EnemyAIControllerBase.h"
 #include "Character/Enemy/EnemyBase.h"
 
 UPicturableComponent::UPicturableComponent()
@@ -38,6 +41,20 @@ void UPicturableComponent::SetInfo(FPicturableDatas picturableDataVal)
 			staticMesh->SetCollisionProfileName(FName("Picturable"));
 			staticMesh->SetVisibility(true);
 			staticMesh->MarkRenderStateDirty();
+		}
+	}
+}
+
+void UPicturableComponent::PictureTaken()
+{
+	AEnemyBase* enemy =  Cast<AEnemyBase>(GetOwner());
+	if (enemy)
+	{
+		AEnemyAIControllerBase* aiController =  Cast<AEnemyAIControllerBase>(enemy->GetController());
+		
+		if (aiController)
+		{
+			//aiController->
 		}
 	}
 }

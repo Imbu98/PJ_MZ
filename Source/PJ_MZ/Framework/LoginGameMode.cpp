@@ -15,12 +15,3 @@ void ALoginGameMode::BeginPlay()
 	
 }
 
-void ALoginGameMode::Login(FString Id, FString Password)
-{
-	
-}
-
-void ALoginGameMode::Register(FString Id, FString Password, FString Nickname)
-{
-	
-}

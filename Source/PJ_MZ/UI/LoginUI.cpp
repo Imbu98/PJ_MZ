@@ -5,8 +5,12 @@
 #include "Components/DynamoDBComponent.h"
 #include "Components/EditableTextBox.h"
 #include "Components/Overlay.h"
+#include "Components/TextBlock.h"
 #include "Framework/LoginGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "StageSelectUI.h"
+#include "Components/ScrollBox.h"
+#include "Components/ScrollBoxSlot.h"
 
 void ULoginUI::NativeConstruct()
 {
@@ -26,8 +30,10 @@ void ULoginUI::NativeConstruct()
 	Input_LoginPW->SetIsPassword(true);
 	Input_RegisterPW->SetIsPassword(true);
 
-	// 회원가입 Overlay 기본 숨김
+	// 로그인 Overlay 외 기본 숨김
 	RegisterOverlay->SetVisibility(ESlateVisibility::Collapsed);
+	StageSelectOverlay->SetVisibility(ESlateVisibility::Collapsed);
+	
 	
 	// DB 델리게이트 바인딩
 	ALoginGameMode* GameMode = Cast<ALoginGameMode>(GetOwningPlayer()->GetWorld()->GetAuthGameMode());
@@ -35,6 +41,43 @@ void ULoginUI::NativeConstruct()
 	{
 		GameMode->DynamoDBComp->OnLoginComplete.AddUObject(this, &ULoginUI::OnLoginResult);
 		GameMode->DynamoDBComp->OnRegisterComplete.AddUObject(this, &ULoginUI::OnRegisterResult);
+	}
+	
+	// DT에서 스테이지 정보 가져오기
+	if (DT_StageSelectInfo)
+	{
+		StageSelectData.Empty();
+		
+		TArray<FStageSelectData*> AllRows;
+		DT_StageSelectInfo->GetAllRows<FStageSelectData>(TEXT("StageSelect"), AllRows);
+		
+		for (FStageSelectData* Row : AllRows)
+		{
+			if (Row)
+			{
+				StageSelectData.Add(*Row);
+			}
+		}
+	}
+}
+
+void ULoginUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	if (bIsScrolling)
+	{
+		float CurrentOffset = ScrollBox_StageSelect->GetScrollOffset();
+		float NewOffset = FMath::FInterpTo(CurrentOffset, TargetScrollOffset, InDeltaTime, ScrollInterpSpeed);
+
+		ScrollBox_StageSelect->SetScrollOffset(NewOffset);
+
+		// 목표에 충분히 가까워지면 정지
+		if (FMath::IsNearlyEqual(NewOffset, TargetScrollOffset, 0.5f))
+		{
+			ScrollBox_StageSelect->SetScrollOffset(TargetScrollOffset);
+			bIsScrolling = false;
+		}
 	}
 }
 
@@ -124,8 +167,7 @@ void ULoginUI::OnLoginResult(bool bSuccess, const FString& UserId, const FString
 			PS->MZ_PlayerID  = UserId;
 			PS->MZ_PlayerName = Nickname;
 		}
-
-		GetWorld()->SeamlessTravel(TEXT("/Game/HT/Levels/L_HT"));
+		SetStageSelectOverlay();
 	}
 }
 
@@ -148,5 +190,142 @@ void ULoginUI::OnRegisterResult(bool bSuccess, const FString& ErrorMessage)
 	Input_RegisterNick->SetText(FText::GetEmpty());
 
 	RegisterOverlay->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void ULoginUI::SetStageSelectOverlay()
+{
+	
+	
+	if (LoginOverlay&&RegisterOverlay&&StageSelectOverlay)
+	{
+		LoginOverlay->SetVisibility(ESlateVisibility::Collapsed);
+		RegisterOverlay->SetVisibility(ESlateVisibility::Collapsed);
+		StageSelectOverlay->SetVisibility(ESlateVisibility::Visible);
+	}
+	
+	// PlayerState에 저장 후 레벨 이동
+	APlayerController* PC = GetOwningPlayer();
+	if (PC)
+	{
+		AHT_PlayerState* PS = PC->GetPlayerState<AHT_PlayerState>();
+		if (PS)
+		{
+			if (TextBlock_UserName)
+			{
+				TextBlock_UserName->SetText(FText::FromString(PS->MZ_PlayerName));
+			}
+		}
+	}
+	
+	if (ScrollBox_StageSelect)
+	{
+		ScrollBox_StageSelect->SetScrollBarVisibility(ESlateVisibility::Collapsed);
+		ScrollBox_StageSelect->SetConsumeMouseWheel(EConsumeMouseWheel::Never);
+		ScrollBox_StageSelect->SetAllowOverscroll(false);
+		
+		for (int32 i = 0; i < StageSelectData.Num(); i++)
+		{
+			StageSelectUIWidget = CreateWidget<UStageSelectUI>(this, StageSelectUIFactory);
+			if (!StageSelectUIWidget) continue;
+
+			UScrollBoxSlot* Slots = Cast<UScrollBoxSlot>(ScrollBox_StageSelect->AddChild(StageSelectUIWidget));
+			if (Slots)
+			{
+				bool bIsFirst = (i == 0);
+				bool bIsLast  = (i == StageSelectData.Num() - 1);
+
+				// 간단하게
+				float Left  = 350.f;
+				float Right = bIsLast ? 350.f : 0.f;
+
+				Slots->SetPadding(FMargin(Left, 50.f, Right, 50.f));
+			}
+
+			StageSelectUIWidget->SetStageSelectInfo(StageSelectData[i]);
+			StageSelectUIArray.Add(StageSelectUIWidget);
+		}
+	}
+	
+	CurrentIndex = 0;
+	UpdateArrowVisibility();
+	
+	// Geometry 계산 완료 후 스크롤 (한 프레임 대기)
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	{
+		ScrollToIndex(CurrentIndex);
+	});
+
+	Btn_Next->OnClicked.AddDynamic(this, &ULoginUI::OnClickNext);
+	Btn_Prev->OnClicked.AddDynamic(this, &ULoginUI::OnClickPrev);
+	
+}
+
+void ULoginUI::OnClickNext()
+{
+	if (CurrentIndex < StageSelectUIArray.Num() - 1)
+	{
+		CurrentIndex++;
+		ScrollToIndex(CurrentIndex);
+		UpdateArrowVisibility();
+	}
+}
+
+void ULoginUI::OnClickPrev()
+{
+	if (CurrentIndex > 0)
+	{
+		CurrentIndex--;
+		ScrollToIndex(CurrentIndex);
+		UpdateArrowVisibility();
+	}
+}
+
+void ULoginUI::ScrollToIndex(int32 Index)
+{
+	if (!StageSelectUIArray.IsValidIndex(Index)) return;
+
+	UUserWidget* TargetWidget = StageSelectUIArray[Index];
+
+	// ScrollBox와 타겟 위젯의 절대 위치
+	FGeometry ScrollGeo = ScrollBox_StageSelect->GetCachedGeometry();
+	FGeometry WidgetGeo = TargetWidget->GetCachedGeometry();
+
+	// ScrollBox 기준 위젯의 상대 위치
+	FVector2D WidgetLocalPos = ScrollGeo.AbsoluteToLocal(WidgetGeo.GetAbsolutePosition());
+
+	float ScrollBoxWidth = ScrollGeo.GetLocalSize().X;
+	float WidgetWidth    = WidgetGeo.GetLocalSize().X;
+
+	// 위젯 중앙이 ScrollBox 중앙에 오도록
+	float TargetOffset = ScrollBox_StageSelect->GetScrollOffset()
+					   + WidgetLocalPos.X
+					   - (ScrollBoxWidth / 2.f)
+					   + (WidgetWidth / 2.f);
+
+	TargetScrollOffset = FMath::Max(0.f, TargetOffset);
+	bIsScrolling = true;
+}
+
+void ULoginUI::UpdateArrowVisibility()
+{
+	int32 Total = StageSelectUIArray.Num();
+
+	// 하나면 둘 다 숨김
+	if (Total <= 1)
+	{
+		Btn_Prev->SetVisibility(ESlateVisibility::Hidden);
+		Btn_Next->SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	// 맨 처음이면 이전 숨김
+	Btn_Prev->SetVisibility(CurrentIndex == 0 
+		? ESlateVisibility::Hidden 
+		: ESlateVisibility::Visible);
+
+	// 맨 끝이면 다음 숨김
+	Btn_Next->SetVisibility(CurrentIndex == Total - 1 
+		? ESlateVisibility::Hidden 
+		: ESlateVisibility::Visible);
 }
 

@@ -108,3 +108,17 @@ struct FLeaderboardEntry
 	float ClearTime;
 };
 
+// 스테이지 선택 데이터 구조체
+USTRUCT(BlueprintType)
+struct FStageSelectData : public FTableRowBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName StageName;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSoftObjectPtr<UTexture2D> StageImage;
+	
+};
+
