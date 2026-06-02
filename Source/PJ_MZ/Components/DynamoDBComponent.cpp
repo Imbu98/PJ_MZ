@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "DynamoDBComponent.h"
 
 #include "HttpModule.h"
@@ -61,11 +58,11 @@ void UDynamoDBComponent::OnSubmitComplete(FHttpRequestPtr Request, FHttpResponse
 }
 
 
-void UDynamoDBComponent::FetchLeaderboard(FString GameId)
+void UDynamoDBComponent::FetchLeaderboard(const FString& GameId,const FString& PlayerId)
 {
 	TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
-	Request->SetURL(DBUrl + TEXT("/leaderboard?game_id=") + GameId);
-	FString URL = DBUrl + TEXT("/leaderboard?game_id=") + GameId;
+	FString URL = DBUrl + TEXT("/leaderboard?game_id=") + GameId + TEXT("&player_id=") + PlayerId;
+	Request->SetURL(URL);
 	UE_LOG(LogTemp, Log, TEXT("요청 URL: %s"), *URL);
 	Request->SetVerb(TEXT("GET"));
 	Request->OnProcessRequestComplete().BindUObject(this, &UDynamoDBComponent::OnFetchComplete);
@@ -74,35 +71,40 @@ void UDynamoDBComponent::FetchLeaderboard(FString GameId)
 
 void UDynamoDBComponent::OnFetchComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess)
 {
-	if (!bSuccess) return;
-
 	if (!bSuccess || !Response.IsValid()) return;
-	
-	// 응답 내용 확인
-	UE_LOG(LogTemp, Log, TEXT("StatusCode: %d"), Response->GetResponseCode());
-	UE_LOG(LogTemp, Log, TEXT("Response: %s"), *Response->GetContentAsString());
 
-	TArray<TSharedPtr<FJsonValue>> JsonArray;
+	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 
-	if (FJsonSerializer::Deserialize(Reader, JsonArray))
+	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		TArray<FLeaderboardEntry> Entries;
-
-		for (auto& Item : JsonArray)
+		// Top10 파싱
+		TArray<FLeaderboardEntry> Top10;
+		TArray<TSharedPtr<FJsonValue>> Top10Array = JsonObject->GetArrayField(TEXT("top10"));
+		for (auto& Item : Top10Array)
 		{
 			TSharedPtr<FJsonObject> Obj = Item->AsObject();
-
 			FLeaderboardEntry Entry;
 			Entry.PlayerName = Obj->GetStringField(TEXT("player_name"));
 			Entry.Score      = Obj->GetIntegerField(TEXT("score"));
 			Entry.ClearTime  = Obj->GetNumberField(TEXT("clear_time"));
-
-			Entries.Add(Entry);
+			Top10.Add(Entry);
 		}
 
-		// 델리게이트 호출 → 바인딩된 모든 곳에 전달
-		OnLeaderboardFetched.Broadcast(Entries);
+		// 내 순위
+		int32 MyRank = (int32)JsonObject->GetNumberField(TEXT("my_rank"));
+
+		// 내 데이터
+		FLeaderboardEntry MyData;
+		TSharedPtr<FJsonObject> MyDataObj = JsonObject->GetObjectField(TEXT("my_data"));
+		if (MyDataObj.IsValid())
+		{
+			MyData.PlayerName = MyDataObj->GetStringField(TEXT("player_name"));
+			MyData.Score      = MyDataObj->GetIntegerField(TEXT("score"));
+			MyData.ClearTime  = MyDataObj->GetNumberField(TEXT("clear_time"));
+		}
+
+		OnLeaderboardFetched.Broadcast(Top10, MyRank, MyData);
 	}
 }
 
