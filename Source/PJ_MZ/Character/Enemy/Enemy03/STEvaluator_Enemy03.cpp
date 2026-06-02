@@ -11,7 +11,7 @@ class AEnemy03AIController;
 
 bool FSTEvaluator_Enemy03::Link(FStateTreeLinker& Linker)
 {
-    Linker.LinkExternalData(ControllerHandle);
+    Linker.LinkExternalData(AIControllerHandle);
     Linker.LinkExternalData(PawnHandle);
     Linker.LinkExternalData(STComponentHandle);
 
@@ -21,50 +21,75 @@ bool FSTEvaluator_Enemy03::Link(FStateTreeLinker& Linker)
 void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
     FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-    AAIController& Controller = Context.GetExternalData(ControllerHandle);
+    AAIController& Controller = Context.GetExternalData(AIControllerHandle);
     APawn& Pawn = Context.GetExternalData(PawnHandle);
-
+    UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
+    
     ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Controller.GetWorld(), 0);
     if (!Player) return;
-
-    float Distance = FVector::Dist(Pawn.GetActorLocation(), Player->GetActorLocation());
-
-    if (InstanceData.bPlayerDetected && Distance >= LoseTargetDistance)
+    
+    InstanceData.AttackRange = AttackRange;
+    float Distance = FVector::Dist(Pawn.GetActorLocation(), Player->GetActorLocation()); 
+    
+    bool bIsInAttackRange = Distance <= AttackRange;
+    
+    if (bIsInAttackRange && !InstanceData.bWasInAttackRange)
+    {
+        InstanceData.bWasInAttackRange = true;
+    
+        FStateTreeEvent Event;
+        Event.Tag = FGameplayTag::RequestGameplayTag("Enemy.Attack");
+        STComp.SendStateTreeEvent(Event);
+        return;
+    }
+    if (!bIsInAttackRange)
+    {
+        InstanceData.bWasInAttackRange = false;
+    }
+    
+    bool bIsInDetectRange = Distance < LoseTargetDistance;
+    
+    if (InstanceData.bPlayerDetected && !bIsInDetectRange)
     {
         InstanceData.bPlayerDetected = false;
         InstanceData.bPlayerLooking = false;
+        InstanceData.bWasInAttackRange = false;
         InstanceData.TargetActor = nullptr;
-
-        UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
+        
         FStateTreeEvent Event;
         Event.Tag = FGameplayTag::RequestGameplayTag(FName("Enemy.PlayerLost"));
         STComp.SendStateTreeEvent(Event);
         return;
     }
-    if (Distance < LoseTargetDistance)
+    
+    if (bIsInDetectRange)
     {
+        const bool bIsPlayerLooking = IsPlayerLookingAtEnemy(Controller);
+        
         if (InstanceData.bPlayerDetected)
         {
-            InstanceData.bPlayerLooking = IsPlayerLookingAtEnemy(Controller);
+            InstanceData.bPlayerLooking = bIsPlayerLooking;
+            InstanceData.TargetActor = Player;
+    
+            return;
         }
-        else
+    
+        if (bIsPlayerLooking)
         {
-            bool bLooking = IsPlayerLookingAtEnemy(Controller);
+            InstanceData.bPlayerDetected = true;
+            InstanceData.bPlayerLooking = true;
+            InstanceData.TargetActor = Player;
+        
+            UE_LOG(LogTemp, Warning, TEXT("Enemy03: PlayerDetected 이벤트 발송"));
+    
+            FStateTreeEvent Event;
+            Event.Tag = FGameplayTag::RequestGameplayTag(FName("Enemy.PlayerDetected"));
+            STComp.SendStateTreeEvent(Event);
             
-            if (bLooking)
-            {
-                InstanceData.bPlayerDetected = true;
-                InstanceData.bPlayerLooking = true;
-
-                UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
-                FStateTreeEvent Event;
-                Event.Tag = FGameplayTag::RequestGameplayTag(FName("Enemy.PlayerDetected"));
-                STComp.SendStateTreeEvent(Event);
-            }
+            return;
         }
     }
 }
-
 bool FSTEvaluator_Enemy03::IsPlayerLookingAtEnemy(AAIController& Controller) const
 {
 

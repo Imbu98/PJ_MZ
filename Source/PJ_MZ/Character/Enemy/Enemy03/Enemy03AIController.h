@@ -13,11 +13,16 @@ class PJ_MZ_API AEnemy03AIController : public AEnemy02AIController
 
 public:
 	AEnemy03AIController();
-
+	
+	bool IsEnemyLookingAtPlayer() const;
+	
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float EnemySightAngle = 60.f;
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStateTreeAIComponent> StateTreeAIComponent;
 };

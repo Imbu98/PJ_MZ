@@ -3,7 +3,6 @@
 
 #include "CoreMinimal.h"
 #include "Character/Enemy/EnemyBase.h"
-#include "Components/StateTreeComponent.h"
 #include "Enemy03Character.generated.h"
 
 UCLASS()

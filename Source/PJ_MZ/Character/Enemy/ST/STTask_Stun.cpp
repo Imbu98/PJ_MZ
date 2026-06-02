@@ -2,6 +2,8 @@
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
 #include "AIController.h"
+#include "Character/Enemy/Enemy03/Enemy03AIController.h"
+#include "Components/StateTreeAIComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -15,6 +17,8 @@ EStateTreeRunStatus FSTTask_Stun::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition) const
 {
+	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 시작"));
+
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	InstanceData.StunTimer = 0.f;
 
@@ -50,10 +54,21 @@ void FSTTask_Stun::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition) const
 {
+	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 끝"));
+	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
-
-	if (ACharacter* Character = Cast<ACharacter>(Controller.GetPawn()))
+	
+	if (AEnemy03AIController* Enemy03 = Cast<AEnemy03AIController>(&Controller))
 	{
-		Character->GetCharacterMovement()->MaxWalkSpeed = 200.f;
+		UStateTreeAIComponent* STComp =
+			   Controller.GetPawn()->FindComponentByClass<UStateTreeAIComponent>();
+		if (!STComp) return;
+	
+		FStateTreeEvent Event;
+		Event.Tag = Enemy03->IsEnemyLookingAtPlayer()
+			? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
+			: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
+
+		STComp->SendStateTreeEvent(Event);
 	}
 }

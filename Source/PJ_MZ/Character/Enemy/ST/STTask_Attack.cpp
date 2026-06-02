@@ -14,6 +14,8 @@ EStateTreeRunStatus FSTTask_Attack::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition) const
 {
+	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: ATTACK 시작"));
+	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	APawn* Pawn = Controller.GetPawn();
 	if (!Pawn) return EStateTreeRunStatus::Failed;

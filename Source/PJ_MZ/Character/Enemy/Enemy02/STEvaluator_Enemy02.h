@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "StateTreeEvaluatorBase.h"
 #include "AIController.h"
+#include "Components/StateTreeAIComponent.h"
 #include "StateTreeExecutionTypes.h"
 #include "STEvaluator_Enemy02.generated.h"
 
@@ -29,18 +30,19 @@ struct PJ_MZ_API FSTEvaluator_Enemy02 : public FStateTreeEvaluatorCommonBase
 
 	using FInstanceDataType = FSTEvaluator_Enemy02InstanceData;
 
+	virtual bool Link(FStateTreeLinker& Linker) override;
+	virtual void Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const override;
+
 	virtual const UStruct* GetInstanceDataType() const override
 	{
 		return FInstanceDataType::StaticStruct();
 	}
-
-	virtual bool Link(FStateTreeLinker& Linker) override;
-	virtual void TreeStart(FStateTreeExecutionContext& Context) const override;
-	virtual void Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const override;
-
-	TStateTreeExternalDataHandle<AAIController> AIControllerHandle;
-	TStateTreeExternalDataHandle<APawn> PawnHandle;
 	
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float AttackRange = 200.f;
+
+private:
+	TStateTreeExternalDataHandle<AAIController> AIControllerHandle;
+	TStateTreeExternalDataHandle<APawn> PawnHandle;
+	TStateTreeExternalDataHandle<UStateTreeAIComponent> STComponentHandle;
 };

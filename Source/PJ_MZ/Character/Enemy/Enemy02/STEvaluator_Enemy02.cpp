@@ -12,46 +12,31 @@ bool FSTEvaluator_Enemy02::Link(FStateTreeLinker& Linker)
 {
 	Linker.LinkExternalData(AIControllerHandle);
 	Linker.LinkExternalData(PawnHandle);
+	Linker.LinkExternalData(STComponentHandle);
 	return true;
-}
-
-void FSTEvaluator_Enemy02::TreeStart(FStateTreeExecutionContext& Context) const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	InstanceData.AIController = &Context.GetExternalData(AIControllerHandle);
-	InstanceData.Pawn = &Context.GetExternalData(PawnHandle);
 }
 
 void FSTEvaluator_Enemy02::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	AAIController& Controller = Context.GetExternalData(AIControllerHandle);
+	APawn& Pawn = Context.GetExternalData(PawnHandle);
+	UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
 
-	AAIController* Controller = InstanceData.AIController.Get();
-	if (!Controller) return;
+	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Controller.GetWorld(), 0);
+	if (!Player) return;
+	
+	float Distance = FVector::Dist(Pawn.GetActorLocation(), Player->GetActorLocation());
 
-	APawn* Pawn = InstanceData.Pawn.Get();
-	if (!Pawn) return;
-
-	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Pawn->GetWorld(), 0);
-	if (Player)
+	if (Distance <= AttackRange)
 	{
-		float Distance = FVector::Dist(
-			Pawn->GetActorLocation(), Player->GetActorLocation());
-
-		if (Distance <= AttackRange)
-		{
-			if (UStateTreeAIComponent* STComp =
-				Controller->FindComponentByClass<UStateTreeAIComponent>())
-			{
-				FStateTreeEvent Event;
-				Event.Tag = FGameplayTag::RequestGameplayTag("Enemy.Attack");
-				STComp->SendStateTreeEvent(Event);
-			}
-			return;
-		}
+		FStateTreeEvent Event;
+		Event.Tag = FGameplayTag::RequestGameplayTag("Enemy.Attack");
+		STComp.SendStateTreeEvent(Event);
+		return;
 	}
 
-	UAIPerceptionComponent* Perception = Controller->GetAIPerceptionComponent();
+	UAIPerceptionComponent* Perception = Controller.GetAIPerceptionComponent();
 	if (!Perception) return;
 
 	TArray<AActor*> PerceivedActors;

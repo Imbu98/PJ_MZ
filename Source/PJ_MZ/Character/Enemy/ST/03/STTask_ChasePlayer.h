@@ -12,6 +12,9 @@ USTRUCT()
 struct FSTTask_ChasePlayerInstanceData
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category = Input)
+	float AttackRange = 200.f;
 
 	UPROPERTY()
 	TObjectPtr<AActor> TargetActor = nullptr;
@@ -39,9 +42,6 @@ struct PJ_MZ_API FSTTask_ChasePlayer : public FStateTreeTaskCommonBase
 
 	UPROPERTY(EditAnywhere, Category = "Chase")
 	float ChaseSpeed = 700.f;
-
-	UPROPERTY(EditAnywhere, Category = "Chase")
-	float AttackRange = 150.f;
 
 private:
 	TStateTreeExternalDataHandle<AAIController> ControllerHandle;
