@@ -13,9 +13,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UScrollBox> ScrollBox_LeaderBoard;
 	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UScoreInfoBoxUI> WBP_ScoreInfoBox;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UScoreInfoBoxUI> ScoreInfoBoxFactory;
 
 	UFUNCTION()
-	void GenerateScoreList(const FLeaderboardEntry& leaderboardInfo,int32 rank);
+	void GenerateScoreList(const FLeaderboardEntry& Entries, bool isMyScore,int32 index);
+	
+	UFUNCTION()
+	void GenerateMyScore(const FLeaderboardEntry& myScore,int32 myRank);
 };

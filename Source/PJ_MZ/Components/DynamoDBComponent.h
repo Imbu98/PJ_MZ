@@ -33,7 +33,7 @@ public:
 	// ===============================
 	// 랭킹 저장 및 불러오기
 	// ===============================
-	void FetchLeaderboard(FString GameId); 
+	void FetchLeaderboard(const FString& GameId,const FString& PlayerId); 
 	
 	void OnSubmitComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 

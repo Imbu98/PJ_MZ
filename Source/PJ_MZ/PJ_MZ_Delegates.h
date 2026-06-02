@@ -17,7 +17,7 @@ DECLARE_MULTICAST_DELEGATE(FOnDungeonGenerationComplete);
 DECLARE_MULTICAST_DELEGATE_OneParam(FCameraFOVChangeDelegate,float);
 
 // DB 랭킹데이터 Get 성공 델리게이트
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeaderboardFetched, const TArray<FLeaderboardEntry>&);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnLeaderboardFetched, const TArray<FLeaderboardEntry>&,int32,const FLeaderboardEntry&);
 
 // 로그인 성공 델리게이트
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnLoginComplete, bool, const FString&,const FString&,int32);

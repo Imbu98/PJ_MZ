@@ -2,8 +2,10 @@
 
 #include "HttpModule.h"
 #include "PJ_MZ.h"
+#include "Character/Player/HT_PlayerState.h"
 #include "Components/DynamoDBComponent.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Kismet/GameplayStatics.h"
 
 APJ_MZGameMode::APJ_MZGameMode()
 {
@@ -32,10 +34,16 @@ void APJ_MZGameMode::OnSubmitComplete(FHttpRequestPtr Request, FHttpResponsePtr 
 // 	DynamoDBComp->OnFetchComplete(Request, Response, bSuccess);
 // }
 
-void APJ_MZGameMode::FetchLeaderboard(FString GameId)
+void APJ_MZGameMode::FetchLeaderboard(const FString& gameId)
 {
 	if (!DynamoDBComp) return;
+
+	AHT_PlayerState* ps =  Cast<AHT_PlayerState>(UGameplayStatics::GetPlayerState(GetWorld(),0));
+	if (ps)
+	{
+		DynamoDBComp->FetchLeaderboard(gameId,ps->MZ_PlayerID);		
+	}
 	
-	DynamoDBComp->FetchLeaderboard(GameId);
+	
 }
 

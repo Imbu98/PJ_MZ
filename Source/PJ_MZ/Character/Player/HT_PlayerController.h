@@ -61,7 +61,7 @@ public:
 	void SetResultUI(const float totalScore);
 	
 	UFUNCTION()
-	void OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries);
+	void OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore);
 
 protected:
 	virtual void BeginPlay() override;

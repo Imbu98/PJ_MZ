@@ -11,6 +11,10 @@ class PJ_MZ_API UScoreInfoBoxUI : public UUserWidget
 	
 public:
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Img_Background;
+	
+	
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> Text_Rank;
 	
 	UPROPERTY(meta = (BindWidget))
@@ -23,7 +27,7 @@ public:
 	TObjectPtr< UTextBlock> Text_ClearTime;
 	
 	UFUNCTION()
-	void SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,int32 rank);
+	void SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,int32 rank,bool isMyScore);
 	
 	
 };

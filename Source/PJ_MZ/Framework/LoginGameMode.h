@@ -17,5 +17,10 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UDynamoDBComponent> DynamoDBComp;
+	
+	UFUNCTION()
+	void FetchLeaderboard(const FString& gameId);
+	
+	
 
 };

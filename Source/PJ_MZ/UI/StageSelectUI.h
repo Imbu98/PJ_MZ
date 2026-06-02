@@ -9,28 +9,66 @@ UCLASS()
 class PJ_MZ_API UStageSelectUI : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void NativeDestruct() override;
+	virtual void NativeConstruct() override;
+
 public:
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UImage> Image_StageSelect;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UButton> Btn_ShowLeaderBoard;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UTextBlock> Text_StageName;
-	
+
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_LockImage;
-	
-	
-	
+	TObjectPtr<class UButton> Btn_LockImage;
+
 	UPROPERTY()
-	FStageSelectData StageData; // 스테이지 이름
+	FStageSelectData StageData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UScoreLeaderboardUI> ScoreLeaderboardFactory;
+
+	UPROPERTY()
+	TObjectPtr<class UScoreLeaderboardUI> ScoreLeaderboardWidget;
+
+	UFUNCTION()
+	void SetStageSelectInfo(
+		const FStageSelectData& stageSelectData,
+		bool isLocked);
+
+	UFUNCTION()
+	void OnClickedStageBtn();
+
+	UFUNCTION()
+	void OnLeaderboardReceived(
+		const TArray<FLeaderboardEntry>& Entries,
+		int32 myRank,
+		const FLeaderboardEntry& myScore);
+
+	//---------------------------------------
+	// Unlock Info Tooltip
+	//---------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<class UStageUnlockInfoUI> StageUnlockInfoUIFactory;
+
+	UPROPERTY()
+	TObjectPtr<class UStageUnlockInfoUI> StageUnlockInfoUIWidget;
+
+	FTimerHandle HoverTimerHandle;
 	
 	UFUNCTION()
-	void SetStageSelectInfo(const FStageSelectData& stageSelectData,bool isLocked);
-	
+	void ShowUnlockInfo();
+
 	UFUNCTION()
-	void ShowLeaderBoard();
+	void OnLockHovered();
+
+	UFUNCTION()
+	void OnLockUnhovered();
 };

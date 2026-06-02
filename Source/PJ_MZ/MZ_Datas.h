@@ -115,7 +115,10 @@ struct FStageSelectData : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FName StageName;
+	FName MoveLevelName; // 이동할 레벨 이름
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName DisplayLevelName; // 플레이어에게 알려줄 스테이지 이름
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSoftObjectPtr<UTexture2D> StageImage;
@@ -123,6 +126,10 @@ struct FStageSelectData : public FTableRowBase
 	// 다음스테이지 해금을 위한 점수
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float UnLockScore;
+	
+	// 다음스테이지 해금을 위한 스테이지
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName UnLockLevelName; 
 	
 };
 

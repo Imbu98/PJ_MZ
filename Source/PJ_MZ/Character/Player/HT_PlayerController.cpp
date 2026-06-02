@@ -191,7 +191,7 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 	}
 }
 
-void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries)
+void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore)
 {
 	if (ScoreLeaderboardUIFactory)
 	{
@@ -199,12 +199,19 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 		if (ScoreLeaderboardUIWidget)
 		{
 			ScoreLeaderboardUIWidget->AddToViewport();
-			
+			ScoreLeaderboardUIWidget->GenerateMyScore(myScore,myRank);
 			for (int32 i=0;i<Entries.Num();i++)
 			{
-				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],i+1);
+				bool isMyScore=false;
+				if (Entries[i].PlayerName==myScore.PlayerName)
+				{
+					isMyScore=true;
+				}
+				
+				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
 				UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
 			}
 		}
 	}
 }
+

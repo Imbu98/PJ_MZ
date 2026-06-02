@@ -1,16 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ScoreInfoBoxUI.h"
 
 #include "MZ_Datas.h"
+#include "Components/Image.h"
+#include "Components/Overlay.h"
 #include "Components/TextBlock.h"
 
-void UScoreInfoBoxUI::SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,int32 rank)
+void UScoreInfoBoxUI::SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,int32 rank,bool isMyScore)
 {
+	
+	if (Img_Background&&isMyScore)
+	{
+		Img_Background->SetColorAndOpacity(FLinearColor::Blue);
+	}
+	
 	if (Text_Rank)
 	{
-	  Text_Rank->SetText(FText::AsNumber(rank));
+		rank > 0 ? Text_Rank->SetText(FText::AsNumber(rank)) : Text_Rank->SetText(FText::FromString(TEXT("기록없음")));
+		
 	}
 	
 	if (Text_PlayerName)
@@ -20,11 +26,16 @@ void UScoreInfoBoxUI::SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,i
 	
 	if (Text_Score)
 	{
-		Text_Score->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.Score)));
+		rank > 0 ? Text_Score->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.Score))): 
+		Text_Score->SetText(FText::FromString(TEXT("기록없음")));
+		
 	}
 	
 	if (Text_ClearTime)
 	{
-		Text_ClearTime->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.ClearTime)));
+		rank > 0 ? Text_ClearTime->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.ClearTime)))
+		: Text_ClearTime->SetText(FText::FromString(TEXT("기록없음")));
+		
+		
 	}
 }

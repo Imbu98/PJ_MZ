@@ -295,7 +295,7 @@ void ULoginUI::OnClickStartGame()
 {
 	if (!StageSelectUIArray.IsValidIndex(CurrentIndex)) return;
 	
-	FName stageName = StageSelectUIArray[CurrentIndex]->StageData.StageName;
+	 FName stageName = StageSelectUIArray[CurrentIndex]->StageData.MoveLevelName;
 	
 	 FString LevelPath = FString::Printf(TEXT("/Game/HT/Levels/%s"), *stageName.ToString());
 	

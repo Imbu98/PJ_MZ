@@ -24,7 +24,7 @@ public:
 	//void OnFetchComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bSuccess);
 	
 	UFUNCTION()
-	void FetchLeaderboard(FString GameId);
+	void FetchLeaderboard(const FString& gameId);
 	
 };
 
