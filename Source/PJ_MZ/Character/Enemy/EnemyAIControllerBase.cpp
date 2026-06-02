@@ -2,7 +2,7 @@
 
 #include "EnemyBase.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "BehaviorTree/BehaviorTree.h"
+#include "Components/StateTreeAIComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Hearing.h"
 
@@ -32,28 +32,21 @@ void AEnemyAIControllerBase::BeginPlay()
 void AEnemyAIControllerBase::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
-    // UE_LOG(LogTemp, Warning, TEXT("OnPossess 호출됨"));
 
-    if (!BlackboardAsset || !BehaviorTreeAsset)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("BB 또는 BT 에셋 없음"));
-        return;
-    }
-
-    UBlackboardComponent* BlackboardComp = nullptr;
-    bool bBBResult = UseBlackboard(BlackboardAsset, BlackboardComp);
-    bool bBTResult = RunBehaviorTree(BehaviorTreeAsset);
-
-    UE_LOG(LogTemp, Warning, TEXT("BB초기화: %s, BT실행: %s"),
-        bBBResult ? TEXT("성공") : TEXT("실패"),
-        bBTResult ? TEXT("성공") : TEXT("실패"));
-    
     SetGenericTeamId(FGenericTeamId(1));
 }
 
 void AEnemyAIControllerBase::PictureTaken()
 {
-    
+    if (UStateTreeAIComponent* STComp =
+    this->FindComponentByClass<UStateTreeAIComponent>())
+    {
+        FStateTreeEvent Event;
+        Event.Tag = FGameplayTag::RequestGameplayTag("Enemy.Stunned");
+        STComp->SendStateTreeEvent(Event);
+
+        UE_LOG(LogTemp, Warning, TEXT("Enemy02: 스턴 이벤트 발송"));
+    }
 }
 
 

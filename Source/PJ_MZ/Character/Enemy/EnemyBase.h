@@ -30,12 +30,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	float RespawnDelay = 5.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "AI")
-	TObjectPtr<UPawnSensingComponent> PawnSensing;
-
-	UFUNCTION()
-	virtual void OnSeePawn(APawn* SensedPawn);
-
 private:
 	void DistoryAndRequestRespawn();
 };

@@ -15,7 +15,4 @@ public:
 	AEnemy03Character();
 
 	virtual void Attack() override;
-
-protected:
-	virtual void OnSeePawn(APawn* SensedPawn) override;
 };

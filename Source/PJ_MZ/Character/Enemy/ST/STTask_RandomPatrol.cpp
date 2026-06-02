@@ -16,6 +16,10 @@ bool FSTTask_RandomPatrol::Link(FStateTreeLinker& Linker)
 
 EStateTreeRunStatus FSTTask_RandomPatrol::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
+	
+	UE_LOG(LogTemp, Warning, TEXT("RandomPatrol EnterState"));
+
+	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	APawn* Pawn = Controller.GetPawn();
 	if (!Pawn) return EStateTreeRunStatus::Failed;

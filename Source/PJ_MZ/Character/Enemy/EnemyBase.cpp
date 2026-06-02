@@ -3,8 +3,6 @@
 #include "EnemyBase.h"
 #include <Components/PicturableComponent.h>
 #include "EnemySpawnManager.h"
-#include "GenericTeamAgentInterface.h"
-#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -13,20 +11,11 @@ AEnemyBase::AEnemyBase()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	PicturableComp = CreateDefaultSubobject<UPicturableComponent>("PicturableComp");
-	
-	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
-	PawnSensing->SightRadius = 200.f;
-	PawnSensing->SetPeripheralVisionAngle(180.f);
-	PawnSensing->bSeePawns = true;
-	PawnSensing->bHearNoises = false;
-	PawnSensing->SensingInterval = 0.1f;
 }
 
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-    PawnSensing->OnSeePawn.AddDynamic(this, &AEnemyBase::OnSeePawn);
 }
 
 void AEnemyBase::Attack()
@@ -57,18 +46,6 @@ void AEnemyBase::DistoryAndRequestRespawn()
 	
 	Destroy();
 }
-
-void AEnemyBase::OnSeePawn(APawn* SensedPawn)
-{
-	// UE_LOG(LogTemp, Warning, TEXT("OnSeePawn 호출됨"));
-	if (!SensedPawn) return;
-    
-	if (SensedPawn->IsPlayerControlled())
-	{
-		Attack();
-	}
-}
-
 
 
 

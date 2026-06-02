@@ -18,13 +18,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
-	
-
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	TObjectPtr<UBlackboardData> BlackboardAsset;
-
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAIPerceptionComponent* AIPerception;
@@ -38,10 +31,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AI|Hearing")
 	float HearingMaxAge = 5.f;
 
-	// Blackboard 키 이름 - 공통
-	const FName BB_SoundLocation = TEXT("SoundLocation");
-	const FName BB_TargetActor   = TEXT("TargetActor");
-	
 public:
 	// 사진 찍힐 때 불릴 함수
 	void PictureTaken();

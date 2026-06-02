@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Perception/AISense_Hearing.h"
 #include "Character/Enemy/EnemyAIControllerBase.h"
+#include "Components/StateTreeAIComponent.h"
 #include "Enemy02AIController.generated.h"
 
 struct FActorPerceptionUpdateInfo;
@@ -17,13 +18,12 @@ public:
 	AEnemy02AIController();
 
 protected:
-
-	virtual void BeginPlay() override;
-	
 	virtual void OnPossess(APawn* InPawn) override;
 
+private:
 	UFUNCTION()
 	void OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	
 	
 	
 };
