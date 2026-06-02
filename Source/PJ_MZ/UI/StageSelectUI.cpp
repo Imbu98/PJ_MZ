@@ -4,6 +4,7 @@
 #include "MZ_Datas.h"
 #include "Character/Player/HT_PlayerState.h"
 #include "Components/Button.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/DynamoDBComponent.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -11,36 +12,28 @@
 #include "Framework/PJ_MZGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
+class UCanvasPanelSlot;
+
 void UStageSelectUI::NativeDestruct()
 {
 	Super::NativeDestruct();
 	
-	HideUnlockInfo();
 	GetWorld()->GetTimerManager().ClearTimer(HoverTimerHandle);
 }
 
-void UStageSelectUI::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+void UStageSelectUI::NativeConstruct()
 {
-	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	Super::NativeConstruct();
 	
-	// 0.5초 후 ShowUnlockInfo 호출
-	GetWorld()->GetTimerManager().SetTimer(
-		HoverTimerHandle,
+	Btn_LockImage->OnHovered.AddDynamic(
+	 this,
+	 &UStageSelectUI::OnLockHovered);
+
+	Btn_LockImage->OnUnhovered.AddDynamic(
 		this,
-		&UStageSelectUI::ShowUnlockInfo,
-		0.5f,
-		false
-	);
+		&UStageSelectUI::OnLockUnhovered);
 }
 
-void UStageSelectUI::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
-{
-	Super::NativeOnMouseLeave(InMouseEvent);
-	
-	// 타이머 취소 및 위젯 숨김
-	GetWorld()->GetTimerManager().ClearTimer(HoverTimerHandle);
-	HideUnlockInfo();
-}
 
 void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData,bool isLocked)
 {
@@ -69,9 +62,9 @@ void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData,
 		Text_StageName->SetText(FText::FromName(StageData.DisplayLevelName));
 	}
 	
-	if (Image_LockImage)
+	if (Btn_LockImage)
 	{
-		isLocked ? Image_LockImage->SetVisibility(ESlateVisibility::Visible) : Image_LockImage->SetVisibility(ESlateVisibility::Collapsed);
+		isLocked ? Btn_LockImage->SetVisibility(ESlateVisibility::Visible) : Btn_LockImage->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	
 	ALoginGameMode* GameMode = Cast<ALoginGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -120,25 +113,44 @@ void UStageSelectUI::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entr
 	}
 }
 
-void UStageSelectUI::ShowUnlockInfo()
+void UStageSelectUI::OnLockHovered()
 {
-	
-	if (!StageUnlockInfoWidget && StageUnlockInfoWidgetFactory)
-	{
-		StageUnlockInfoWidget = CreateWidget<UStageUnlockInfoUI>(GetOwningPlayer(), StageUnlockInfoWidgetFactory);
-	}
-
-	if (StageUnlockInfoWidget && !StageUnlockInfoWidget->IsInViewport())
-	{
-		StageUnlockInfoWidget->AddToViewport();
-		StageUnlockInfoWidget->SetText(StageData.DisplayLevelName,StageData.UnLockScore);
-	}
+	GetWorld()->GetTimerManager().SetTimer(
+	   HoverTimerHandle,
+	   this,
+	   &UStageSelectUI::ShowUnlockInfo,
+	   0.5f,
+	   false);
 }
 
-void UStageSelectUI::HideUnlockInfo()
+void UStageSelectUI::OnLockUnhovered()
 {
-	if (StageUnlockInfoWidget && StageUnlockInfoWidget->IsInViewport())
+	// GetWorld()->GetTimerManager().ClearTimer(HoverTimerHandle);
+	//
+	// if (StageUnlockInfoUIWidget)
+	// {
+	// 	StageUnlockInfoUIWidget->SetVisibility(
+	// 		ESlateVisibility::Collapsed);
+	// }
+}
+
+void UStageSelectUI::ShowUnlockInfo()
+{
+	if (StageData.MoveLevelName!="L_HT")
 	{
-		StageUnlockInfoWidget->RemoveFromParent();
-	}
+		if (!StageUnlockInfoUIWidget && StageUnlockInfoUIFactory)
+		{
+			StageUnlockInfoUIWidget =
+				CreateWidget<UStageUnlockInfoUI>(
+					GetOwningPlayer(),
+					StageUnlockInfoUIFactory);
+
+			StageUnlockInfoUIWidget->AddToViewport();
+			StageUnlockInfoUIWidget->SetStageData(StageData);
+		}
+		// if (StageUnlockInfoUIWidget)
+		// {
+		// 	StageUnlockInfoUIWidget->SetVisibility(ESlateVisibility::Visible);	
+		// }
+	}	
 }

@@ -9,52 +9,66 @@ UCLASS()
 class PJ_MZ_API UStageSelectUI : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 protected:
 	virtual void NativeDestruct() override;
-	// 마우스 이벤트
-	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
-	
+	virtual void NativeConstruct() override;
+
 public:
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UImage> Image_StageSelect;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UButton> Btn_ShowLeaderBoard;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UTextBlock> Text_StageName;
-	
+
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image_LockImage;
-	
+	TObjectPtr<class UButton> Btn_LockImage;
+
 	UPROPERTY()
-	FStageSelectData StageData; // 스테이지 데이터
-	
+	FStageSelectData StageData;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class UScoreLeaderboardUI> ScoreLeaderboardFactory;
-	
+
 	UPROPERTY()
-	TObjectPtr<UScoreLeaderboardUI> ScoreLeaderboardWidget;
-	
+	TObjectPtr<class UScoreLeaderboardUI> ScoreLeaderboardWidget;
+
 	UFUNCTION()
-	void SetStageSelectInfo(const FStageSelectData& stageSelectData,bool isLocked);
-	
+	void SetStageSelectInfo(
+		const FStageSelectData& stageSelectData,
+		bool isLocked);
+
 	UFUNCTION()
 	void OnClickedStageBtn();
-	
+
 	UFUNCTION()
-	void OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore);
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UStageUnlockInfoUI> StageUnlockInfoWidgetFactory;
-	
+	void OnLeaderboardReceived(
+		const TArray<FLeaderboardEntry>& Entries,
+		int32 myRank,
+		const FLeaderboardEntry& myScore);
+
+	//---------------------------------------
+	// Unlock Info Tooltip
+	//---------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	TSubclassOf<class UStageUnlockInfoUI> StageUnlockInfoUIFactory;
+
 	UPROPERTY()
-	TObjectPtr<UStageUnlockInfoUI> StageUnlockInfoWidget;
+	TObjectPtr<class UStageUnlockInfoUI> StageUnlockInfoUIWidget;
 
 	FTimerHandle HoverTimerHandle;
-
+	
+	UFUNCTION()
 	void ShowUnlockInfo();
-	void HideUnlockInfo();
+
+	UFUNCTION()
+	void OnLockHovered();
+
+	UFUNCTION()
+	void OnLockUnhovered();
 };

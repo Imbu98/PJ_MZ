@@ -127,5 +127,9 @@ struct FStageSelectData : public FTableRowBase
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float UnLockScore;
 	
+	// 다음스테이지 해금을 위한 스테이지
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName UnLockLevelName; 
+	
 };
 
