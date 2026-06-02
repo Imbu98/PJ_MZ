@@ -88,7 +88,7 @@ public:
 	
 	// DB 델리게이트
 	UFUNCTION()
-	void OnLoginResult(bool bSuccess, const FString& UserId, const FString& Nickname);
+	void OnLoginResult(bool bSuccess, const FString& UserId, const FString& Nickname,int32 StageFlags);
 
 	UFUNCTION()
 	void OnRegisterResult(bool bSuccess, const FString& ErrorMessage);
@@ -111,6 +111,12 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UTextBlock> TextBlock_UserName;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> Btn_StartGame;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UImage> Img_Locked;
+	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	TObjectPtr<class UDataTable> DT_StageSelectInfo;
 	
@@ -125,22 +131,28 @@ public:
 	
 	UPROPERTY()
 	TArray<TObjectPtr<UStageSelectUI>> StageSelectUIArray;
+
 	
 	UFUNCTION()
-	void SetStageSelectOverlay();
+	void SetStageSelectOverlay(const int32 stageFlags);
 	
 	int32 CurrentIndex = 0;
 	
-	const float Padding = 350.f;
+	int32 StageFlags=0;
+	
+	
 
 	UFUNCTION()
 	void OnClickNext();
 
 	UFUNCTION()
 	void OnClickPrev();
+	
+	UFUNCTION()
+	void OnClickStartGame();
 
 	void ScrollToIndex(int32 Index);
-	void UpdateArrowVisibility();
+	void UpdateVisibility();
 	
 	// 목표 오프셋
 	float TargetScrollOffset = 0.f;

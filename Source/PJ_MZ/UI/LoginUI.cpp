@@ -9,6 +9,7 @@
 #include "Framework/LoginGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "StageSelectUI.h"
+#include "Components/Image.h"
 #include "Components/ScrollBox.h"
 #include "Components/ScrollBoxSlot.h"
 
@@ -145,7 +146,7 @@ void ULoginUI::OnClickRegister()
 	}
 }
 
-void ULoginUI::OnLoginResult(bool bSuccess, const FString& UserId, const FString& Nickname)
+void ULoginUI::OnLoginResult(bool bSuccess, const FString& UserId, const FString& Nickname,int32 stageFlags)
 {
 	if (!bSuccess)
 	{
@@ -164,10 +165,12 @@ void ULoginUI::OnLoginResult(bool bSuccess, const FString& UserId, const FString
 		AHT_PlayerState* PS = PC->GetPlayerState<AHT_PlayerState>();
 		if (PS)
 		{
-			PS->MZ_PlayerID  = UserId;
+			PS->MZ_PlayerID   = UserId;
 			PS->MZ_PlayerName = Nickname;
+			PS->MZ_StageFlags = stageFlags;
+			StageFlags = stageFlags;
 		}
-		SetStageSelectOverlay();
+		SetStageSelectOverlay(stageFlags);
 	}
 }
 
@@ -192,9 +195,8 @@ void ULoginUI::OnRegisterResult(bool bSuccess, const FString& ErrorMessage)
 	RegisterOverlay->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void ULoginUI::SetStageSelectOverlay()
+void ULoginUI::SetStageSelectOverlay(const int32 stageFlags)
 {
-	
 	
 	if (LoginOverlay&&RegisterOverlay&&StageSelectOverlay)
 	{
@@ -240,14 +242,22 @@ void ULoginUI::SetStageSelectOverlay()
 
 				Slots->SetPadding(FMargin(Left, 50.f, Right, 50.f));
 			}
+			
+			// i+1번째 스테이지 클리어 여부 확인 (i는 0부터, 스테이지는 1부터)
+			// 0번째(첫 스테이지)는 항상 열려있음
+			bool bIsLocked = false;
+			if (i > 0)
+			{
+				bIsLocked = (stageFlags & (1 << (i - 1))) == 0;
+			}
 
-			StageSelectUIWidget->SetStageSelectInfo(StageSelectData[i]);
+			StageSelectUIWidget->SetStageSelectInfo(StageSelectData[i],bIsLocked);
 			StageSelectUIArray.Add(StageSelectUIWidget);
 		}
 	}
 	
 	CurrentIndex = 0;
-	UpdateArrowVisibility();
+	UpdateVisibility();
 	
 	// Geometry 계산 완료 후 스크롤 (한 프레임 대기)
 	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
@@ -257,6 +267,7 @@ void ULoginUI::SetStageSelectOverlay()
 
 	Btn_Next->OnClicked.AddDynamic(this, &ULoginUI::OnClickNext);
 	Btn_Prev->OnClicked.AddDynamic(this, &ULoginUI::OnClickPrev);
+	Btn_StartGame->OnClicked.AddDynamic(this, &ULoginUI::OnClickStartGame);
 	
 }
 
@@ -266,7 +277,7 @@ void ULoginUI::OnClickNext()
 	{
 		CurrentIndex++;
 		ScrollToIndex(CurrentIndex);
-		UpdateArrowVisibility();
+		UpdateVisibility();
 	}
 }
 
@@ -276,8 +287,20 @@ void ULoginUI::OnClickPrev()
 	{
 		CurrentIndex--;
 		ScrollToIndex(CurrentIndex);
-		UpdateArrowVisibility();
+		UpdateVisibility();
 	}
+}
+
+void ULoginUI::OnClickStartGame()
+{
+	if (!StageSelectUIArray.IsValidIndex(CurrentIndex)) return;
+	
+	FName stageName = StageSelectUIArray[CurrentIndex]->StageData.StageName;
+	
+	 FString LevelPath = FString::Printf(TEXT("/Game/HT/Levels/%s"), *stageName.ToString());
+	
+	 GetWorld()->SeamlessTravel(LevelPath);
+	
 }
 
 void ULoginUI::ScrollToIndex(int32 Index)
@@ -306,7 +329,7 @@ void ULoginUI::ScrollToIndex(int32 Index)
 	bIsScrolling = true;
 }
 
-void ULoginUI::UpdateArrowVisibility()
+void ULoginUI::UpdateVisibility()
 {
 	int32 Total = StageSelectUIArray.Num();
 
@@ -327,5 +350,17 @@ void ULoginUI::UpdateArrowVisibility()
 	Btn_Next->SetVisibility(CurrentIndex == Total - 1 
 		? ESlateVisibility::Hidden 
 		: ESlateVisibility::Visible);
+	
+	
+	if (CurrentIndex > 0)
+	{
+		bool bIsLocked = (StageFlags & (1 << (CurrentIndex - 1))) == 0;
+		Img_Locked->SetVisibility(bIsLocked ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		// 첫 번째 스테이지는 항상 열림
+		Img_Locked->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 

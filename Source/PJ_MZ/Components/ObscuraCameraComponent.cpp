@@ -185,7 +185,10 @@ void UObscuraCameraComponent::OnGameEnd()
 	// 끝나는데 걸린 시간
 	float endTime = Cached_PS->GetElapsedSeconds();
 
-	GameMode->SubmitScore(GameId, PlayerId, PlayerName, totalScore, endTime);
+	//Clear처리할 스테이지 index
+	int32 stageIndex = CheckIsUnLocked(totalScore);
+	
+	GameMode->SubmitScore(GameId, PlayerId, PlayerName, totalScore, endTime,stageIndex);
 	
 	SetResultUI(totalScore);
 	
@@ -338,6 +341,33 @@ float UObscuraCameraComponent::CalculateSetBonus(float totalScore)
 		}
 	}
 	return totalScore;
+}
+
+// Dt에 적용된 해금점수보다 현재 점수가 높은지 판단
+int32 UObscuraCameraComponent::CheckIsUnLocked(float score)
+{
+	FName levelName = *UGameplayStatics::GetCurrentLevelName(GetWorld());
+	
+	if (!DT_StageSelectData)
+	{
+		UE_LOG(LogPJ_MZ,Warning,TEXT("No DT_StageSelectData"));
+		return 0;
+	}
+	// 모든 행 이름 가져오기
+	TArray<FName> RowNames = DT_StageSelectData->GetRowNames();
+
+	// 현재 레벨이 몇 번째 행인지 찾기
+	int32 StageIndex = RowNames.IndexOfByKey(levelName) + 1; // 1부터 시작
+	
+	FStageSelectData* StageSelectData = DT_StageSelectData->FindRow<FStageSelectData>(levelName,TEXT("No StageSelectData"));
+	if (StageSelectData)
+	{
+		if (score>=StageSelectData->UnLockScore)
+		{
+			return StageIndex;
+		}
+	}
+	return 0;
 }
 
 

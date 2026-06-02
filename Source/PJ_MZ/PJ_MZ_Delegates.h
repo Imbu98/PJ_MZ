@@ -20,7 +20,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FCameraFOVChangeDelegate,float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeaderboardFetched, const TArray<FLeaderboardEntry>&);
 
 // 로그인 성공 델리게이트
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnLoginComplete, bool, const FString&,const FString&);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnLoginComplete, bool, const FString&,const FString&,int32);
 // 회원가입 성공 델리게이트
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRegisterComplete, bool,const FString&);
 
