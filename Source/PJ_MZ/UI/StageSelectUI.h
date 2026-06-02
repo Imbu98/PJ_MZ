@@ -55,11 +55,11 @@ public:
 	// Unlock Info Tooltip
 	//---------------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
-	TSubclassOf<class UStageUnlockInfoUI> StageUnlockInfoUIFactory;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="UI")
+	// TSubclassOf<class UStageUnlockInfoUI> StageUnlockInfoUIFactory;
 
-	UPROPERTY()
-	TObjectPtr<class UStageUnlockInfoUI> StageUnlockInfoUIWidget;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UStageUnlockInfoUI> WBP_StageUnlockInfo;
 
 	FTimerHandle HoverTimerHandle;
 	

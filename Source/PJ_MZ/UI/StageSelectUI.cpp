@@ -32,6 +32,12 @@ void UStageSelectUI::NativeConstruct()
 	Btn_LockImage->OnUnhovered.AddDynamic(
 		this,
 		&UStageSelectUI::OnLockUnhovered);
+
+	if (WBP_StageUnlockInfo)
+	{
+		WBP_StageUnlockInfo->SetVisibility(ESlateVisibility::Collapsed);	
+	}
+	
 }
 
 
@@ -125,32 +131,24 @@ void UStageSelectUI::OnLockHovered()
 
 void UStageSelectUI::OnLockUnhovered()
 {
-	// GetWorld()->GetTimerManager().ClearTimer(HoverTimerHandle);
-	//
-	// if (StageUnlockInfoUIWidget)
-	// {
-	// 	StageUnlockInfoUIWidget->SetVisibility(
-	// 		ESlateVisibility::Collapsed);
-	// }
+	GetWorld()->GetTimerManager().ClearTimer(HoverTimerHandle);
+	
+	if (WBP_StageUnlockInfo)
+	{
+		WBP_StageUnlockInfo->SetVisibility(
+			ESlateVisibility::Collapsed);
+	}
 }
 
 void UStageSelectUI::ShowUnlockInfo()
 {
-	if (StageData.MoveLevelName!="L_HT")
+	// 첫 레벨은 무조건 열려있으니 첫 레벨이 아닐 때만
+	if (StageData.MoveLevelName == "L_HT")
 	{
-		if (!StageUnlockInfoUIWidget && StageUnlockInfoUIFactory)
-		{
-			StageUnlockInfoUIWidget =
-				CreateWidget<UStageUnlockInfoUI>(
-					GetOwningPlayer(),
-					StageUnlockInfoUIFactory);
-
-			StageUnlockInfoUIWidget->AddToViewport();
-			StageUnlockInfoUIWidget->SetStageData(StageData);
-		}
-		// if (StageUnlockInfoUIWidget)
-		// {
-		// 	StageUnlockInfoUIWidget->SetVisibility(ESlateVisibility::Visible);	
-		// }
-	}	
+		return;
+	}
+	if (WBP_StageUnlockInfo)
+	{
+		WBP_StageUnlockInfo->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
 }

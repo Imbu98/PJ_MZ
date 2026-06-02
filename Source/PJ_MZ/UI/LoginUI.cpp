@@ -227,7 +227,7 @@ void ULoginUI::SetStageSelectOverlay(const int32 stageFlags)
 		
 		for (int32 i = 0; i < StageSelectData.Num(); i++)
 		{
-			StageSelectUIWidget = CreateWidget<UStageSelectUI>(this, StageSelectUIFactory);
+			UStageSelectUI* StageSelectUIWidget = CreateWidget<UStageSelectUI>(this, StageSelectUIFactory);
 			if (!StageSelectUIWidget) continue;
 
 			UScrollBoxSlot* Slots = Cast<UScrollBoxSlot>(ScrollBox_StageSelect->AddChild(StageSelectUIWidget));

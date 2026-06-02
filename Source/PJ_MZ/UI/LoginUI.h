@@ -124,9 +124,6 @@ public:
 	TSubclassOf<class UStageSelectUI> StageSelectUIFactory;
 	
 	UPROPERTY()
-	TObjectPtr<UStageSelectUI> StageSelectUIWidget;
-	
-	UPROPERTY()
 	TArray<FStageSelectData> StageSelectData;
 	
 	UPROPERTY()
