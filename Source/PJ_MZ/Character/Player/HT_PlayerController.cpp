@@ -1,4 +1,4 @@
-#include "HT_PlayerController.h"
+ #include "HT_PlayerController.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "HT_Player.h"
@@ -20,17 +20,36 @@ AHT_PlayerController::AHT_PlayerController()
 	PlayerCameraManagerClass = AHT_PlayerController::StaticClass();
 }
 
+
+
 void AHT_PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	SetInputMode(FInputModeGameOnly());
+	SetShowMouseCursor(false);
 	
 	APJ_MZGameMode* GameMode = Cast<APJ_MZGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
 		// 델리게이트 바인딩
 		GameMode->DynamoDBComp->OnLeaderboardFetched.AddUObject(this, &AHT_PlayerController::OnLeaderboardReceived);
+	}
+
+	// 게임 시작 시 팝업 미리 생성해두고 숨겨놓기
+	if (PopupWidgetClass)
+	{
+		PopupWidget = CreateWidget<UPopupUI>(this, PopupWidgetClass);
+		PopupWidget->AddToViewport();
+		PopupWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	// 게임 시작 시 대화창 미리 생성해두고 숨겨놓기
+	if (DialogueWidgetClass)
+	{
+		DialogueWidget = CreateWidget<UDialogueUI>(this, DialogueWidgetClass);
+		DialogueWidget->AddToViewport();
+		DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	
 }
@@ -163,6 +182,42 @@ void AHT_PlayerController::SetFadeOutWhiteUI()
 			ControlFadeUIWidget->FadeOutWhite();
 		}
 	}
+}
+
+void AHT_PlayerController::ShowPopup(FText Message, FText ConfirmText, FText CancelText,const FOnPopupAction& OnConfirm, const FOnPopupAction& OnCancel)
+{
+	if (!PopupWidget) return;
+	// 이전 바인딩 정리
+
+	
+	PopupWidget->InitPopup(Message, ConfirmText, CancelText, OnConfirm, OnCancel);
+	PopupWidget->SetVisibility(ESlateVisibility::Visible);
+
+	SetShowMouseCursor(true);
+	SetInputMode(FInputModeUIOnly());
+}
+
+void AHT_PlayerController::HidePopup()
+{
+	if (!PopupWidget) return;
+
+	PopupWidget->SetVisibility(ESlateVisibility::Collapsed);
+	SetShowMouseCursor(false);
+	SetInputMode(FInputModeGameOnly());
+}
+
+void AHT_PlayerController::ShowDialogue(const TArray<FDialogueLine>& Lines, const FOnDialogueFinished& OnFinished)
+{
+	if (!DialogueWidget) return;
+
+	DialogueWidget->InitDialogue(Lines, OnFinished);
+	DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AHT_PlayerController::HideDialogue()
+{
+	if (!DialogueWidget) return;
+	DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void AHT_PlayerController::SetResultUI(const float totalScore)

@@ -133,3 +133,42 @@ struct FStageSelectData : public FTableRowBase
 	
 };
 
+USTRUCT(BlueprintType)
+struct FNPCInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	// 표시할 이름
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText SpeakerName;
+
+	// 초상화
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> Portrait;
+};
+
+// 대사 한 줄 (구조체 안 구조체, TableRowBase 상속 불필요)
+USTRUCT(BlueprintType)
+struct FDialogueLine
+{
+	GENERATED_BODY()
+
+	// DT_NPCInfo의 RowName 참조 (ex: "StageNPC", "Player")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName SpeakerID;
+
+	// 대사 내용
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Content;
+};
+
+// 대화 묶음 (DT_Dialogue의 Row 단위)
+USTRUCT(BlueprintType)
+struct FDialogueRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	// 대사 배열
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FDialogueLine> Lines;
+};

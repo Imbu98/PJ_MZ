@@ -21,6 +21,7 @@
 #include "ImageUtils.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "UI/DialogueUI.h"
 
 AHT_Player::AHT_Player()
 {
@@ -65,26 +66,11 @@ void AHT_Player::BeginPlay()
 		SpotLight->SetVisibility(false);
 	}
 
-	// 촬영 횟수 초기화 → PlayerState에서
-	if (Cached_PS)
-	{
-		UMz_GameInstance* Mz_GI = Cast<UMz_GameInstance>(GetGameInstance());
-		if (Mz_GI)
-		{
-			if (!Mz_GI->bIsShotCountInitialized)
-			{
-				Cached_PS->InitShotCount();
-			}
-			else
-			{
-				Cached_PS->CurrentCanShotCount = Mz_GI->CachedShotCount;
-			}
-			Mz_GI->bIsShotCountInitialized = true;
-		}
-
-		Cached_PS->CurrentMentality = Cached_PS->MaxMentality;
-		OnUpdateObscuraShotCount();
-	}
+	//
+	Cached_PS->CurrentMentality = Cached_PS->MaxMentality;
+	Cached_PS->OnMentalityChangeDelegate.Broadcast(Cached_PS->CurrentMentality / Cached_PS->MaxMentality);
+	
+	
 }
 
 void AHT_Player::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -206,6 +192,17 @@ void AHT_Player::OnChangeMentality(float amount)
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 {
+	if (!CachedHT_Pc) return;
+	
+	// 대화 중이면 다음 문장
+	if ( CachedHT_Pc->DialogueWidget && CachedHT_Pc->DialogueWidget->IsVisible())
+	{
+		CachedHT_Pc->DialogueWidget->OnNextInput();
+		return;
+	}
+
+	// 아니면 기존 상호작용
+	
 	TArray<AActor*> actorsToIgnore;
 	FHitResult outHit;
 	bool isHit = UKismetSystemLibrary::SphereTraceSingleByProfile(GetWorld(), GetActorLocation(), GetActorLocation(),200.f,
@@ -295,12 +292,21 @@ void AHT_Player::OnEnterObscuraMode(const FInputActionValue& Value)
 	// {
 	// 	GetMesh()->GetAnimInstance()->Montage_Play(EquipObscuraMontage,1.0f);
 	// }
-	CreateObscuraWidget();
+
+	// 카메라 모드 능력이 없으면 return
+	if (!PlayerAbilityTags.HasTag(ObscuraTag)) return;
+		
+	CreateObscuraWidget();	
 }
 
 void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 {
-	if (ObscuraCameraComp==nullptr) return; 
+
+	// 카메라 모드 능력이 없으면 return
+	if (!PlayerAbilityTags.HasTag(ObscuraTag)) return;
+
+	if (ObscuraCameraComp==nullptr) return;
+
 
 	if (ObscuraCameraComp->GetObscuraMode() == EObscuraModeAction::SHOTTING)
 	{

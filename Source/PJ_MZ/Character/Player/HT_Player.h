@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "../../Default/PJ_MZCharacter.h"
 #include "PJ_MZ_Delegates.h"
 #include "Interface/Interact_Interface.h"
@@ -112,6 +113,8 @@ protected:
 	
 	UPROPERTY()
 	FTimerHandle ObscuraTimer;
+
+
 	
 
 	
@@ -185,6 +188,16 @@ public:
 	void RemoveObscuraWidget();
 	
 	bool bObscuraReleased = false; // 중간에 똇는지 확인하기 위한 플래그
+
+
+	// ===============================
+	// 플레이어 능력 태그
+	// ===============================
+	UPROPERTY()
+	FGameplayTagContainer PlayerAbilityTags; // Player가 가지고있는 능력들 저장
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag ObscuraTag;
 	
 	
 	

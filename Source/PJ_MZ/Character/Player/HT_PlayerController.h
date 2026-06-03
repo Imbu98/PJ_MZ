@@ -2,6 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "MZ_Datas.h"
+#include "UI/DialogueUI.h"
+#include "UI/PopupUI.h"
 #include "HT_PlayerController.generated.h"
 
 UCLASS()
@@ -20,42 +23,85 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<class UPlayerStateUI> PlayerStateUIWidget;
-	
+
+	// ===============================
+	// 카메라 UI
+	// ===============================
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class UObscuraUI> ObscuraUIFactory;
 	
 	UPROPERTY()
 	TObjectPtr<class UObscuraUI> ObscuraUIWidget;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UControlFadeUI> ControlFadeUIFactory;
-	
-	UPROPERTY()
-	TObjectPtr<class UControlFadeUI> ControlFadeUIWidget;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UResultUI> PhotoResultUIFactory;
-	
-	UPROPERTY()
-	TObjectPtr<UResultUI> PhotoResultUIWidget;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UScoreLeaderboardUI> ScoreLeaderboardUIFactory;
-	
-	UPROPERTY()
-	TObjectPtr<UScoreLeaderboardUI> ScoreLeaderboardUIWidget;
-	
+
 	UFUNCTION()
 	void CreateObscuraWidget();
 	
 	UFUNCTION()
 	void RemoveObscuraWidget();
+
+	// ===============================
+	// 페이드인 페이드 아웃 UI
+	// ===============================
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class UControlFadeUI> ControlFadeUIFactory;
 	
+	UPROPERTY()
+	TObjectPtr<class UControlFadeUI> ControlFadeUIWidget;
+
 	UFUNCTION()
 	void SetFadeOutBlackUI();
 	
 	UFUNCTION()
 	void SetFadeOutWhiteUI();
+
+	// ===============================
+	// 결과창 UI
+	// ===============================
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class UResultUI> PhotoResultUIFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UResultUI> PhotoResultUIWidget;
+
+	// ===============================
+	// 랭킹점수 UI
+	// ===============================
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TSubclassOf<class UScoreLeaderboardUI> ScoreLeaderboardUIFactory;
+	
+	UPROPERTY()
+	TObjectPtr<UScoreLeaderboardUI> ScoreLeaderboardUIWidget;
+
+	// ===============================
+	// 팝업 UI
+	// ===============================
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UPopupUI> PopupWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UPopupUI> PopupWidget;
+
+	// 팝업 열기 (메시지 + 각 버튼 동작 넘기기)
+	void ShowPopup(FText Message, FText ConfirmText, FText CancelText,const FOnPopupAction& OnConfirm, const FOnPopupAction& OnCancel);
+	void HidePopup();
+
+	// ===============================
+	// 대화창 UI
+	// ===============================
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UDialogueUI> DialogueWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UDialogueUI> DialogueWidget;
+
+
+	UFUNCTION()
+	void ShowDialogue(const TArray<FDialogueLine>& Lines, const FOnDialogueFinished& OnFinished);
+	UFUNCTION()
+	void HideDialogue();
+
+	
+
 	
 	UFUNCTION()
 	void SetResultUI(const float totalScore);

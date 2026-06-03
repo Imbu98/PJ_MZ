@@ -21,15 +21,16 @@ protected:
 public:
 
 	// ===============================
-	// 촬영 횟수
+	// 촬영
 	// ===============================
 	UPROPERTY()
 	int32 MaxCanShotCount = 3;
 
 	UPROPERTY()
-	int32 CurrentCanShotCount;
-	
-	
+	int32 CurrentCanShotCount; // 현재 촬영 남은 개수
+
+	UPROPERTY()
+	bool bHasSpokenToNPC = false; // NPC에게 말을 걸었는지 확인
 
 	void InitShotCount() { CurrentCanShotCount = MaxCanShotCount; }
 	void SetCurrentCanShotCount(int32 newCount) { CurrentCanShotCount = newCount; }
