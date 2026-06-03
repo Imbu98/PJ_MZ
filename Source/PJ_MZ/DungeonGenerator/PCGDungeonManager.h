@@ -23,6 +23,9 @@ protected:
 public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
     TSubclassOf<ARoomBase> StartRoomClass;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
+    TSubclassOf<AActor> CloseDoorClass;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Dungeon|Setup")
     TArray<FRoomTypeEntry> RoomTypeTable;
