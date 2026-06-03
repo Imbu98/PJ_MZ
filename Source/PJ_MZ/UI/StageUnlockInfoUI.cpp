@@ -3,36 +3,6 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/TextBlock.h"
 
-
-void UStageUnlockInfoUI::NativeConstruct()
-{
-	Super::NativeConstruct();
-}
-
-void UStageUnlockInfoUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-
-	if (!GetOwningPlayer())
-		return;
-
-	float MouseX;
-	float MouseY;
-
-	GetOwningPlayer()->GetMousePosition(MouseX, MouseY);
-
-	float DPIScale =
-		UWidgetLayoutLibrary::GetViewportScale(GetWorld());
-
-	SetPositionInViewport(
-	FVector2D(
-		MouseX / DPIScale,
-		MouseY / DPIScale
-	) + FVector2D(20.f, 20.f),
-	true
-	);
-}
-
 void UStageUnlockInfoUI::SetStageData(const FStageSelectData& stageData)
 {
 	if (Text_Stage)
