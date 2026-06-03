@@ -36,6 +36,7 @@ void APCGDungeonManager::GenerateDungeon()
 			RoomTypeTable,
 			MinRooms,
 			MaxRooms,
+			CloseDoorClass,
 			SpawnedRooms);
 
 		if (SpawnedRooms.Num() >= MinRooms)

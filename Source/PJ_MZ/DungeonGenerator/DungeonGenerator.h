@@ -38,6 +38,7 @@ public:
 		const TArray<FRoomTypeEntry>& RoomTypeTable,
 		int32 MinRooms,
 		int32 MaxRooms,
+		TSubclassOf<AActor> CloseDoorClass,
 		TArray<ARoomBase*>& OutSpawnedRooms);
 
 	UFUNCTION(BlueprintCallable, Category="Dungeon")

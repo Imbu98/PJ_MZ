@@ -14,6 +14,7 @@ void UDungeonGenerator::GenerateDungeon(
     const TArray<FRoomTypeEntry>& RoomTypeTable,
     int32 MinRooms,
     int32 MaxRooms,
+    TSubclassOf<AActor> CloseDoorClass,
     TArray<ARoomBase*>& OutSpawnedRooms)
 {
     OutSpawnedRooms.Empty();
@@ -142,12 +143,42 @@ void UDungeonGenerator::GenerateDungeon(
         }
         else
         {
+            if (CloseDoorClass)
+            {
+                FRotator DoorRot = FromDoor->GetComponentRotation();
+                DoorRot.Yaw += 90.0f;
+
+                GetWorld()->SpawnActor<AActor>(
+                    CloseDoorClass,
+                    FromDoor->GetComponentLocation(),
+                    DoorRot);
+            }
+            
             FromDoor->bBlocked = true;
 
             UE_LOG(LogTemp, Warning,
                 TEXT("[Generator] 문 막힘: %s"),
                 *FromDoor->GetName());
         }
+    }
+    
+    for (TPair<ARoomBase*, UDoorComponent*>& DoorPair : OpenDoors)
+    {
+        UDoorComponent* Door = DoorPair.Value;
+        if (!Door || !Door->IsAvailable()) continue;
+
+        if (CloseDoorClass)
+        {
+            FRotator DoorRot = Door->GetComponentRotation();
+            DoorRot.Yaw += 90.0f;
+
+            GetWorld()->SpawnActor<AActor>(
+                CloseDoorClass,
+                Door->GetComponentLocation(),
+                DoorRot);
+        }
+
+        Door->bBlocked = true;
     }
 
     UE_LOG(LogTemp, Log,
