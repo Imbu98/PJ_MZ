@@ -29,11 +29,12 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
     if (!Player) return;
     
     InstanceData.AttackRange = AttackRange;
+    
     float Distance = FVector::Dist(Pawn.GetActorLocation(), Player->GetActorLocation()); 
     
-    bool bIsInAttackRange = Distance <= AttackRange;
+    // bool bIsInAttackRange = Distance <= AttackRange;
     
-    if (bIsInAttackRange && !InstanceData.bWasInAttackRange)
+    if (Distance <= AttackRange && !InstanceData.bWasInAttackRange)
     {
         InstanceData.bWasInAttackRange = true;
     
@@ -42,14 +43,14 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
         STComp.SendStateTreeEvent(Event);
         return;
     }
-    if (!bIsInAttackRange)
+    if (Distance > AttackRange)
     {
         InstanceData.bWasInAttackRange = false;
     }
     
-    bool bIsInDetectRange = Distance < LoseTargetDistance;
+    // bool bIsInDetectRange = Distance < LoseTargetDistance;
     
-    if (InstanceData.bPlayerDetected && !bIsInDetectRange)
+    if (InstanceData.bPlayerDetected && Distance > LoseTargetDistance)
     {
         InstanceData.bPlayerDetected = false;
         InstanceData.bPlayerLooking = false;
@@ -62,19 +63,19 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
         return;
     }
     
-    if (bIsInDetectRange)
+    if (Distance <= LoseTargetDistance)
     {
-        const bool bIsPlayerLooking = IsPlayerLookingAtEnemy(Controller);
+        // const bool bIsPlayerLooking = IsPlayerLookingAtEnemy(Controller);
         
         if (InstanceData.bPlayerDetected)
         {
-            InstanceData.bPlayerLooking = bIsPlayerLooking;
+            InstanceData.bPlayerLooking = IsPlayerLookingAtEnemy(Controller);
             InstanceData.TargetActor = Player;
     
             return;
         }
     
-        if (bIsPlayerLooking)
+        if (IsPlayerLookingAtEnemy(Controller))
         {
             InstanceData.bPlayerDetected = true;
             InstanceData.bPlayerLooking = true;

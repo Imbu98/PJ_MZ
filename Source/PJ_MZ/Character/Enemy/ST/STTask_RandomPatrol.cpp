@@ -22,7 +22,6 @@ EStateTreeRunStatus FSTTask_RandomPatrol::EnterState(FStateTreeExecutionContext&
 	APawn* Pawn = Controller.GetPawn();
 	if (!Pawn) return EStateTreeRunStatus::Failed;
 
-	// 이동 속도 느리게
 	if (ACharacter* Character = Cast<ACharacter>(Pawn))
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
