@@ -17,6 +17,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	
+	UPROPERTY(EditAnywhere, Category="Animation")
+	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	TObjectPtr<UAnimMontage> StunMontage;
+	
+	void HaltMovement();
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void Attack();
 
