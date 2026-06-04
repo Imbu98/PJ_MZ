@@ -97,9 +97,11 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	// 촬영횟수가 없으면 사망
 	if (CurrentCanShotCount <= 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
-		
-		OnGameEnd();
+		float penaltyAmount = -10.f;
+		Cached_PS->ChangeMentality(penaltyAmount);
+		// GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
+		//
+		// OnGameEnd();
 		
 		return;
 	}

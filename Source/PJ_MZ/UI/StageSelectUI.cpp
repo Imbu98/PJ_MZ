@@ -103,7 +103,12 @@ void UStageSelectUI::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entr
 		if (ScoreLeaderboardWidget)
 		{
 			ScoreLeaderboardWidget->AddToViewport();
-			ScoreLeaderboardWidget->GenerateMyScore(myScore,myRank);
+			FOnScoreBtnAction OnScoreBtn;
+			OnScoreBtn.AddLambda([this]()
+			{
+				ScoreLeaderboardWidget->SetVisibility(ESlateVisibility::Collapsed);
+			});
+			ScoreLeaderboardWidget->GenerateMyScore(myScore,myRank,OnScoreBtn);
 			for (int32 i=0;i<Entries.Num();i++)
 			{
 				bool isMyScore=false;

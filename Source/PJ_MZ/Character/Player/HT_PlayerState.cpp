@@ -3,6 +3,8 @@
 
 #include "HT_PlayerState.h"
 
+#include "HT_Player.h"
+
 AHT_PlayerState::AHT_PlayerState()
 {
 	PrimaryActorTick.bCanEverTick = true; 
@@ -33,7 +35,11 @@ void AHT_PlayerState::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	ElapsedSeconds += DeltaTime;
+	AHT_Player* player = Cast<AHT_Player>(GetPlayerController()->GetPawn());
+	if (player&&player->PlayerAbilityTags.HasTag(player->ObscuraTag))
+	{
+		ElapsedSeconds += DeltaTime;	
+	}
 }
 
 

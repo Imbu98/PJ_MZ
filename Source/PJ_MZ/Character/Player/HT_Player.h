@@ -107,7 +107,7 @@ protected:
 	
 	// PlayerController
 	UPROPERTY()
-	TObjectPtr<class AHT_PlayerController> CachedHT_Pc;
+	TObjectPtr<class AHT_PlayerController> Cached_Pc;
 	
 	UPROPERTY()
 	TObjectPtr<class AHT_PlayerState> Cached_PS;
@@ -191,6 +191,22 @@ public:
 	bool bObscuraReleased = false; // 중간에 똇는지 확인하기 위한 플래그
 
 
+	UFUNCTION()
+	virtual	void MoveInput(const FInputActionValue& Value) override;
+	
+	UFUNCTION()
+	virtual void LookInput(const FInputActionValue& Value) override;
+	
+	
+	// ===============================
+	// UI의 각 점에 대한 정보
+	// ===============================
+	UFUNCTION()
+	void playerAttacked(float amount);
+	
+	UPROPERTY()
+	TObjectPtr<class UAnimMontage> AM_PlayerStun;
+	
 	// ===============================
 	// 플레이어 능력 태그
 	// ===============================

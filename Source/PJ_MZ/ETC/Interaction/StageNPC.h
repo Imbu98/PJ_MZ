@@ -45,5 +45,8 @@ public:
 	// NPC는 RowName만 가지는게 더 깔끔
 	UPROPERTY(EditAnywhere, Category="Dialogue")
 	TObjectPtr<UDataTable> DialogueDataTable;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<UStaticMeshComponent> DoorMeshComp;
 
 };

@@ -31,9 +31,9 @@ void UPlayerStateUI::OnPlayerMentalityBarUpdated(float percent)
 
 void UPlayerStateUI::OnStaminaBarUpdated(float percent)
 {
-	if (PB_MentalityBar)
+	if (PB_StaminaBar)
 	{
-		PB_MentalityBar->SetPercent(percent);
+		PB_StaminaBar->SetPercent(percent);
 	}
 }
 

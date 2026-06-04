@@ -83,6 +83,10 @@ void AStageNPC::GivePlayerToCamera()
 		}
 	// 대화창 숨기기
 	PC->HideDialogue();
+	if (DoorMeshComp)
+	{
+		DoorMeshComp->DestroyComponent();	
+	}
 }
 
 void AStageNPC::HandleFirstTalk(AHT_PlayerState* PS)
@@ -130,6 +134,12 @@ void AStageNPC::ShowChoiceWidget()
 	
 	AHT_PlayerController* PC = Cast<AHT_PlayerController>(CachedPlayer->GetController());
 	if (!PC) return;
+	
+	ConfirmDelegate.RemoveAll(this);
+	ConfirmDelegate.AddUObject(this, &AStageNPC::OnConfirmExit);
+	
+	CancelDelegate.RemoveAll(this);
+	CancelDelegate.AddUObject(this, &AStageNPC::OnCancelExit);
 	
 	 PC->ShowPopup(FText::FromString(TEXT("사진 횟수가 남아있습니다.\n정말 나가시겠습니까?")),
 	 	FText::FromString(TEXT("나가기")),

@@ -17,6 +17,19 @@ void ULoginUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
+	APlayerController* PC = GetOwningPlayer();
+	if (PC)
+	{
+		AHT_PlayerState* PS = PC->GetPlayerState<AHT_PlayerState>();
+		if (PS)
+		{
+			if (!PS->MZ_PlayerID.IsEmpty())
+			{
+				SetStageSelectOverlay(PS->MZ_StageFlags);				
+			}
+		}
+	}
+	
 	// 버튼 바인딩
 	Btn_ShowLoginPW->OnClicked.AddDynamic(this, &ULoginUI::OnClickShowLoginPassword);
 	Btn_ShowRegisterPW->OnClicked.AddDynamic(this, &ULoginUI::OnClickShowRegisterPassword);

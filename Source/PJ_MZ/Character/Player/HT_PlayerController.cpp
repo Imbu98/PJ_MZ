@@ -254,7 +254,15 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 		if (ScoreLeaderboardUIWidget)
 		{
 			ScoreLeaderboardUIWidget->AddToViewport();
-			ScoreLeaderboardUIWidget->GenerateMyScore(myScore,myRank);
+			FOnScoreBtnAction OnScoreBtnAction;
+			OnScoreBtnAction.AddLambda([this]()
+			{
+				FString LevelPath = FString::Printf(TEXT("/Game/HT/Levels/L_Login"));
+	
+				GetWorld()->SeamlessTravel(LevelPath);
+			});
+			
+			ScoreLeaderboardUIWidget->GenerateMyScore(myScore,myRank,OnScoreBtnAction);
 			for (int32 i=0;i<Entries.Num();i++)
 			{
 				bool isMyScore=false;

@@ -53,7 +53,7 @@ void AHT_Player::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetWorld()->GetTimerManager().SetTimer(SprintTimer, this, &AHT_Player::SprintFixedTick, SprintFixedTickTime, true);
 
-	CachedHT_Pc = Cast<AHT_PlayerController>(Controller);
+	Cached_Pc = Cast<AHT_PlayerController>(Controller);
     
 	// PlayerState 캐싱
 	Cached_PS = GetPlayerState<AHT_PlayerState>();
@@ -189,17 +189,19 @@ void AHT_Player::OnChangeMentality(float amount)
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 {
-	if (!CachedHT_Pc) return;
+	if (!Cached_Pc) return;
+	
+	// 기본상태가 아니면 상호작용 할 수 없게 변경
+	if (ObscuraCameraComp->GetObscuraMode()!=EObscuraModeAction::IDLE) return;
 	
 	// 대화 중이면 다음 문장
-	if ( CachedHT_Pc->DialogueWidget && CachedHT_Pc->DialogueWidget->IsVisible())
+	if ( Cached_Pc->DialogueWidget && Cached_Pc->DialogueWidget->IsVisible())
 	{
-		CachedHT_Pc->DialogueWidget->OnNextInput();
+		Cached_Pc->DialogueWidget->OnNextInput();
 		return;
 	}
 
 	// 아니면 기존 상호작용
-	
 	TArray<AActor*> actorsToIgnore;
 	FHitResult outHit;
 	bool isHit = UKismetSystemLibrary::SphereTraceSingleByProfile(GetWorld(), GetActorLocation(), GetActorLocation(),200.f,
@@ -232,7 +234,7 @@ void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 		{
 			SpotLight->SetVisibility(true);
 
-			if (CachedHT_Pc && CachedHT_Pc->ObscuraUIWidget)
+			if (Cached_Pc && Cached_Pc->ObscuraUIWidget)
 			{
 				Cached_PS->IsObscraCooltime = true;
 			}
@@ -253,7 +255,7 @@ void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 
 			GetWorld()->GetTimerManager().SetTimer(ObscuraTimer, [this]()
 			{
-				SpotLight->SetVisibility(false);
+				//SpotLight->SetVisibility(false);
 				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 				ObscuraCameraComp->ApplyShutterDamage();
 				// 타이머 콜백 내부
@@ -318,8 +320,8 @@ void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 
 	ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
 
-	if (SpotLight->IsVisible())
-		SpotLight->SetVisibility(false);
+	// if (SpotLight->IsVisible())
+	// 	SpotLight->SetVisibility(false);
 	RemoveObscuraWidget();
     
 	bObscuraReleased = false;
@@ -349,9 +351,9 @@ void AHT_Player::OnZoomObscura(const FInputActionValue& Value)
 
 void AHT_Player::CreateObscuraWidget()
 {
-	if (CachedHT_Pc && Cached_PS)
+	if (Cached_Pc && Cached_PS)
 	{
-		CachedHT_Pc->CreateObscuraWidget();
+		Cached_Pc->CreateObscuraWidget();
 		if (ObscuraCameraComp)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::CAMERAMODE);
@@ -362,14 +364,51 @@ void AHT_Player::CreateObscuraWidget()
 
 void AHT_Player::RemoveObscuraWidget()
 {
-	if (CachedHT_Pc)
+	if (Cached_Pc)
 	{
-		CachedHT_Pc->RemoveObscuraWidget();
+		Cached_Pc->RemoveObscuraWidget();
 		if (ObscuraCameraComp)
 		{
 			ObscuraCameraComp->SetObscuraMode(EObscuraModeAction::IDLE);
 			ObscuraCameraComp->ClearMainPhotoActor();
 		}
 	}
+}
+
+void AHT_Player::MoveInput(const FInputActionValue& Value)
+{
+	// 대화중이거나 팝업창 띄워져있을때는 막도록 
+	if (!Cached_Pc) return;
+	
+	if (Cached_Pc->PopupWidget&&Cached_Pc->PopupWidget->IsVisible()) return;
+	
+	if (Cached_Pc->DialogueWidget&&Cached_Pc->DialogueWidget->IsVisible()) return;
+	
+	Super::MoveInput(Value);
+	
+	
+}
+
+void AHT_Player::LookInput(const FInputActionValue& Value)
+{
+	// 대화중이거나 팝업창 띄워져있을때는 막도록 
+	if (!Cached_Pc) return;
+	
+	if (Cached_Pc->PopupWidget&&Cached_Pc->PopupWidget->IsVisible()) return;
+	
+	if (Cached_Pc->DialogueWidget&&Cached_Pc->DialogueWidget->IsVisible()) return;
+	
+	Super::LookInput(Value);
+}
+
+void AHT_Player::playerAttacked(float amount)
+{
+	if (Cached_PS)
+	{
+		Cached_PS->ChangeMentality(amount);
+	}
+	GetMesh()->GetAnimInstance()->Montage_Play(AM_PlayerStun);
+	
+	//GetController()->DisableInput(Cached_Pc);
 }
 

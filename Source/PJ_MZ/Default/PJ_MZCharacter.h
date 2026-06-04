@@ -33,7 +33,7 @@ class APJ_MZCharacter : public ACharacter , public IGenericTeamAgentInterface
 	UCameraComponent* FirstPersonCameraComponent;
 
 protected:
-
+	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;
@@ -57,10 +57,10 @@ public:
 protected:
 
 	/** Called from Input Actions for movement input */
-	void MoveInput(const FInputActionValue& Value);
+	virtual void MoveInput(const FInputActionValue& Value);
 
 	/** Called from Input Actions for looking input */
-	void LookInput(const FInputActionValue& Value);
+	virtual void LookInput(const FInputActionValue& Value);
 
 	/** Handles aim inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
