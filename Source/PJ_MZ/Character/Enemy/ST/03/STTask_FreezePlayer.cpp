@@ -15,7 +15,7 @@ bool FSTTask_FreezePlayer::Link(FStateTreeLinker& Linker)
 
 EStateTreeRunStatus FSTTask_FreezePlayer::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: FREEZE 끝"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: FREEZE 끝"));
 	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	APawn* Pawn = Controller.GetPawn();
@@ -33,7 +33,7 @@ EStateTreeRunStatus FSTTask_FreezePlayer::EnterState(FStateTreeExecutionContext&
 
 void FSTTask_FreezePlayer::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: FREEZE 시작"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: FREEZE 시작"));
 
 	// AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	// APawn* Pawn = Controller.GetPawn();
