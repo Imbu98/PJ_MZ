@@ -143,18 +143,7 @@ void UDungeonGenerator::GenerateDungeon(
         }
         else
         {
-            if (CloseDoorClass)
-            {
-                FRotator DoorRot = FromDoor->GetComponentRotation();
-                DoorRot.Yaw += 90.0f;
-
-                GetWorld()->SpawnActor<AActor>(
-                    CloseDoorClass,
-                    FromDoor->GetComponentLocation(),
-                    DoorRot);
-            }
-            
-            FromDoor->bBlocked = true;
+            FromDoor->bBlocked = false;
 
             UE_LOG(LogTemp, Warning,
                 TEXT("[Generator] 문 막힘: %s"),
@@ -162,23 +151,27 @@ void UDungeonGenerator::GenerateDungeon(
         }
     }
     
-    for (TPair<ARoomBase*, UDoorComponent*>& DoorPair : OpenDoors)
+    for (ARoomBase* Room : OutSpawnedRooms)
     {
-        UDoorComponent* Door = DoorPair.Value;
-        if (!Door || !Door->IsAvailable()) continue;
+        if (!IsValid(Room)) continue;
 
-        if (CloseDoorClass)
+        for (UDoorComponent* Door : Room->Doors)
         {
-            FRotator DoorRot = Door->GetComponentRotation();
-            DoorRot.Yaw += 90.0f;
+            if (!Door || !Door->IsAvailable()) continue;
 
-            GetWorld()->SpawnActor<AActor>(
-                CloseDoorClass,
-                Door->GetComponentLocation(),
-                DoorRot);
+            if (CloseDoorClass)
+            {
+                FRotator DoorRot = Door->GetComponentRotation();
+                DoorRot.Yaw += 90.0f;
+
+                GetWorld()->SpawnActor<AActor>(
+                    CloseDoorClass,
+                    Door->GetComponentLocation(),
+                    DoorRot);
+            }
+
+            Door->bBlocked = true;
         }
-
-        Door->bBlocked = true;
     }
 
     UE_LOG(LogTemp, Log,

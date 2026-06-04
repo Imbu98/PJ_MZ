@@ -16,7 +16,7 @@ bool FSTTask_ChasePlayer::Link(FStateTreeLinker& Linker)
 
 EStateTreeRunStatus FSTTask_ChasePlayer::EnterState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: CHASE 시작"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: CHASE 시작"));
 
 	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
@@ -49,7 +49,7 @@ EStateTreeRunStatus FSTTask_ChasePlayer::Tick(FStateTreeExecutionContext& Contex
 
 void FSTTask_ChasePlayer::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: CHASE 끝"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: CHASE 끝"));
 
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	Controller.StopMovement();

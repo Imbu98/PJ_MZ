@@ -17,7 +17,7 @@ EStateTreeRunStatus FSTTask_Stun::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 시작"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 시작"));
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	InstanceData.StunTimer = 0.f;
@@ -54,7 +54,7 @@ void FSTTask_Stun::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 끝"));
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 끝"));
 	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	
