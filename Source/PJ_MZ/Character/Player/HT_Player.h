@@ -28,13 +28,14 @@ class PJ_MZ_API AHT_Player : public APJ_MZCharacter , public IInteract_Interface
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USpotLightComponent* SpotLight;
 public:
+	// 카메라 컴포넌트
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<class UObscuraCameraComponent> ObscuraCameraComp;
 	
-	// 헤더
-	UPROPERTY()
-	USceneCaptureComponent2D* SceneCapture;
-
+	// 사운드 컴포넌트
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<class USoundComponent> SoundComp;
+	
 	UPROPERTY()
 	UTextureRenderTarget2D* RenderTarget;
 	

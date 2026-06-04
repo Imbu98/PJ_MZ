@@ -20,6 +20,7 @@
 #include "HT_PlayerState.h"
 #include "ImageUtils.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/SoundComponent.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "UI/DialogueUI.h"
 
@@ -38,14 +39,10 @@ AHT_Player::AHT_Player()
 	
 	ObscuraCameraComp = CreateDefaultSubobject<UObscuraCameraComponent>(TEXT("ObscuraCameraComp"));
 	
-	// 초기화
-	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
-	SceneCapture->SetupAttachment(RootComponent);
+	SoundComp = CreateDefaultSubobject<USoundComponent>(TEXT("SoundComp"));
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>();
 	RenderTarget->InitAutoFormat(1920, 1080);
-	SceneCapture->TextureTarget = RenderTarget;
-	SceneCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR; // HUD 제외
 }
 
 void AHT_Player::BeginPlay()
@@ -246,6 +243,10 @@ void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 			if (PC)
 			{
 				PC->SetFadeOutWhiteUI();
+				if (SoundComp)
+				{
+					SoundComp->PlayCameraShutterSound();	
+				}
 			}
 
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
