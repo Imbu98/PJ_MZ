@@ -28,11 +28,14 @@ void UScoreInfoBoxUI::SetScoreBoxInfo(const FLeaderboardEntry& leaderboardInfo,i
 	{
 		rank > 0 ? Text_Score->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.Score))): 
 		Text_Score->SetText(FText::FromString(TEXT("기록없음")));
+		
 	}
 	
 	if (Text_ClearTime)
 	{
 		rank > 0 ? Text_ClearTime->SetText(FText::FromString(FString::Printf(TEXT("%.2f"),leaderboardInfo.ClearTime)))
 		: Text_ClearTime->SetText(FText::FromString(TEXT("기록없음")));
+		
+		
 	}
 }
