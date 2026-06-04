@@ -2,6 +2,7 @@
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
 #include "AIController.h"
+#include "Character/Enemy/EnemyBase.h"
 #include "Character/Enemy/Enemy03/Enemy03AIController.h"
 #include "Components/StateTreeAIComponent.h"
 #include "GameFramework/Character.h"
@@ -28,6 +29,12 @@ EStateTreeRunStatus FSTTask_Stun::EnterState(
 	if (ACharacter* Character = Cast<ACharacter>(Controller.GetPawn()))
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = 0.f;
+	}
+	
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
+	{
+		Enemy->HaltMovement();
+		if (Enemy->StunMontage) Enemy->PlayAnimMontage(Enemy->StunMontage);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Enemy Stun 시작"));

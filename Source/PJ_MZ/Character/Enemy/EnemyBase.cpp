@@ -3,6 +3,8 @@
 #include "EnemyBase.h"
 #include <Components/PicturableComponent.h>
 #include "EnemySpawnManager.h"
+#include "AIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -16,6 +18,18 @@ AEnemyBase::AEnemyBase()
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AEnemyBase::HaltMovement()
+{
+	if (AAIController* AI = Cast<AAIController>(GetController()))
+	{
+		AI->StopMovement();
+	}
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->StopMovementImmediately();
+	}
 }
 
 void AEnemyBase::Attack()

@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
+#include "Character/Enemy/Enemy03/Enemy03Character.h"
 
 bool FSTTask_RandomPatrol::Link(FStateTreeLinker& Linker)
 {
@@ -26,7 +27,12 @@ EStateTreeRunStatus FSTTask_RandomPatrol::EnterState(FStateTreeExecutionContext&
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
 	}
-
+	
+	if (AEnemy03Character* Enemy = Cast<AEnemy03Character>(Controller.GetPawn()))
+	{
+		Enemy->SetAlerted(false);
+	}
+	
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(Controller.GetWorld());
 	if (!NavSystem) return EStateTreeRunStatus::Failed;

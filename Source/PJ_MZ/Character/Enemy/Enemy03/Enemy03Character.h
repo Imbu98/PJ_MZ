@@ -14,4 +14,9 @@ public:
 	AEnemy03Character();
 
 	virtual void Attack() override;
+	
+	UPROPERTY(BlueprintReadOnly, Category="Animation")
+	bool bIsAlerted = false;
+
+	void SetAlerted(bool bInAlerted) { bIsAlerted = bInAlerted; }
 };
