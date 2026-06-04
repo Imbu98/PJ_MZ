@@ -63,7 +63,7 @@ void AHT_Player::BeginPlay()
 
 	if (SpotLight)
 	{
-		SpotLight->SetVisibility(false);
+		SpotLight->SetVisibility(true);
 	}
 
 	//

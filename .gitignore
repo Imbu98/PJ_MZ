@@ -80,3 +80,4 @@ DerivedDataCache/*
 
 # content big file ignore
 Content/DerelictCorridor/*
+Content/Dungeon/*
