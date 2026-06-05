@@ -114,10 +114,6 @@ protected:
 	
 	UPROPERTY()
 	FTimerHandle ObscuraTimer;
-
-
-	
-
 	
 	// Player Obscura Mode Montage
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -199,22 +195,32 @@ public:
 	
 	
 	// ===============================
-	// UI의 각 점에 대한 정보
+	// 플레이어 피격 이벤트 
 	// ===============================
 	UFUNCTION()
-	void playerAttacked(float amount);
+	void playerAttacked(float amount,float stunTime);
 	
-	UPROPERTY()
-	TObjectPtr<class UAnimMontage> AM_PlayerStun;
+	UFUNCTION()
+	void EndState(FGameplayTag tag);
+	
+	FTimerHandle StunTimerHandle;
 	
 	// ===============================
 	// 플레이어 능력 태그
 	// ===============================
-	UPROPERTY()
-	FGameplayTagContainer PlayerAbilityTags; // Player가 가지고있는 능력들 저장
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGameplayTag ObscuraTag;
+	
+	// ===============================
+	// 몽타주
+	// ===============================
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<class UAnimMontage> AM_PlayerStun;
+	
+	
+	
+	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
 	
 	
 	

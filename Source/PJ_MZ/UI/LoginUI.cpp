@@ -17,6 +17,23 @@ void ULoginUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
+	// DT에서 스테이지 정보 가져오기
+	if (DT_StageSelectInfo)
+	{
+		StageSelectData.Empty();
+		
+		TArray<FStageSelectData*> AllRows;
+		DT_StageSelectInfo->GetAllRows<FStageSelectData>(TEXT("StageSelect"), AllRows);
+		
+		for (FStageSelectData* Row : AllRows)
+		{
+			if (Row)
+			{
+				StageSelectData.Add(*Row);
+			}
+		}
+	}
+	
 	APlayerController* PC = GetOwningPlayer();
 	if (PC)
 	{
@@ -25,7 +42,8 @@ void ULoginUI::NativeConstruct()
 		{
 			if (!PS->MZ_PlayerID.IsEmpty())
 			{
-				SetStageSelectOverlay(PS->MZ_StageFlags);				
+				SetStageSelectOverlay(PS->MZ_StageFlags);	
+				return;
 			}
 		}
 	}
@@ -57,22 +75,7 @@ void ULoginUI::NativeConstruct()
 		GameMode->DynamoDBComp->OnRegisterComplete.AddUObject(this, &ULoginUI::OnRegisterResult);
 	}
 	
-	// DT에서 스테이지 정보 가져오기
-	if (DT_StageSelectInfo)
-	{
-		StageSelectData.Empty();
-		
-		TArray<FStageSelectData*> AllRows;
-		DT_StageSelectInfo->GetAllRows<FStageSelectData>(TEXT("StageSelect"), AllRows);
-		
-		for (FStageSelectData* Row : AllRows)
-		{
-			if (Row)
-			{
-				StageSelectData.Add(*Row);
-			}
-		}
-	}
+	
 }
 
 void ULoginUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -268,6 +271,9 @@ void ULoginUI::SetStageSelectOverlay(const int32 stageFlags)
 			StageSelectUIArray.Add(StageSelectUIWidget);
 		}
 	}
+	
+	
+	
 	
 	CurrentIndex = 0;
 	UpdateVisibility();

@@ -38,6 +38,10 @@ void UStageSelectUI::NativeConstruct()
 		WBP_StageUnlockInfo->SetVisibility(ESlateVisibility::Collapsed);	
 	}
 	
+	
+	
+	
+	
 }
 
 
@@ -77,8 +81,10 @@ void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData,
 	if (GameMode)
 	{
 		// 델리게이트 바인딩
-		GameMode->DynamoDBComp->OnLeaderboardFetched.AddUObject(this, &UStageSelectUI::OnLeaderboardReceived);
+			GameMode->DynamoDBComp->OnLeaderboardFetched.AddUObject(this, &UStageSelectUI::OnLeaderboardReceived);	
 	}
+	
+
 }
 
 void UStageSelectUI::OnClickedStageBtn()
@@ -86,42 +92,39 @@ void UStageSelectUI::OnClickedStageBtn()
 	ALoginGameMode* GameMode = Cast<ALoginGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
-		
-			// 델리게이트 바인딩
-			GameMode->FetchLeaderboard(StageData.MoveLevelName.ToString());	
-		
-		
+		GameMode->FetchLeaderboard(StageData.MoveLevelName.ToString());	
 	}
 }
 
 // 해당 레벨의 리더보드 가져와서 보여주기
 void UStageSelectUI::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore)
 {
-	if (ScoreLeaderboardFactory)
-	{
-		ScoreLeaderboardWidget = CreateWidget<UScoreLeaderboardUI>(GetOwningPlayer(), ScoreLeaderboardFactory);
-		if (ScoreLeaderboardWidget)
+	
+		if (ScoreLeaderboardFactory)
 		{
-			ScoreLeaderboardWidget->AddToViewport();
-			FOnScoreBtnAction OnScoreBtn;
-			OnScoreBtn.AddLambda([this]()
+			ScoreLeaderboardWidget = CreateWidget<UScoreLeaderboardUI>(GetOwningPlayer(), ScoreLeaderboardFactory);
+			if (ScoreLeaderboardWidget)
 			{
-				ScoreLeaderboardWidget->SetVisibility(ESlateVisibility::Collapsed);
-			});
-			ScoreLeaderboardWidget->GenerateMyScore(myScore,myRank,OnScoreBtn);
-			for (int32 i=0;i<Entries.Num();i++)
-			{
-				bool isMyScore=false;
-				if (Entries[i].PlayerName==myScore.PlayerName)
+				ScoreLeaderboardWidget->AddToViewport();
+				FOnScoreBtnAction OnScoreBtn;
+				OnScoreBtn.AddLambda([this]()
 				{
-					isMyScore=true;
+					ScoreLeaderboardWidget->RemoveFromParent();
+				});
+				ScoreLeaderboardWidget->GenerateMyScore(myScore,myRank,OnScoreBtn);
+				for (int32 i=0;i<Entries.Num();i++)
+				{
+					bool isMyScore=false;
+					if (Entries[i].PlayerName==myScore.PlayerName)
+					{
+						isMyScore=true;
+					}
+					ScoreLeaderboardWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
+					UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
 				}
-				ScoreLeaderboardWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
-				UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
-			}
 			
+			}
 		}
-	}
 }
 
 void UStageSelectUI::OnLockHovered()

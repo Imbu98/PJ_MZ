@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GenericTeamAgentInterface.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
@@ -24,10 +25,12 @@ class APJ_MZCharacter : public ACharacter , public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
+public:
 	/** Pawn mesh: first person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FirstPersonMesh;
 
+protected:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
@@ -97,6 +100,18 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	FGenericTeamId TeamId=0;
+	
+	// ===============================
+	// 플레이어 능력 태그
+	// ===============================
+	UPROPERTY()
+	FGameplayTagContainer PlayerAbilityTags; // Player가 가지고있는 능력들 저장
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag StunTag;
+	
+	UFUNCTION()
+	bool IsPlayerStunned();
 
 };
 

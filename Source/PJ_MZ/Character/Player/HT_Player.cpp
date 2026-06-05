@@ -189,6 +189,8 @@ void AHT_Player::OnChangeMentality(float amount)
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 {
+	if (IsPlayerStunned()) return;
+	
 	if (!Cached_Pc) return;
 	
 	// 기본상태가 아니면 상호작용 할 수 없게 변경
@@ -220,6 +222,7 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 
 void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 {
+	if (IsPlayerStunned()) return;
 	if (!ObscuraCameraComp || !Cached_PS) return;
 	if (Cached_PS->IsObscraCooltime)
 	{
@@ -297,6 +300,8 @@ void AHT_Player::OnEnterObscuraMode(const FInputActionValue& Value)
 	// }
 
 	// 카메라 모드 능력이 없으면 return
+	if (IsPlayerStunned()) return;
+	
 	if (!PlayerAbilityTags.HasTag(ObscuraTag)) return;
 		
 	CreateObscuraWidget();	
@@ -304,7 +309,7 @@ void AHT_Player::OnEnterObscuraMode(const FInputActionValue& Value)
 
 void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 {
-
+	if (IsPlayerStunned()) return;
 	// 카메라 모드 능력이 없으면 return
 	if (!PlayerAbilityTags.HasTag(ObscuraTag)) return;
 
@@ -332,6 +337,8 @@ void AHT_Player::OnOutObscuraMode(const FInputActionValue& Value)
 
 void AHT_Player::OnZoomObscura(const FInputActionValue& Value)
 {
+	if (IsPlayerStunned()) return;
+	
 	if (!ObscuraCameraComp) return;
 	if (ObscuraCameraComp->GetObscuraMode() != EObscuraModeAction::CAMERAMODE) return;
 
@@ -351,6 +358,8 @@ void AHT_Player::OnZoomObscura(const FInputActionValue& Value)
 
 void AHT_Player::CreateObscuraWidget()
 {
+	
+
 	if (Cached_Pc && Cached_PS)
 	{
 		Cached_Pc->CreateObscuraWidget();
@@ -364,6 +373,8 @@ void AHT_Player::CreateObscuraWidget()
 
 void AHT_Player::RemoveObscuraWidget()
 {
+	if (IsPlayerStunned()) return;
+	
 	if (Cached_Pc)
 	{
 		Cached_Pc->RemoveObscuraWidget();
@@ -401,14 +412,45 @@ void AHT_Player::LookInput(const FInputActionValue& Value)
 	Super::LookInput(Value);
 }
 
-void AHT_Player::playerAttacked(float amount)
+void AHT_Player::playerAttacked(float amount,float stunTime)
 {
 	if (Cached_PS)
 	{
 		Cached_PS->ChangeMentality(amount);
 	}
-	GetMesh()->GetAnimInstance()->Montage_Play(AM_PlayerStun);
 	
-	//GetController()->DisableInput(Cached_Pc);
+	if (AM_PlayerStun)
+	{
+		FirstPersonMesh->GetAnimInstance()->Montage_Play(AM_PlayerStun);
+		
+		GetWorld()->GetTimerManager().ClearTimer(StunTimerHandle);
+		
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(
+			this,
+			&AHT_Player::EndState,
+			StunTag);
+
+		GetWorld()->GetTimerManager().SetTimer(
+			StunTimerHandle,
+			TimerDelegate,
+			stunTime,
+			false);
+	}
 }
+
+void AHT_Player::EndState(FGameplayTag tag)
+{
+	PlayerAbilityTags.RemoveTag(tag);
+}
+
+void AHT_Player::PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate)
+{
+	if (Montage)	
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(Montage);
+		GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate,Montage);
+	}
+}
+
 

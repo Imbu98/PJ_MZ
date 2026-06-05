@@ -75,6 +75,8 @@ void APJ_MZCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void APJ_MZCharacter::MoveInput(const FInputActionValue& Value)
 {
+	if (IsPlayerStunned()) return;
+	
 	// get the Vector2D move axis
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -85,6 +87,8 @@ void APJ_MZCharacter::MoveInput(const FInputActionValue& Value)
 
 void APJ_MZCharacter::LookInput(const FInputActionValue& Value)
 {
+	if (IsPlayerStunned()) return;
+	
 	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld())<0.5f) return;
 	
 	// get the Vector2D look axis
@@ -130,4 +134,14 @@ void APJ_MZCharacter::DoJumpEnd()
 FGenericTeamId APJ_MZCharacter::GetGenericTeamId() const
 {
 	return TeamId;
+}
+
+bool APJ_MZCharacter::IsPlayerStunned()
+{
+	if (PlayerAbilityTags.HasTag(StunTag))
+	{
+		return true;
+	}
+	
+	return false;
 }
