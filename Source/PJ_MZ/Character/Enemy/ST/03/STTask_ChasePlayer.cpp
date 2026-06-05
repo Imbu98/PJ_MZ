@@ -3,6 +3,8 @@
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
 #include "Character/Enemy/EnemyBase.h"
+#include "Character/Enemy/Enemy03/Enemy03Character.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -26,6 +28,19 @@ EStateTreeRunStatus FSTTask_ChasePlayer::EnterState(FStateTreeExecutionContext& 
 	
 	if (ACharacter* Character = Cast<ACharacter>(Pawn)) 
 		Character->GetCharacterMovement()->MaxWalkSpeed = ChaseSpeed;
+	
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
+	{
+		Enemy->StopAmbientSounds();
+	}
+	if (AEnemy03Character* E3 = Cast<AEnemy03Character>(Controller.GetPawn()))
+	{
+		if (E3->ChaseSound)
+		{
+			E3->ChaseAudioComp->SetSound(E3->ChaseSound);
+			E3->ChaseAudioComp->Play();
+		}
+	}
 	
 	return EStateTreeRunStatus::Running;
 }
@@ -53,4 +68,9 @@ void FSTTask_ChasePlayer::ExitState(FStateTreeExecutionContext& Context, const F
 
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	Controller.StopMovement();
+	
+	if (AEnemy03Character* E3 = Cast<AEnemy03Character>(Controller.GetPawn()))
+	{
+		E3->ChaseAudioComp->Stop();
+	}
 }

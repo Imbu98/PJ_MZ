@@ -5,6 +5,7 @@
 #include "NavigationSystem.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/AudioComponent.h"
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
 #include "Character/Enemy/Enemy03/Enemy03Character.h"
@@ -28,9 +29,14 @@ EStateTreeRunStatus FSTTask_RandomPatrol::EnterState(FStateTreeExecutionContext&
 		Character->GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
 	}
 	
-	if (AEnemy03Character* Enemy = Cast<AEnemy03Character>(Controller.GetPawn()))
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
 	{
-		Enemy->SetAlerted(false);
+		Enemy->StartAmbientSounds();
+	}
+	if (AEnemy03Character* E3 = Cast<AEnemy03Character>(Controller.GetPawn()))
+	{
+		E3->SetAlerted(false);
+		E3->ChaseAudioComp->Stop();
 	}
 	
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);

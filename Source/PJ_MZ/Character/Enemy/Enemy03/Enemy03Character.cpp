@@ -1,5 +1,6 @@
 #include "Enemy03Character.h"
 #include "Enemy03AIController.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -7,6 +8,21 @@ AEnemy03Character::AEnemy03Character()
 {
 	AIControllerClass = AEnemy03AIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	
+	ChaseAudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("ChaseAudio"));
+	ChaseAudioComp->SetupAttachment(RootComponent);
+	ChaseAudioComp->bAutoActivate = false;
+	ChaseAudioComp->bOverrideAttenuation = true;
+}
+
+void AEnemy03Character::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (SoundAttenuation && ChaseAudioComp)
+	{
+		ChaseAudioComp->AttenuationSettings = SoundAttenuation;
+	}
 }
 
 void AEnemy03Character::Attack()
