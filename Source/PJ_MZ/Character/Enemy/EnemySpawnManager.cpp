@@ -145,12 +145,16 @@ FVector AEnemySpawnManager::GetRandomSpawnLocation()
 
 	for (int32 i = 0; i < 10; i++)
 	{
-		// 월드 원점 기준으로 넓게 탐색
-		bool bFound = NavSystem->GetRandomReachablePointInRadius(
-			FVector::ZeroVector,
-			SpawnSearchRadius,
-			ResultLocation
-		);
+		// bool bFound = NavSystem->GetRandomReachablePointInRadius(
+		// 	FVector::ZeroVector,
+		// 	SpawnSearchRadius,
+		// 	ResultLocation
+		// );
+		
+		bool bFound = NavSystem->GetRandomPointInNavigableRadius(
+		FVector::ZeroVector,
+		SpawnSearchRadius,
+		ResultLocation);
 
 		if (bFound)
 		{

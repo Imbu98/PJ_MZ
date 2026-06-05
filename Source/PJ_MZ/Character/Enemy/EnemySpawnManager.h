@@ -27,7 +27,7 @@ protected:
 
 	// 랜덤 위치 탐색 반경
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float SpawnSearchRadius = 10000.f;
+	float SpawnSearchRadius = 20000.f;
 
 private:
 	// PCG 맵 생성 완료 이벤트 바인딩
