@@ -19,6 +19,7 @@ void AHT_PlayerState::CopyProperties(class APlayerState* PlayerState)
 	{
 		MyPlayerState->MZ_PlayerID = MZ_PlayerID;
 		MyPlayerState->MZ_PlayerName = MZ_PlayerName;
+		MyPlayerState->MZ_StageFlags = MZ_StageFlags;
 	}
 }
 

@@ -82,3 +82,6 @@ DerivedDataCache/*
 Content/DerelictCorridor/*
 Content/Dungeon/*
 Content/ASCTeuthisan/*
+
+#Package
+Package/*

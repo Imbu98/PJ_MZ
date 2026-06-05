@@ -4,6 +4,7 @@
 #include <Components/PicturableComponent.h>
 #include "EnemySpawnManager.h"
 #include "AIController.h"
+#include "Character/Player/HT_Player.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -35,11 +36,20 @@ void AEnemyBase::HaltMovement()
 void AEnemyBase::Attack()
 {
 	// 자식 클래스에서 구체적인 공격 구현
+	
+	
 }
 
 void AEnemyBase::OnAttackSuccess()
 {
 	UE_LOG(LogTemp, Warning, TEXT("공격성공"));
+	
+	AHT_Player* player =Cast<AHT_Player> (GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (player)
+	{
+		player->playerAttacked(10.f,1.5f);
+	}
+	
 	DistoryAndRequestRespawn();
 }
 
