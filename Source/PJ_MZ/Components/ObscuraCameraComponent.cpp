@@ -190,6 +190,11 @@ void UObscuraCameraComponent::OnGameEnd()
 	//Clear처리할 스테이지 index
 	int32 stageIndex = CheckIsUnLocked(totalScore);
 	
+	if (stageIndex >= 1)
+	{
+		Cached_PS->MZ_StageFlags |= (1 << (stageIndex - 1));
+	}
+	
 	GameMode->SubmitScore(GameId, PlayerId, PlayerName, totalScore, endTime,stageIndex);
 	
 	SetResultUI(totalScore);

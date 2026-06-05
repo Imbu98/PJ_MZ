@@ -42,7 +42,8 @@ void ULoginUI::NativeConstruct()
 		{
 			if (!PS->MZ_PlayerID.IsEmpty())
 			{
-				SetStageSelectOverlay(PS->MZ_StageFlags);	
+				StageFlags = PS->MZ_StageFlags;
+				SetStageSelectOverlay(StageFlags);	
 				return;
 			}
 		}
@@ -316,7 +317,7 @@ void ULoginUI::OnClickStartGame()
 	
 	 FName stageName = StageSelectUIArray[CurrentIndex]->StageData.MoveLevelName;
 	
-	 FString LevelPath = FString::Printf(TEXT("/Game/HT/Levels/%s"), *stageName.ToString());
+	 FString LevelPath = FString::Printf(TEXT("%s"),*stageName.ToString());
 	
 	 GetWorld()->SeamlessTravel(LevelPath);
 	

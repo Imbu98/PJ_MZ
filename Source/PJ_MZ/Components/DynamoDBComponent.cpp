@@ -3,9 +3,12 @@
 #include "HttpModule.h"
 #include "MZ_Datas.h"
 #include "PJ_MZ.h"
+#include "GameFramework/GameModeBase.h"
+#include "../Character/Player/HT_PlayerState.h"
 #include "Interfaces/IHttpResponse.h"
 
 
+class AHT_PlayerState;
 // Sets default values for this component's properties
 UDynamoDBComponent::UDynamoDBComponent()
 {
@@ -52,9 +55,6 @@ void UDynamoDBComponent::OnSubmitComplete(FHttpRequestPtr Request, FHttpResponse
 		UE_LOG(LogPJ_MZ, Error, TEXT("서버 응답 없음"));
 		return;
 	}
-
-	UE_LOG(LogPJ_MZ, Log, TEXT("StatusCode: %d"), Response->GetResponseCode());
-	UE_LOG(LogPJ_MZ, Log, TEXT("Response: %s"), *Response->GetContentAsString());
 }
 
 

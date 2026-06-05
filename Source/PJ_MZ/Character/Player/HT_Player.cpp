@@ -414,6 +414,8 @@ void AHT_Player::LookInput(const FInputActionValue& Value)
 
 void AHT_Player::playerAttacked(float amount,float stunTime)
 {
+	PlayerAbilityTags.AddTag(StunTag);
+	
 	if (Cached_PS)
 	{
 		Cached_PS->ChangeMentality(amount);
@@ -423,8 +425,14 @@ void AHT_Player::playerAttacked(float amount,float stunTime)
 	{
 		FirstPersonMesh->GetAnimInstance()->Montage_Play(AM_PlayerStun);
 		
+		// 시점 정면으로
+		FRotator NewRot = Controller->GetControlRotation();
+		NewRot.Pitch = 0.f;
+		Controller->SetControlRotation(NewRot);
+		
 		GetWorld()->GetTimerManager().ClearTimer(StunTimerHandle);
 		
+		// stunTime만큼 stun적용 후 태그 제거
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindUObject(
 			this,
