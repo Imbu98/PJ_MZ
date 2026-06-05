@@ -1,6 +1,7 @@
 #include "SoundComponent.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AISense_Hearing.h"
 
 
 USoundComponent::USoundComponent()
@@ -22,6 +23,7 @@ void USoundComponent::PlayCameraShutterSound()
 	if (owner&&CameraShutterSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(),CameraShutterSound,owner->GetActorLocation());
+		UAISense_Hearing::ReportNoiseEvent(GetWorld(), owner->GetActorLocation(), 1.f, owner, 0.f, TEXT("Sound"));
 	}
 }
 
