@@ -11,6 +11,8 @@ void UPlayerStateUI::SetupCharacter(AHT_PlayerState* playerState)
 {
 	if (playerState==nullptr) return;
 	
+	CachedPlayerState = playerState;
+	
 	playerState->OnStaminaBarUpdated.RemoveAll(this);
 	playerState->OnStaminaBarUpdated.AddUObject(this, &UPlayerStateUI::OnStaminaBarUpdated);
 	
@@ -19,13 +21,25 @@ void UPlayerStateUI::SetupCharacter(AHT_PlayerState* playerState)
 	
 	playerState->OnShotCountChangeDelegate.RemoveAll(this);
 	playerState->OnShotCountChangeDelegate.AddUObject(this,&UPlayerStateUI::OnShotCountUpdated);
+	
+	if (HorizontalBox_CameraUsage)
+	{
+		HorizontalBox_CameraUsage->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
-void UPlayerStateUI::OnPlayerMentalityBarUpdated(float percent)
+void UPlayerStateUI::OnPlayerMentalityBarUpdated(float curMental,float MaxMental, float amount)
 {
 	if (PB_MentalityBar)
 	{
-		PB_MentalityBar->SetPercent(percent);
+		PB_MentalityBar->SetPercent(curMental/MaxMental);
+		if (amount<0)
+		{
+			if (MentalityReduceAnim)
+			{
+				PlayAnimation(MentalityReduceAnim);	
+			}
+		}
 	}
 }
 
@@ -41,10 +55,21 @@ void UPlayerStateUI::OnShotCountUpdated(int shotCount)
 {
 	if (!ObscuraCountHorizontalBox) return;
 	
+	if (!CachedPlayerState) return;
 	
 	ObscuraCountHorizontalBox->ClearChildren();
 	
-	ObscuraCountHorizontalBox->SetRenderTransformAngle(180.f);
+	// 맥스카운트와 같다 = 처음 카메라를 받았다 
+	if (shotCount==CachedPlayerState->MaxCanShotCount)
+	{
+		if (HorizontalBox_CameraUsage)
+		{
+			HorizontalBox_CameraUsage->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	
+	
 	
 	for (int i = 0; i < shotCount; i++)
 	{

@@ -22,9 +22,11 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 
 	// 플레이어와 거리 체크
 	float Distance = FVector::Dist(Enemy->GetActorLocation(), Player->GetActorLocation());
+	
 	if (Distance > AttackRange) return EBTNodeResult::Failed;
 
 	// 공격 실행
+	
 	Enemy->StartAttack();
 
 	return EBTNodeResult::Succeeded;

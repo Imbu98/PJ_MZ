@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 
 // 정신력 변경 델리게이트
-DECLARE_MULTICAST_DELEGATE_OneParam(FMentalityChangedDelegate,float);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FMentalityChangedDelegate,float,float,float);
 // 스테미나 변경 델리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FStaminaChangeDelegate,float);
 // 촬영횟수 변경 델리게이트

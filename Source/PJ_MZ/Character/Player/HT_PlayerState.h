@@ -87,8 +87,8 @@ public:
 	UFUNCTION()
 	void ChangeMentality(float amount)
 	{
-		CurrentMentality=FMath::Clamp(CurrentMentality-amount,0,100);
-		OnMentalityChangeDelegate.Broadcast(CurrentMentality/MaxMentality);
+		CurrentMentality=FMath::Clamp(CurrentMentality+amount,0,100);
+		OnMentalityChangeDelegate.Broadcast(CurrentMentality,MaxMentality,amount);
 	}
 
 	// ===============================
