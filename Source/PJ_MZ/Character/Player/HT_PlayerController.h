@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="Input|Input Mappings")
 	TArray<class UInputMappingContext*> DefaultMappingContexts;
 	
+	UPROPERTY()
+	TObjectPtr<class AHT_Player> CachedPlayer;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class UPlayerStateUI> PlayerStateUIFactory;
 	

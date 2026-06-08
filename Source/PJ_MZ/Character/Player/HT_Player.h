@@ -52,11 +52,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	TObjectPtr<UInputAction> InteractAction;
 	
-	UPROPERTY(EditAnywhere, Category ="Input")
-	TObjectPtr<UInputAction> DialogueSkipAction;
-	
-	
-	
 	// 카메라 촬영모드 진입
 	UPROPERTY(EditAnywhere, Category ="Input")
 	TObjectPtr<UInputAction> EnterCameraModeAction;
@@ -168,9 +163,6 @@ protected:
 	void OnInteractInput(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void OnDialogueEndInput(const FInputActionValue& Value);
-	
-	UFUNCTION()
 	void OnShotObscura(const FInputActionValue& Value);
 	
 	UFUNCTION()
@@ -193,14 +185,6 @@ public:
 	void RemoveObscuraWidget();
 	
 	bool bObscuraReleased = false; // 중간에 똇는지 확인하기 위한 플래그
-
-
-	UFUNCTION()
-	virtual	void MoveInput(const FInputActionValue& Value) override;
-	
-	UFUNCTION()
-	virtual void LookInput(const FInputActionValue& Value) override;
-	
 	
 	// ===============================
 	// 플레이어 피격 이벤트 
@@ -230,6 +214,10 @@ public:
 	
 	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
 	
+		
+	// ===============================
+	// 플레이어 키 태그
+	// ===============================
 	
 	
 

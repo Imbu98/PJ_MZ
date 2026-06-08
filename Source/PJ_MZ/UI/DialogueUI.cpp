@@ -40,9 +40,17 @@ void UDialogueUI::OnNextInput()
 
 void UDialogueUI::SkipDiaglogue()
 {
-	// 마지막 대사로 바로 이동
-	CurrentIndex = Lines.Num() - 1;
-	ShowCurrentLine();
+	// 이미 마지막대사면 똑같이 넘긴걸로 표시
+	if (CurrentIndex == Lines.Num() - 1)
+	{
+		OnDialogueClicked();
+	}
+	else
+	{
+		// 마지막 대사로 바로 이동
+		CurrentIndex = Lines.Num() - 1;
+		ShowCurrentLine();
+	}
 }
 
 void UDialogueUI::OnDialogueClicked()

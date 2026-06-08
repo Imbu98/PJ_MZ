@@ -75,7 +75,7 @@ void APJ_MZCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void APJ_MZCharacter::MoveInput(const FInputActionValue& Value)
 {
-	if (IsPlayerStunned()) return;
+	if (IsPlayerStunned()||IsPlayerOnDialouge()) return;
 	
 	// get the Vector2D move axis
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -87,7 +87,7 @@ void APJ_MZCharacter::MoveInput(const FInputActionValue& Value)
 
 void APJ_MZCharacter::LookInput(const FInputActionValue& Value)
 {
-	if (IsPlayerStunned()) return;
+	if (IsPlayerStunned()||IsPlayerOnDialouge()) return;
 	
 	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld())<0.5f) return;
 	
@@ -121,6 +121,7 @@ void APJ_MZCharacter::DoMove(float Right, float Forward)
 
 void APJ_MZCharacter::DoJumpStart()
 {
+	if (IsPlayerStunned()||IsPlayerOnDialouge()) return;
 	// pass Jump to the character
 	Jump();
 }
@@ -138,10 +139,15 @@ FGenericTeamId APJ_MZCharacter::GetGenericTeamId() const
 
 bool APJ_MZCharacter::IsPlayerStunned()
 {
-	if (PlayerAbilityTags.HasTag(StunTag))
-	{
-		return true;
-	}
-	
-	return false;
+	return PlayerAbilityTags.HasTag(StunTag);
+}
+
+bool APJ_MZCharacter::IsPlayerOnDialouge()
+{
+	return PlayerAbilityTags.HasTag(DialogTag);
+}
+
+bool APJ_MZCharacter::IsPlayerOnPressShift()
+{
+	return PlayerAbilityTags.HasTag(ShiftTag);
 }

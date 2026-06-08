@@ -25,7 +25,13 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<USoundBase> CameraShutterSound;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<USoundBase> HorrorBGM;
+	
 public:
 	UFUNCTION()
 	void PlayCameraShutterSound();
+	
+	UFUNCTION()
+	void PlayHorrorBGM();
 };

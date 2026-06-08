@@ -58,6 +58,8 @@ void AHT_PlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
+	CachedPlayer = Cast<AHT_Player>(InPawn);
+	
 		if (PlayerStateUIFactory)
     	{
     		PlayerStateUIWidget = CreateWidget<UPlayerStateUI>(this,PlayerStateUIFactory);
@@ -187,9 +189,11 @@ void AHT_PlayerController::SetFadeOutWhiteUI()
 void AHT_PlayerController::ShowPopup(FText Message, FText ConfirmText, FText CancelText,const FOnPopupAction& OnConfirm, const FOnPopupAction& OnCancel)
 {
 	if (!PopupWidget) return;
-	// 이전 바인딩 정리
-
 	
+	if (CachedPlayer)
+	{
+		CachedPlayer->PlayerAbilityTags.AddTag(CachedPlayer->DialogTag);
+	}
 	PopupWidget->InitPopup(Message, ConfirmText, CancelText, OnConfirm, OnCancel);
 	PopupWidget->SetVisibility(ESlateVisibility::Visible);
 
@@ -200,6 +204,11 @@ void AHT_PlayerController::ShowPopup(FText Message, FText ConfirmText, FText Can
 void AHT_PlayerController::HidePopup()
 {
 	if (!PopupWidget) return;
+	
+	if (CachedPlayer)
+	{
+		CachedPlayer->PlayerAbilityTags.RemoveTag(CachedPlayer->DialogTag);
+	}
 
 	PopupWidget->SetVisibility(ESlateVisibility::Collapsed);
 	SetShowMouseCursor(false);
@@ -209,6 +218,11 @@ void AHT_PlayerController::HidePopup()
 void AHT_PlayerController::ShowDialogue(const TArray<FDialogueLine>& Lines, const FOnDialogueFinished& OnFinished)
 {
 	if (!DialogueWidget) return;
+	
+	if (CachedPlayer)
+	{
+		CachedPlayer->PlayerAbilityTags.AddTag(CachedPlayer->DialogTag);
+	}
 
 	DialogueWidget->InitDialogue(Lines, OnFinished);
 	DialogueWidget->SetVisibility(ESlateVisibility::Visible);
@@ -217,6 +231,12 @@ void AHT_PlayerController::ShowDialogue(const TArray<FDialogueLine>& Lines, cons
 void AHT_PlayerController::HideDialogue()
 {
 	if (!DialogueWidget) return;
+	
+	if (CachedPlayer)
+	{
+		CachedPlayer->PlayerAbilityTags.RemoveTag(CachedPlayer->DialogTag);
+	}
+	
 	DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 

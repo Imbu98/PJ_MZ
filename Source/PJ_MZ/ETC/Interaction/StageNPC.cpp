@@ -168,6 +168,7 @@ void AStageNPC::OnCancelExit()
 	{
 		PC->SetShowMouseCursor(false);
 		PC->SetInputMode(FInputModeGameOnly());
+		PC->HidePopup();
 	}
 }
 

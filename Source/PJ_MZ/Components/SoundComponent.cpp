@@ -27,3 +27,11 @@ void USoundComponent::PlayCameraShutterSound()
 	}
 }
 
+void USoundComponent::PlayHorrorBGM()
+{
+	if (HorrorBGM)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(),HorrorBGM,0.5f);
+	}
+}
+

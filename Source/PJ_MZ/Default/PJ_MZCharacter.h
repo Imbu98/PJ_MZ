@@ -110,8 +110,21 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGameplayTag StunTag;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag ShiftTag;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag DialogTag;
+	
 	UFUNCTION()
 	bool IsPlayerStunned();
+	
+	UFUNCTION()
+	bool IsPlayerOnDialouge();
+	
+	UFUNCTION()
+	bool IsPlayerOnPressShift();
+	
 
 };
 

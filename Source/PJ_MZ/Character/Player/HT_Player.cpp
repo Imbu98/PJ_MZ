@@ -90,7 +90,6 @@ void AHT_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AHT_Player::DoStartSprint);
 			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AHT_Player::DoEndSprint);
 			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AHT_Player::OnInteractInput);
-			EnhancedInputComponent->BindAction(DialogueSkipAction, ETriggerEvent::Started, this, &AHT_Player::OnDialogueEndInput);
 			
 			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Started, this, &AHT_Player::OnEnterObscuraMode);
 			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Completed, this, &AHT_Player::OnOutObscuraMode);
@@ -114,6 +113,8 @@ void AHT_Player::DoStartSprint()
 		// set the sprint walk speed
 		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 	}
+	
+	PlayerAbilityTags.AddTag(ShiftTag);
 
 }
 
@@ -128,6 +129,8 @@ void AHT_Player::DoEndSprint()
 		// set the default walk speed
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	}
+	
+	PlayerAbilityTags.RemoveTag(ShiftTag);
 }
 
 void AHT_Player::SprintFixedTick()
@@ -183,9 +186,19 @@ void AHT_Player::OnChangeMentality(float amount)
 {
 	if (!Cached_PS) return;
 	Cached_PS->CurrentMentality += amount;
+	
 	Cached_PS->OnMentalityChangeDelegate.Broadcast(
 		Cached_PS->CurrentMentality / Cached_PS->MaxMentality
 	);
+	
+	// 정신력이 절반 이하로 떨어지면
+	if (Cached_PS->CurrentMentality< Cached_PS->MaxMentality/2)
+	{
+		if (SoundComp)
+		{
+			SoundComp->PlayHorrorBGM();
+		}
+	}
 }
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
@@ -198,9 +211,16 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 	if (ObscuraCameraComp->GetObscuraMode()!=EObscuraModeAction::IDLE) return;
 	
 	// 대화 중이면 다음 문장
-	if ( Cached_Pc->DialogueWidget && Cached_Pc->DialogueWidget->IsVisible())
+	if (PlayerAbilityTags.HasTag(DialogTag))
 	{  
-		Cached_Pc->DialogueWidget->OnNextInput();
+		if (PlayerAbilityTags.HasTag(ShiftTag))
+		{
+			Cached_Pc->DialogueWidget->SkipDiaglogue();
+		}
+		else
+		{
+			Cached_Pc->DialogueWidget->OnNextInput();
+		}
 		return;
 	}
 
@@ -218,14 +238,6 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 		{
 			IInteract_Interface::Execute_Interacted(hitActor);
 		}
-	}
-}
-
-void AHT_Player::OnDialogueEndInput(const FInputActionValue& Value)
-{
-	if ( Cached_Pc->DialogueWidget && Cached_Pc->DialogueWidget->IsVisible())
-	{  
-		Cached_Pc->DialogueWidget->SkipDiaglogue();
 	}
 }
 
@@ -393,32 +405,6 @@ void AHT_Player::RemoveObscuraWidget()
 			ObscuraCameraComp->ClearMainPhotoActor();
 		}
 	}
-}
-
-void AHT_Player::MoveInput(const FInputActionValue& Value)
-{
-	// 대화중이거나 팝업창 띄워져있을때는 막도록 
-	if (!Cached_Pc) return;
-	
-	if (Cached_Pc->PopupWidget&&Cached_Pc->PopupWidget->IsVisible()) return;
-	
-	if (Cached_Pc->DialogueWidget&&Cached_Pc->DialogueWidget->IsVisible()) return;
-	
-	Super::MoveInput(Value);
-	
-	
-}
-
-void AHT_Player::LookInput(const FInputActionValue& Value)
-{
-	// 대화중이거나 팝업창 띄워져있을때는 막도록 
-	if (!Cached_Pc) return;
-	
-	if (Cached_Pc->PopupWidget&&Cached_Pc->PopupWidget->IsVisible()) return;
-	
-	if (Cached_Pc->DialogueWidget&&Cached_Pc->DialogueWidget->IsVisible()) return;
-	
-	Super::LookInput(Value);
 }
 
 void AHT_Player::playerAttacked(float amount,float stunTime)
