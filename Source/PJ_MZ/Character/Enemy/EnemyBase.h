@@ -14,6 +14,9 @@ class PJ_MZ_API AEnemyBase : public ACharacter
 public:
 	AEnemyBase();
 	
+	// UPROPERTY()
+	// bool bResetDetection = false;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	

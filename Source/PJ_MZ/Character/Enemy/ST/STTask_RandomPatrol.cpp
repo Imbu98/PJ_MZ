@@ -8,6 +8,7 @@
 #include "Components/AudioComponent.h"
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
+#include "Character/Enemy/Enemy02/Enemy02Character.h"
 #include "Character/Enemy/Enemy03/Enemy03Character.h"
 
 bool FSTTask_RandomPatrol::Link(FStateTreeLinker& Linker)
@@ -31,6 +32,11 @@ EStateTreeRunStatus FSTTask_RandomPatrol::EnterState(FStateTreeExecutionContext&
 	
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
 	{
+		Enemy->StartAmbientSounds();
+	}
+	if (AEnemy02Character* Enemy = Cast<AEnemy02Character>(Controller.GetPawn()))
+	{
+		Enemy->BreathAudioComp->Stop();
 		Enemy->StartAmbientSounds();
 	}
 	if (AEnemy03Character* E3 = Cast<AEnemy03Character>(Controller.GetPawn()))

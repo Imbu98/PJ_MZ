@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
+#include "Character/Enemy/EnemyBase.h"
 #include "Components/CapsuleComponent.h"
 
 class AEnemy03AIController;
@@ -26,19 +27,19 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
     APawn& Pawn = Context.GetExternalData(PawnHandle);
     UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
     
-    if (AEnemy03AIController* Enemy03 =
+    if (AEnemy03AIController* Enemy =
     Cast<AEnemy03AIController>(&Controller))
     {
-        if (Enemy03->bResetDetection)
+        if (Enemy->bResetDetection)
         {
             InstanceData.bPlayerDetected = false;
             InstanceData.bPlayerLooking = false;
             InstanceData.bWasInAttackRange = false;
             InstanceData.TargetActor = nullptr;
 
-            Enemy03->bResetDetection = false;
+            Enemy->bResetDetection = false;
 
-            UE_LOG(LogTemp, Warning, TEXT("Detection Reset"));
+        UE_LOG(LogTemp, Warning, TEXT("Detection Reset 완료"))
         }
     }
     
@@ -83,6 +84,12 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
     if (Distance <= LoseTargetDistance)
     {
         // const bool bIsPlayerLooking = IsPlayerLookingAtEnemy(Controller);
+        
+        // bool bLooking = IsPlayerLookingAtEnemy(Controller);
+        // UE_LOG(LogTemp, Warning, TEXT("감지체크 - bDetected: %s, bLooking: %s, Distance: %f"),
+        //     InstanceData.bPlayerDetected ? TEXT("true") : TEXT("false"),
+        //     bLooking ? TEXT("true") : TEXT("false"),
+        //     Distance);
         
         if (InstanceData.bPlayerDetected)
         {

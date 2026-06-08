@@ -12,4 +12,15 @@ class PJ_MZ_API AEnemy02Character : public AEnemyBase
 
 public:
 	AEnemy02Character();
+	
+	UPROPERTY(VisibleAnywhere, Category="Sound")
+	TObjectPtr<UAudioComponent> BreathAudioComp;
+	
+	UPROPERTY(EditAnywhere, Category="Sound")
+	TObjectPtr<USoundBase> BreathSound;
+	
+	UPROPERTY(EditAnywhere, Category="Sound")
+	TObjectPtr<USoundBase> DetectionSound;
+	
+	virtual void BeginPlay() override;
 };

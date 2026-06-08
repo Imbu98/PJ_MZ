@@ -51,12 +51,6 @@ EStateTreeRunStatus FSTTask_Stun::EnterState(
 		}
 	}
 	
-	if (AEnemy03AIController* Enemy03 =
-	Cast<AEnemy03AIController>(&Controller))
-	{
-		Enemy03->bResetDetection = true;
-	}
-	
 	UE_LOG(LogTemp, Warning, TEXT("Enemy Stun 시작"));
 	return EStateTreeRunStatus::Running;
 }
@@ -83,14 +77,21 @@ EStateTreeRunStatus FSTTask_Stun::Tick(
 				? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
 				: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
 
+			Enemy03->bResetDetection = true;
+			UE_LOG(LogTemp, Warning, TEXT("bResetDetection = true 설정됨"));
+			
 			STComp->SendStateTreeEvent(Event);
 
 			UE_LOG(LogTemp, Warning,
 				TEXT("Send Event : %s"),
 				*Event.Tag.ToString());
 
-			return EStateTreeRunStatus::Succeeded;
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy03AIController 캐스트 실패!"));
+		}
+			return EStateTreeRunStatus::Succeeded;
 	}
 	return EStateTreeRunStatus::Running;
 }
@@ -103,29 +104,16 @@ void FSTTask_Stun::ExitState(
 	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	
-	if (AEnemy03AIController* Enemy03 = Cast<AEnemy03AIController>(&Controller))
-	{
-		UStateTreeAIComponent* STComp =
-			   Controller.FindComponentByClass<UStateTreeAIComponent>();
-		if (!STComp) return;
-		
-		if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
-		{
-			if (UAnimInstance* Anim = Enemy->GetMesh()->GetAnimInstance())
-			{
-				Anim->Montage_Stop(0.1f);
-			}
-		}
 	
-	// 	FStateTreeEvent Event;
-	// 	Event.Tag = Enemy03->IsEnemyLookingAtPlayer()
-	// 		? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
-	// 		: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
-	// 	
-	// 	UE_LOG(LogTemp, Warning,
-	// TEXT("Send Event : %s"),
-	// *Event.Tag.ToString());
-	//
-	// 	STComp->SendStateTreeEvent(Event);
+	UStateTreeAIComponent* STComp =
+		   Controller.FindComponentByClass<UStateTreeAIComponent>();
+	if (!STComp) return;
+		
+	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
+	{
+		if (UAnimInstance* Anim = Enemy->GetMesh()->GetAnimInstance())
+		{
+			Anim->Montage_Stop(0.1f);
+		}
 	}
 }
