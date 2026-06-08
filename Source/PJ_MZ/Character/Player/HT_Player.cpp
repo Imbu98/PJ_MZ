@@ -220,6 +220,7 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 		{
 			Cached_Pc->DialogueWidget->OnNextInput();
 		}
+		
 		return;
 	}
 
@@ -410,10 +411,7 @@ void AHT_Player::playerAttacked(float amount,float stunTime)
 {
 	PlayerAbilityTags.AddTag(StunTag);
 	
-	if (Cached_PS)
-	{
-		Cached_PS->ChangeMentality(amount);
-	}
+	OnChangeMentality(amount);
 	
 	if (AM_PlayerStun)
 	{

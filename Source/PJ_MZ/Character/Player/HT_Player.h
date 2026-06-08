@@ -155,6 +155,7 @@ protected:
 	/** Called while sprinting at a fixed time interval */
 	void SprintFixedTick();
 	
+public:
 	// 플레이어 정신력 변화 함수
 	UFUNCTION()
 	void OnChangeMentality(float amount);

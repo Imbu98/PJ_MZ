@@ -98,7 +98,13 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	if (CurrentCanShotCount <= 0)
 	{
 		float penaltyAmount = -10.f;
-		Cached_PS->ChangeMentality(penaltyAmount);
+		AHT_Player* Player = Cast<AHT_Player>(GetOwner());
+		if (Player)
+		{
+			Player->OnChangeMentality(penaltyAmount);
+		}
+		
+		
 		// GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,FString::Printf(TEXT("OverFlow...Died")));
 		//
 		// OnGameEnd();

@@ -32,6 +32,22 @@ void AStageNPC::Interacted_Implementation()
 
 	if (!CachedPlayer) return;
 	
+	FVector cameraDir = GetActorLocation()- CachedPlayer->GetActorLocation();
+	
+	FRotator LookRot = cameraDir.Rotation();
+	
+	LookRot.Pitch = 0.f;
+	LookRot.Roll = 0.f;
+
+	CachedPlayer->GetController()->SetControlRotation(LookRot);
+	
+	// APlayerController* pC =  Cast<APlayerController>(CachedPlayer->GetController());
+	// if (pC)
+	// {
+	// 	pC->SetViewTargetWithBlend(this,0.5f);
+	// }
+	
+	
 	AHT_PlayerState* PS = CachedPlayer->GetPlayerState<AHT_PlayerState>();
 
 	if (!PS) return;
