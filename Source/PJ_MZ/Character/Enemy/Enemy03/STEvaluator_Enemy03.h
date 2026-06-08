@@ -47,7 +47,7 @@ struct  PJ_MZ_API FSTEvaluator_Enemy03 : public FStateTreeEvaluatorCommonBase
 	float LoseTargetDistance = 3000.f;
 	
 	UPROPERTY(EditAnywhere, Category = "Config")
-	float AttackRange = 200.f;
+	float AttackRange = 230.f;
 	
 	
 

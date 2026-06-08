@@ -50,7 +50,13 @@ EStateTreeRunStatus FSTTask_Stun::EnterState(
 				Enemy->SoundAttenuation);
 		}
 	}
-
+	
+	if (AEnemy03AIController* Enemy03 =
+	Cast<AEnemy03AIController>(&Controller))
+	{
+		Enemy03->bResetDetection = true;
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("Enemy Stun 시작"));
 	return EStateTreeRunStatus::Running;
 }
@@ -65,9 +71,27 @@ EStateTreeRunStatus FSTTask_Stun::Tick(
 	if (InstanceData.StunTimer >= StunDuration)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Enemy Stun 종료"));
-		return EStateTreeRunStatus::Succeeded;
-	}
+	
+		AAIController& Controller = Context.GetExternalData(ControllerHandle);
+		UStateTreeAIComponent* STComp =
+			   Controller.FindComponentByClass<UStateTreeAIComponent>();
+		
+		if (AEnemy03AIController* Enemy03 = Cast<AEnemy03AIController>(&Controller))
+		{
+			FStateTreeEvent Event;
+			Event.Tag = Enemy03->IsEnemyLookingAtPlayer()
+				? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
+				: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
 
+			STComp->SendStateTreeEvent(Event);
+
+			UE_LOG(LogTemp, Warning,
+				TEXT("Send Event : %s"),
+				*Event.Tag.ToString());
+
+			return EStateTreeRunStatus::Succeeded;
+		}
+	}
 	return EStateTreeRunStatus::Running;
 }
 
@@ -75,21 +99,33 @@ void FSTTask_Stun::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition) const
 {
-	// UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 끝"));
+	UE_LOG(LogTemp, Warning, TEXT("Enemy03 Current State: STUN 끝"));
 	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	
 	if (AEnemy03AIController* Enemy03 = Cast<AEnemy03AIController>(&Controller))
 	{
 		UStateTreeAIComponent* STComp =
-			   Controller.GetPawn()->FindComponentByClass<UStateTreeAIComponent>();
+			   Controller.FindComponentByClass<UStateTreeAIComponent>();
 		if (!STComp) return;
+		
+		if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
+		{
+			if (UAnimInstance* Anim = Enemy->GetMesh()->GetAnimInstance())
+			{
+				Anim->Montage_Stop(0.1f);
+			}
+		}
 	
-		FStateTreeEvent Event;
-		Event.Tag = Enemy03->IsEnemyLookingAtPlayer()
-			? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
-			: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
-
-		STComp->SendStateTreeEvent(Event);
+	// 	FStateTreeEvent Event;
+	// 	Event.Tag = Enemy03->IsEnemyLookingAtPlayer()
+	// 		? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
+	// 		: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
+	// 	
+	// 	UE_LOG(LogTemp, Warning,
+	// TEXT("Send Event : %s"),
+	// *Event.Tag.ToString());
+	//
+	// 	STComp->SendStateTreeEvent(Event);
 	}
 }

@@ -34,12 +34,13 @@ void AEnemyBase::HaltMovement()
 	}
 }
 
-void AEnemyBase::Attack()
+void AEnemyBase::StartAttack()
 {
 	if (ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
 	{
 		FVector Dir = Player->GetActorLocation() - GetActorLocation();
-		Dir.Z = 0.0;
+		Dir.Z = 0.0f;
+
 		if (!Dir.IsNearlyZero())
 		{
 			SetActorRotation(Dir.Rotation());
@@ -52,7 +53,7 @@ void AEnemyBase::Attack()
 	{
 		Move->DisableMovement();
 	}
-
+	
 	if (AttackSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -61,38 +62,94 @@ void AEnemyBase::Attack()
 			1.f, 1.f, 0.f,
 			SoundAttenuation);
 	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("AttackSound = %s"),
+	AttackSound ? TEXT("Valid") : TEXT("Null"));
 
 	if (AttackMontage)
 	{
+		bAttacking = true;
+
 		PlayAnimMontage(AttackMontage);
 
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(
-			TimerHandle, this, &AEnemyBase::OnAttackSuccess,
-			AttackMontage->GetPlayLength(), false);
+		if (UAnimInstance* Anim = GetMesh()->GetAnimInstance())
+		{
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindUObject(
+				this,
+				&AEnemyBase::OnAttackMontageEnded);
+
+			Anim->Montage_SetEndDelegate(
+				EndDelegate,
+				AttackMontage);
+		}
 	}
-	else
-	{
-		OnAttackSuccess();
-	}
-	
-	// 자식 클래스에서 구체적인 공격 구현
-	
-	
 }
 
-void AEnemyBase::OnAttackSuccess()
+void AEnemyBase::AttackHit()
 {
-	UE_LOG(LogTemp, Warning, TEXT("공격성공"));
-	
-	AHT_Player* player =Cast<AHT_Player> (GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (player)
+	UE_LOG(LogTemp, Warning, TEXT("공격 성공"));
+
+	AHT_Player* Player =
+		Cast<AHT_Player>(
+			GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	if (Player)
 	{
-		player->playerAttacked(10.f,1.5f);
+		Player->playerAttacked(10.f, 1.5f);
 	}
-	
-	DistoryAndRequestRespawn();
 }
+
+void AEnemyBase::StopAttack()
+{
+	if (UAnimInstance* Anim = GetMesh()->GetAnimInstance())
+	{
+		if (AttackMontage &&
+			Anim->Montage_IsPlaying(AttackMontage))
+		{
+			Anim->Montage_Stop(0.1f, AttackMontage);
+		}
+	}
+
+	bAttacking = false;
+
+	if (UCharacterMovementComponent* Move =
+		GetCharacterMovement())
+	{
+		Move->SetMovementMode(MOVE_Walking);
+	}
+}
+
+void AEnemyBase::OnAttackMontageEnded(
+	UAnimMontage* Montage,
+	bool bInterrupted)
+{
+	bAttacking = false;
+
+	if (UCharacterMovementComponent* Move =
+		GetCharacterMovement())
+	{
+		Move->SetMovementMode(MOVE_Walking);
+	}
+
+	if (!bInterrupted)
+	{
+		DistoryAndRequestRespawn();
+	}
+}
+
+// void AEnemyBase::OnAttackSuccess()
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("공격성공"));
+// 	
+// 	AHT_Player* player =Cast<AHT_Player> (GetWorld()->GetFirstPlayerController()->GetPawn());
+// 	if (player)
+// 	{
+// 		player->playerAttacked(10.f,1.5f);
+// 	}
+// 	
+// 	DistoryAndRequestRespawn();
+// }
 
 void AEnemyBase::DistoryAndRequestRespawn()
 {

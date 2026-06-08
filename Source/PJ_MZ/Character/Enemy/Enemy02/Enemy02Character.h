@@ -12,6 +12,4 @@ class PJ_MZ_API AEnemy02Character : public AEnemyBase
 
 public:
 	AEnemy02Character();
-	virtual void Attack() override;
-
 };

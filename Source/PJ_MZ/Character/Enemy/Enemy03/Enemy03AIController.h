@@ -14,6 +14,9 @@ class PJ_MZ_API AEnemy03AIController : public AEnemy02AIController
 public:
 	AEnemy03AIController();
 	
+	UPROPERTY()
+	bool bResetDetection = false;
+	
 	bool IsEnemyLookingAtPlayer() const;
 	
 protected:

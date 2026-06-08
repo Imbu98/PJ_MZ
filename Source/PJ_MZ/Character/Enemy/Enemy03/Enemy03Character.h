@@ -15,7 +15,7 @@ public:
 	
 	virtual void BeginPlay() override;
 
-	virtual void Attack() override;
+	// virtual void Attack() override;
 	
 	UPROPERTY(BlueprintReadOnly, Category="Animation")
 	bool bIsAlerted = false;
