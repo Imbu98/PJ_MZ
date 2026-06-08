@@ -90,7 +90,7 @@ void AHT_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AHT_Player::DoStartSprint);
 			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AHT_Player::DoEndSprint);
 			EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AHT_Player::OnInteractInput);
-			EnhancedInputComponent->BindAction(DialogueSkipAction, ETriggerEvent::Started, this, &AHT_PlayerController::OnDialogueSkip);
+			EnhancedInputComponent->BindAction(DialogueSkipAction, ETriggerEvent::Started, this, &AHT_Player::OnDialogueEndInput);
 			
 			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Started, this, &AHT_Player::OnEnterObscuraMode);
 			EnhancedInputComponent->BindAction(EnterCameraModeAction, ETriggerEvent::Completed, this, &AHT_Player::OnOutObscuraMode);
@@ -226,7 +226,6 @@ void AHT_Player::OnDialogueEndInput(const FInputActionValue& Value)
 	if ( Cached_Pc->DialogueWidget && Cached_Pc->DialogueWidget->IsVisible())
 	{  
 		Cached_Pc->DialogueWidget->SkipDiaglogue();
-		return;
 	}
 }
 
