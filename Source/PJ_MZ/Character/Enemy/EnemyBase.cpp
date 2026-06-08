@@ -5,6 +5,7 @@
 #include "EnemySpawnManager.h"
 #include "AIController.h"
 #include "Character/Player/HT_Player.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -35,6 +36,46 @@ void AEnemyBase::HaltMovement()
 
 void AEnemyBase::Attack()
 {
+	if (ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
+	{
+		FVector Dir = Player->GetActorLocation() - GetActorLocation();
+		Dir.Z = 0.0;
+		if (!Dir.IsNearlyZero())
+		{
+			SetActorRotation(Dir.Rotation());
+		}
+	}
+
+	HaltMovement();
+
+	if (UCharacterMovementComponent* Move = GetCharacterMovement())
+	{
+		Move->DisableMovement();
+	}
+
+	if (AttackSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this, AttackSound, GetActorLocation(),
+			FRotator::ZeroRotator,
+			1.f, 1.f, 0.f,
+			SoundAttenuation);
+	}
+
+	if (AttackMontage)
+	{
+		PlayAnimMontage(AttackMontage);
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(
+			TimerHandle, this, &AEnemyBase::OnAttackSuccess,
+			AttackMontage->GetPlayLength(), false);
+	}
+	else
+	{
+		OnAttackSuccess();
+	}
+	
 	// 자식 클래스에서 구체적인 공격 구현
 	
 	
@@ -69,6 +110,41 @@ void AEnemyBase::DistoryAndRequestRespawn()
 	}
 	
 	Destroy();
+}
+
+void AEnemyBase::StartAmbientSounds()
+{
+	if (AmbientSounds.Num() == 0) return;
+
+	const float Delay = FMath::RandRange(5.f, 12.f);
+	GetWorldTimerManager().SetTimer(
+		AmbientTimerHandle, this,
+		&AEnemyBase::PlayRandomAmbientSound,
+		Delay, false);
+}
+
+void AEnemyBase::StopAmbientSounds()
+{
+	GetWorldTimerManager().ClearTimer(AmbientTimerHandle);
+}
+
+void AEnemyBase::PlayRandomAmbientSound()
+{
+	if (AmbientSounds.Num() > 0)
+	{
+		const int32 Idx = FMath::RandRange(0, AmbientSounds.Num() - 1);
+		UGameplayStatics::PlaySoundAtLocation(
+			this, AmbientSounds[Idx], GetActorLocation(),
+			FRotator::ZeroRotator,
+			1.f, 1.f, 0.f,
+			SoundAttenuation);
+	}
+
+	const float Delay = FMath::RandRange(5.f, 12.f);
+	GetWorldTimerManager().SetTimer(
+		AmbientTimerHandle, this,
+		&AEnemyBase::PlayRandomAmbientSound,
+		Delay, false);
 }
 
 

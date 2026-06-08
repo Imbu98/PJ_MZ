@@ -3,6 +3,8 @@
 #include "StateTreeLinker.h"
 #include "AIController.h"
 #include "Character/Enemy/EnemyBase.h"
+#include "Character/Enemy/Enemy03/Enemy03Character.h"
+#include "Kismet/GameplayStatics.h"
 
 bool FSTTask_Attack::Link(FStateTreeLinker& Linker)
 {
@@ -18,7 +20,11 @@ EStateTreeRunStatus FSTTask_Attack::EnterState(
 	
 	AAIController& Controller = Context.GetExternalData(ControllerHandle);
 	APawn* Pawn = Controller.GetPawn();
-	if (!Pawn) return EStateTreeRunStatus::Failed;
+	if (!Pawn)
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+	
 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Pawn))
 	{

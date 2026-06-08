@@ -17,13 +17,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	
+	UPROPERTY(EditAnywhere, Category="EnemySound")
+	TObjectPtr<USoundAttenuation> SoundAttenuation;
+
+	UPROPERTY(EditAnywhere, Category="EnemySound")
+	TObjectPtr<USoundBase> AttackSound;
+
+	UPROPERTY(EditAnywhere, Category="EnemySound")
+	TObjectPtr<USoundBase> StunSound;
+
+	UPROPERTY(EditAnywhere, Category="EnemySound")
+	TArray<TObjectPtr<USoundBase>> AmbientSounds;
+
+	
 	UPROPERTY(EditAnywhere, Category="Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	TObjectPtr<UAnimMontage> StunMontage;
 	
-	void HaltMovement();
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Attack();
@@ -32,6 +44,14 @@ public:
 	void OnAttackSuccess();
 
 	virtual void BeginPlay() override;
+	
+	void HaltMovement();
+	
+	FTimerHandle AmbientTimerHandle;
+
+	void StartAmbientSounds();
+	void StopAmbientSounds();
+	void PlayRandomAmbientSound();
 	
 protected:
 	

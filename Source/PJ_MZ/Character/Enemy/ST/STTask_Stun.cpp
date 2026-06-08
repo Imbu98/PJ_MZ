@@ -7,6 +7,7 @@
 #include "Components/StateTreeAIComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 bool FSTTask_Stun::Link(FStateTreeLinker& Linker)
 {
@@ -34,7 +35,20 @@ EStateTreeRunStatus FSTTask_Stun::EnterState(
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Controller.GetPawn()))
 	{
 		Enemy->HaltMovement();
-		if (Enemy->StunMontage) Enemy->PlayAnimMontage(Enemy->StunMontage);
+
+		if (Enemy->StunMontage)
+		{
+			Enemy->PlayAnimMontage(Enemy->StunMontage);
+		}
+
+		if (Enemy->StunSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+				Enemy, Enemy->StunSound, Enemy->GetActorLocation(),
+				FRotator::ZeroRotator,
+				1.f, 1.f, 0.f,
+				Enemy->SoundAttenuation);
+		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Enemy Stun 시작"));
