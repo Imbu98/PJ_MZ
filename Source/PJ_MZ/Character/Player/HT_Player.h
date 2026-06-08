@@ -52,6 +52,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	TObjectPtr<UInputAction> InteractAction;
 	
+	UPROPERTY(EditAnywhere, Category ="Input")
+	TObjectPtr<UInputAction> DialogueSkipAction;
+	
+	
+	
 	// 카메라 촬영모드 진입
 	UPROPERTY(EditAnywhere, Category ="Input")
 	TObjectPtr<UInputAction> EnterCameraModeAction;
@@ -161,6 +166,9 @@ protected:
 	
 	UFUNCTION()
 	void OnInteractInput(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void OnDialogueEndInput(const FInputActionValue& Value);
 	
 	UFUNCTION()
 	void OnShotObscura(const FInputActionValue& Value);

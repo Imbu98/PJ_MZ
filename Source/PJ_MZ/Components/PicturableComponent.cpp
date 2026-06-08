@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "Character/Enemy/EnemyAIControllerBase.h"
 #include "Character/Enemy/EnemyBase.h"
+#include "ETC/Picturable/PicturableBase.h"
 
 UPicturableComponent::UPicturableComponent()
 {
@@ -61,7 +62,11 @@ void UPicturableComponent::PictureTaken()
 	// 아니면 오브젝트에 대한 처리
 	else
 	{
-		
+		APicturableBase* picturable =  Cast<APicturableBase>(GetOwner());
+		if (picturable)
+		{
+			picturable->PictureTaken();
+		}
 	}
 }
 

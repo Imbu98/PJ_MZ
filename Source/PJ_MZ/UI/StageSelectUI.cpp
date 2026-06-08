@@ -77,12 +77,7 @@ void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData,
 		isLocked ? Btn_LockImage->SetVisibility(ESlateVisibility::Visible) : Btn_LockImage->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	
-	ALoginGameMode* GameMode = Cast<ALoginGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (GameMode)
-	{
-		// 델리게이트 바인딩
-			GameMode->DynamoDBComp->OnLeaderboardFetched.AddUObject(this, &UStageSelectUI::OnLeaderboardReceived);	
-	}
+	
 	
 
 }
@@ -90,10 +85,13 @@ void UStageSelectUI::SetStageSelectInfo(const FStageSelectData& stageSelectData,
 void UStageSelectUI::OnClickedStageBtn()
 {
 	ALoginGameMode* GameMode = Cast<ALoginGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (GameMode)
-	{
-		GameMode->FetchLeaderboard(StageData.MoveLevelName.ToString());	
-	}
+	if (!GameMode) return;
+	// 데이터 불러오기 성공 델리게이트 바인딩
+	GameMode->DynamoDBComp->OnLeaderboardFetched.Clear();
+	GameMode->DynamoDBComp->OnLeaderboardFetched.AddUObject(this, &UStageSelectUI::OnLeaderboardReceived);
+	
+	// 데이터 불러오기
+	GameMode->FetchLeaderboard(StageData.MoveLevelName.ToString());	
 }
 
 // 해당 레벨의 리더보드 가져와서 보여주기

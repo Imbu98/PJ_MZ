@@ -15,6 +15,7 @@ public:
 	APicturableBase();
 	
 	virtual void Tick(float DeltaTime) override;
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -24,6 +25,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
+	
+public:
+	void PictureTaken();
 	
 
 };

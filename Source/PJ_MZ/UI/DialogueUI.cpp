@@ -38,6 +38,13 @@ void UDialogueUI::OnNextInput()
 	OnDialogueClicked();
 }
 
+void UDialogueUI::SkipDiaglogue()
+{
+	// 마지막 대사로 바로 이동
+	CurrentIndex = Lines.Num() - 1;
+	ShowCurrentLine();
+}
+
 void UDialogueUI::OnDialogueClicked()
 {
 	CurrentIndex++;

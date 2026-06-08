@@ -19,6 +19,9 @@ public:
 	// 플레이어가 키 입력 시 다음 대사
 	UFUNCTION()
 	void OnNextInput();
+	// 플레이어가 키 입력 시 마지막 대사로 이동
+	UFUNCTION()
+	void SkipDiaglogue();
 
 protected:
 	virtual void NativeConstruct() override;
