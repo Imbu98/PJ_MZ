@@ -1,5 +1,6 @@
 #include "STEvaluator_Enemy03.h"
 #include "AIController.h"
+#include "Enemy03AIController.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -24,6 +25,22 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
     AAIController& Controller = Context.GetExternalData(AIControllerHandle);
     APawn& Pawn = Context.GetExternalData(PawnHandle);
     UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
+    
+    if (AEnemy03AIController* Enemy03 =
+    Cast<AEnemy03AIController>(&Controller))
+    {
+        if (Enemy03->bResetDetection)
+        {
+            InstanceData.bPlayerDetected = false;
+            InstanceData.bPlayerLooking = false;
+            InstanceData.bWasInAttackRange = false;
+            InstanceData.TargetActor = nullptr;
+
+            Enemy03->bResetDetection = false;
+
+            UE_LOG(LogTemp, Warning, TEXT("Detection Reset"));
+        }
+    }
     
     ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Controller.GetWorld(), 0);
     if (!Player) return;

@@ -28,8 +28,49 @@ EStateTreeRunStatus FSTTask_Attack::EnterState(
 
 	if (AEnemyBase* Enemy = Cast<AEnemyBase>(Pawn))
 	{
-		Enemy->Attack();
+        Enemy->StartAttack();
 	}
 
-	return EStateTreeRunStatus::Succeeded;
+    return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTTask_Attack::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime) const
+{
+	AAIController& Controller =
+		Context.GetExternalData(ControllerHandle);
+
+	APawn* Pawn = Controller.GetPawn();
+	if (!Pawn)
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+
+	AEnemyBase* Enemy = Cast<AEnemyBase>(Pawn);
+	if (!Enemy)
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+
+	if (!Enemy->IsAttacking())
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+void FSTTask_Attack::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	AAIController& Controller =
+		Context.GetExternalData(ControllerHandle);
+
+	if (AEnemyBase* Enemy =
+		Cast<AEnemyBase>(Controller.GetPawn()))
+	{
+		Enemy->StopAttack();
+	}
 }

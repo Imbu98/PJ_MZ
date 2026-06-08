@@ -27,6 +27,8 @@ struct FSTTask_Attack : public FStateTreeTaskCommonBase
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition) const override;
+	EStateTreeRunStatus Tick(FStateTreeExecutionContext& Context, float DeltaTime) const;
+	void ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const;
 
 private:
 	TStateTreeExternalDataHandle<AAIController> ControllerHandle;

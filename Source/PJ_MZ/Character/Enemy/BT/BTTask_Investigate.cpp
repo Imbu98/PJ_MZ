@@ -74,7 +74,7 @@ void UBTTask_Investigate::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
             // 공격 범위 안에 있으면 공격
             if (AEnemyBase* Enemy = Cast<AEnemyBase>(Pawn))
             {
-                Enemy->Attack();
+                Enemy->StartAttack();
             }
             FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
             return;

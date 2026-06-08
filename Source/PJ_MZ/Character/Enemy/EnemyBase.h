@@ -38,10 +38,19 @@ public:
 	
 	
 	UFUNCTION(BlueprintCallable)
-	virtual void Attack();
-
+	void StartAttack();
 	UFUNCTION(BlueprintCallable)
-	void OnAttackSuccess();
+	void StopAttack();
+
+	bool IsAttacking() const
+	{
+		return bAttacking;
+	}
+	UFUNCTION(BlueprintCallable)
+	void AttackHit();
+
+	// UFUNCTION(BlueprintCallable)
+	// void OnAttackSuccess();
 
 	virtual void BeginPlay() override;
 	
@@ -57,6 +66,13 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	float RespawnDelay = 5.f;
+	
+	bool bAttacking = false;
+
+	UFUNCTION()
+	void OnAttackMontageEnded(
+		UAnimMontage* Montage,
+		bool bInterrupted);
 
 private:
 	void DistoryAndRequestRespawn();

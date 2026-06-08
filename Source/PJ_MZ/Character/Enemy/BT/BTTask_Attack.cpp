@@ -25,7 +25,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	if (Distance > AttackRange) return EBTNodeResult::Failed;
 
 	// 공격 실행
-	Enemy->Attack();
+	Enemy->StartAttack();
 
 	return EBTNodeResult::Succeeded;
 }
