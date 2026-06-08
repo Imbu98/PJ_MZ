@@ -23,7 +23,7 @@ public:
 	void SetupCharacter(class AHT_PlayerState* playerState);
 	
 	UFUNCTION()
-	void OnPlayerMentalityBarUpdated(float percent);
+	void OnPlayerMentalityBarUpdated(float curMental,float MaxMental, float amount);
 	
 	// 스프린트 게이지
 	UFUNCTION()
@@ -43,12 +43,22 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UHorizontalBox> ObscuraCountHorizontalBox;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UHorizontalBox> HorizontalBox_CameraUsage;
+	
+	UPROPERTY()
+	TObjectPtr<AHT_PlayerState> CachedPlayerState;
+	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<UUserWidget> ObscuraCountFactory;
 	
 	UPROPERTY()
 	TObjectPtr<UUserWidget> ObscuraCountWidget;
+	
+private:
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	TObjectPtr<class UWidgetAnimation> MentalityReduceAnim;
 	
 	
 };
