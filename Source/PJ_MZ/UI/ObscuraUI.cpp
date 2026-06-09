@@ -320,19 +320,26 @@ void UObscuraUI::OnCameraFOVUpdated(float FOV)
 }
 
 
-void UObscuraUI::OnPlayerMentalityBarUpdated(float percent)
+void UObscuraUI::OnPlayerMentalityBarUpdated(float curMental,float MaxMental,float amount)
 {
 	if (PB_MentalityBar)
 	{
-		PB_MentalityBar->SetPercent(percent);
+		PB_MentalityBar->SetPercent(curMental/MaxMental);
+		if (amount<0)
+		{
+			if (MentalityReduceAnim)
+			{
+				PlayAnimation(MentalityReduceAnim);	
+			}
+		}
 	}
 }
 
 void UObscuraUI::OnStaminaBarUpdated(float percent)
 {
-	if (PB_MentalityBar)
+	if (PB_StaminaBar)
 	{
-		PB_MentalityBar->SetPercent(percent);
+		PB_StaminaBar->SetPercent(percent);
 	}
 }
 

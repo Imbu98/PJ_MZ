@@ -20,9 +20,14 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> Btn_LeaderBoardExitButton;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> Text_NoRecord;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UScoreInfoBoxUI> ScoreInfoBoxFactory;
+
+	
 
 	UFUNCTION()
 	void GenerateScoreList(const FLeaderboardEntry& Entries, bool isMyScore,int32 index);

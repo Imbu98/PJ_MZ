@@ -65,7 +65,7 @@ void AHT_Player::BeginPlay()
 
 	//
 	Cached_PS->CurrentMentality = Cached_PS->MaxMentality;
-	Cached_PS->OnMentalityChangeDelegate.Broadcast(Cached_PS->CurrentMentality / Cached_PS->MaxMentality);
+	Cached_PS->OnMentalityChangeDelegate.Broadcast(Cached_PS->CurrentMentality,Cached_PS->MaxMentality,0);
 	
 	
 }
@@ -188,8 +188,7 @@ void AHT_Player::OnChangeMentality(float amount)
 	Cached_PS->CurrentMentality += amount;
 	
 	Cached_PS->OnMentalityChangeDelegate.Broadcast(
-		Cached_PS->CurrentMentality / Cached_PS->MaxMentality
-	);
+		Cached_PS->CurrentMentality , Cached_PS->MaxMentality,amount);
 	
 	// 정신력이 절반 이하로 떨어지면
 	if (Cached_PS->CurrentMentality< Cached_PS->MaxMentality/2)
@@ -221,6 +220,7 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 		{
 			Cached_Pc->DialogueWidget->OnNextInput();
 		}
+		
 		return;
 	}
 
@@ -411,10 +411,7 @@ void AHT_Player::playerAttacked(float amount,float stunTime)
 {
 	PlayerAbilityTags.AddTag(StunTag);
 	
-	if (Cached_PS)
-	{
-		Cached_PS->ChangeMentality(amount);
-	}
+	OnChangeMentality(amount);
 	
 	if (AM_PlayerStun)
 	{

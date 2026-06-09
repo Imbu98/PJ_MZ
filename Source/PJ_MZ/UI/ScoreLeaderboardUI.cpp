@@ -7,7 +7,9 @@
 
 void UScoreLeaderboardUI::GenerateScoreList(const FLeaderboardEntry& Entries,bool isMyScore,int32 index)
 {
+	
 	UScoreInfoBoxUI* scoreInfoBox = CreateWidget<UScoreInfoBoxUI>(this, ScoreInfoBoxFactory);
+	
 	if (scoreInfoBox)
 	{
 		

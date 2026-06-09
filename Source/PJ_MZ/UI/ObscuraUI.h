@@ -48,7 +48,7 @@ private:
 	TObjectPtr<class UTextBlock> Text_ObscuraCount;
 		
 	UFUNCTION()
-	void OnPlayerMentalityBarUpdated(float percent);
+	void OnPlayerMentalityBarUpdated(float curMental,float MaxMental,float amount);
 	
 	// 스프린트 게이지
 	UFUNCTION()
@@ -95,6 +95,8 @@ public:
 	TObjectPtr<UUserWidget> TargetIndicatorWidget;
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	TObjectPtr<UWidgetAnimation> TargetIndicatorAnim;
+	UPROPERTY(meta=(BindWidgetAnim),Transient)
+	TObjectPtr<class UWidgetAnimation> MentalityReduceAnim;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float LerpSpeed = 10.0f;

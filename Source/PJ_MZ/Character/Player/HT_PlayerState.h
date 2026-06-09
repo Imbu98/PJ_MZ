@@ -83,13 +83,6 @@ public:
 	float MaxMentality = 100.f;
 	UPROPERTY()
 	float CurrentMentality;
-	
-	UFUNCTION()
-	void ChangeMentality(float amount)
-	{
-		CurrentMentality=FMath::Clamp(CurrentMentality-amount,0,100);
-		OnMentalityChangeDelegate.Broadcast(CurrentMentality/MaxMentality);
-	}
 
 	// ===============================
 	// 델리게이트
