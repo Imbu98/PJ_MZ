@@ -104,22 +104,35 @@ void UStageSelectUI::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entr
 			if (ScoreLeaderboardWidget)
 			{
 				ScoreLeaderboardWidget->AddToViewport();
+
+				ScoreLeaderboardWidget->Text_NoRecord->SetVisibility(ESlateVisibility::Collapsed);
+				
 				FOnScoreBtnAction OnScoreBtn;
 				OnScoreBtn.AddLambda([this]()
 				{
 					ScoreLeaderboardWidget->RemoveFromParent();
 				});
+				
 				ScoreLeaderboardWidget->GenerateMyScore(myScore,myRank,OnScoreBtn);
-				for (int32 i=0;i<Entries.Num();i++)
+
+				if (Entries.Num() > 0)
 				{
-					bool isMyScore=false;
-					if (Entries[i].PlayerName==myScore.PlayerName)
+					for (int32 i=0;i<Entries.Num();i++)
 					{
-						isMyScore=true;
-					}
-					ScoreLeaderboardWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
-					UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+						bool isMyScore=false;
+						if (Entries[i].PlayerName==myScore.PlayerName)
+						{
+							isMyScore=true;
+						}
+						ScoreLeaderboardWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
+						UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+					}					
 				}
+				else
+				{
+					ScoreLeaderboardWidget->Text_NoRecord->SetVisibility(ESlateVisibility::Visible);
+				}
+				
 			
 			}
 		}
@@ -131,7 +144,7 @@ void UStageSelectUI::OnLockHovered()
 	   HoverTimerHandle,
 	   this,
 	   &UStageSelectUI::ShowUnlockInfo,
-	   0.5f,
+	   0.2f,
 	   false);
 }
 
@@ -156,5 +169,6 @@ void UStageSelectUI::ShowUnlockInfo()
 	if (WBP_StageUnlockInfo)
 	{
 		WBP_StageUnlockInfo->SetVisibility(ESlateVisibility::HitTestInvisible);
+		WBP_StageUnlockInfo->SetStageData(StageData);
 	}
 }

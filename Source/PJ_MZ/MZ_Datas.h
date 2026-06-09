@@ -115,6 +115,9 @@ struct FStageSelectData : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FName MoveLevelPath; // 이동할 레벨 경로
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FName MoveLevelName; // 이동할 레벨 이름
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

@@ -315,9 +315,7 @@ void ULoginUI::OnClickStartGame()
 {
 	if (!StageSelectUIArray.IsValidIndex(CurrentIndex)) return;
 	
-	 FName stageName = StageSelectUIArray[CurrentIndex]->StageData.MoveLevelName;
-	
-	 FString LevelPath = FString::Printf(TEXT("%s"),*stageName.ToString());
+	 FString LevelPath = FString::Printf(TEXT("%s"),* StageSelectUIArray[CurrentIndex]->StageData.MoveLevelPath.ToString());
 	
 	 GetWorld()->SeamlessTravel(LevelPath);
 	

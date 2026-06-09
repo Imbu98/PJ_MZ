@@ -283,6 +283,7 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 			});
 			
 			ScoreLeaderboardUIWidget->GenerateMyScore(myScore,myRank,OnScoreBtnAction);
+			
 			for (int32 i=0;i<Entries.Num();i++)
 			{
 				bool isMyScore=false;
