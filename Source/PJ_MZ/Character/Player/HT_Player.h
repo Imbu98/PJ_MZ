@@ -38,6 +38,10 @@ public:
 	
 	UPROPERTY()
 	UTextureRenderTarget2D* RenderTarget;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<class UPostProcessComponent> PostProcessComp;
+
 	
 protected:
 
@@ -96,14 +100,6 @@ protected:
 
 	/** Sprint tick timer */
 	FTimerHandle SprintTimer;
-	
-	// Player 최대 정신력
-	UPROPERTY(EditAnywhere,Category="Mentality")
-	float MaxMentality = 100.f;
-	
-	// Player 현재 정신력
-	UPROPERTY()
-	float CurrentMentality;
 	
 	// PlayerController
 	UPROPERTY()
@@ -198,12 +194,6 @@ public:
 	
 	FTimerHandle StunTimerHandle;
 	
-	// ===============================
-	// 플레이어 능력 태그
-	// ===============================
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FGameplayTag ObscuraTag;
 	
 	// ===============================
 	// 몽타주
@@ -217,8 +207,16 @@ public:
 	
 		
 	// ===============================
-	// 플레이어 키 태그
+	// 모션블러 
 	// ===============================
+	UPROPERTY(EditDefaultsOnly)
+	UMaterial* BlurMaterial;
+
+	UPROPERTY()
+	UMaterialInstanceDynamic* BlurMID;
+
+	UFUNCTION()
+	void SetMentalityPenalty(bool penalty);
 	
 	
 

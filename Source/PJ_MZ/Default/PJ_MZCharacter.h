@@ -115,6 +115,12 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGameplayTag DialogTag;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag ObscuraTag;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag PenaltyTag; // 플레이어가 페널티 받고 있는지 확인하는 태그
 	
 	UFUNCTION()
 	bool IsPlayerStunned();

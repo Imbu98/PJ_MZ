@@ -1,5 +1,6 @@
 #include "SoundComponent.h"
 
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AISense_Hearing.h"
 
@@ -27,11 +28,15 @@ void USoundComponent::PlayCameraShutterSound()
 	}
 }
 
-void USoundComponent::PlayHorrorBGM()
+void USoundComponent::ControlHorrorBGM(bool soundOn)
 {
-	if (HorrorBGM)
+	if (soundOn)
 	{
-		UGameplayStatics::PlaySound2D(GetWorld(),HorrorBGM,0.5f);
+		horrorBgmAudioComp =UGameplayStatics::SpawnSound2D(GetWorld(),HorrorBGM);	
+	}
+	else
+	{
+		horrorBgmAudioComp->Stop();
 	}
 }
 

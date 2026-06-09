@@ -19,6 +19,7 @@
 #include "UI/ObscuraUI.h"
 #include "HT_PlayerState.h"
 #include "ImageUtils.h"
+#include "Components/PostProcessComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SoundComponent.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -40,6 +41,9 @@ AHT_Player::AHT_Player()
 	ObscuraCameraComp = CreateDefaultSubobject<UObscuraCameraComponent>(TEXT("ObscuraCameraComp"));
 	
 	SoundComp = CreateDefaultSubobject<USoundComponent>(TEXT("SoundComp"));
+
+	PostProcessComp = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcess"));
+	PostProcessComp->bUnbound = true; // 전체 화면에 적용
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>();
 	RenderTarget->InitAutoFormat(1920, 1080);
@@ -67,6 +71,12 @@ void AHT_Player::BeginPlay()
 	Cached_PS->CurrentMentality = Cached_PS->MaxMentality;
 	Cached_PS->OnMentalityChangeDelegate.Broadcast(Cached_PS->CurrentMentality,Cached_PS->MaxMentality,0);
 	
+
+	if (BlurMaterial)
+	{
+		BlurMID = UMaterialInstanceDynamic::Create(BlurMaterial, this);
+		PostProcessComp->AddOrUpdateBlendable(BlurMID, 1.0f);
+	}
 	
 }
 
@@ -185,19 +195,43 @@ void AHT_Player::SprintFixedTick()
 void AHT_Player::OnChangeMentality(float amount)
 {
 	if (!Cached_PS) return;
-	Cached_PS->CurrentMentality += amount;
+
+	if (!SoundComp) return;
+	
+	Cached_PS->CurrentMentality =
+	FMath::Clamp(Cached_PS->CurrentMentality + amount, 0.f, 100.f);
 	
 	Cached_PS->OnMentalityChangeDelegate.Broadcast(
 		Cached_PS->CurrentMentality , Cached_PS->MaxMentality,amount);
 	
-	// 정신력이 절반 이하로 떨어지면
-	if (Cached_PS->CurrentMentality< Cached_PS->MaxMentality/2)
+	const bool bBelowHalf = Cached_PS->CurrentMentality <= Cached_PS->MaxMentality * 0.5f;
+
+	const bool bMentalityPenalty = PlayerAbilityTags.HasTag(PenaltyTag);
+	
+	if (bBelowHalf && !bMentalityPenalty)
 	{
-		if (SoundComp)
-		{
-			SoundComp->PlayHorrorBGM();
-		}
+		PlayerAbilityTags.AddTag(PenaltyTag);
+		SetMentalityPenalty(true);
 	}
+	else if (!bBelowHalf && bMentalityPenalty)
+	{
+		PlayerAbilityTags.RemoveTag(PenaltyTag);
+		SetMentalityPenalty(false);
+	}
+
+	// 블러는 현재 정신력 기준으로 매번 계산
+	float Alpha = 0.f;
+
+	if (bBelowHalf)
+	{
+		Alpha = FMath::GetMappedRangeValueClamped(
+			FVector2D(50.f, 0.f),
+			FVector2D(0.5f, 1.5f),
+			Cached_PS->CurrentMentality
+		);
+	}
+
+	BlurMID->SetScalarParameterValue("BlurStrength", Alpha);
 }
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
@@ -451,6 +485,20 @@ void AHT_Player::PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded M
 		GetMesh()->GetAnimInstance()->Montage_Play(Montage);
 		GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate,Montage);
 	}
+}
+
+void AHT_Player::SetMentalityPenalty(bool penalty)
+{
+	if (!BlurMID) return;
+
+	if (!SoundComp) return;
+
+	// 공포 BGM 키기 
+	SoundComp->ControlHorrorBGM(penalty);
+
+	
+
+	// TO DO: 랜덤 이벤트 발생 
 }
 
 
