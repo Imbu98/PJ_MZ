@@ -104,7 +104,7 @@ public:
 	// ===============================
 	// 플레이어 능력 태그
 	// ===============================
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FGameplayTagContainer PlayerAbilityTags; // Player가 가지고있는 능력들 저장
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -121,6 +121,12 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FGameplayTag PenaltyTag; // 플레이어가 페널티 받고 있는지 확인하는 태그
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag HealTag; //플레이어가 힐 중인지 확인하는 태그
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGameplayTag TutorialTag;
 	
 	UFUNCTION()
 	bool IsPlayerStunned();

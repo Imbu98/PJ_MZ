@@ -75,6 +75,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<UScoreLeaderboardUI> ScoreLeaderboardUIWidget;
 
+	UFUNCTION()
+	void SetResultUI(const float totalScore);
+
 	// ===============================
 	// 팝업 UI
 	// ===============================
@@ -97,17 +100,28 @@ public:
 	UPROPERTY()
 	TObjectPtr<UDialogueUI> DialogueWidget;
 
-
 	UFUNCTION()
 	void ShowDialogue(const TArray<FDialogueLine>& Lines, const FOnDialogueFinished& OnFinished);
 	UFUNCTION()
 	void HideDialogue();
 
-	
+	// ===============================
+	// 튜토리얼 UI
+	// ===============================
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UTutorialUI> TutorialWidgetFactory;
+
+	UPROPERTY()
+	TObjectPtr<UTutorialUI> TutorialWidget;
+
+	UFUNCTION()
+	void ShowTutorial(const FText& text);
+
+	UFUNCTION()
+	void HideTutorial();
+
 
 	
-	UFUNCTION()
-	void SetResultUI(const float totalScore);
 	
 	UFUNCTION()
 	void OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore);

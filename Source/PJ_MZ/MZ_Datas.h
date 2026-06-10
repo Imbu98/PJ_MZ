@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "GameplayTagContainer.h"
 #include "MZ_Datas.generated.h"
 
 UENUM(BlueprintType)
@@ -136,6 +137,10 @@ struct FStageSelectData : public FTableRowBase
 	
 };
 
+
+// ===============================
+// NPC 대화
+// ===============================
 USTRUCT(BlueprintType)
 struct FNPCInfoRow : public FTableRowBase
 {
@@ -174,4 +179,24 @@ struct FDialogueRow : public FTableRowBase
 	// 대사 배열
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FDialogueLine> Lines;
+};
+
+// ===============================
+// 튜토리얼
+// ===============================
+
+USTRUCT(BlueprintType)
+struct FTutorialData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName LevelName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag TutorialTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText TutorialText;
 };

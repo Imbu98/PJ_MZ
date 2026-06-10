@@ -258,6 +258,14 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 		return;
 	}
 
+	// 튜토리얼이 띄워져있으면 끄기
+	if (PlayerAbilityTags.HasTag(TutorialTag))
+	{
+		Cached_Pc->HideTutorial();
+		
+		return;
+	}
+
 	// 아니면 기존 상호작용
 	TArray<AActor*> actorsToIgnore;
 	FHitResult outHit;
@@ -499,6 +507,21 @@ void AHT_Player::SetMentalityPenalty(bool penalty)
 	
 
 	// TO DO: 랜덤 이벤트 발생 
+}
+
+void AHT_Player::HealMentaility(bool overlapped)
+{
+	if (overlapped)
+	{
+		GetWorldTimerManager().SetTimer(HealTimerHandle,[this]()
+		{
+			OnChangeMentality(1);
+		},1.f,true);
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(HealTimerHandle);
+	}
 }
 
 

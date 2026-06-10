@@ -8,6 +8,7 @@
 #include "Components/ObscuraCameraComponent.h"
 #include "../../Framework/PJ_MZGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Public/UI/TutorialUI.h"
 #include "UI/ControlFadeUI.h"
 #include "UI/ObscuraUI.h"
 #include "UI/PlayerStateUI.h"
@@ -265,6 +266,27 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 		}
 	}
 }
+
+ void AHT_PlayerController::ShowTutorial(const FText& text)
+ {
+	if (TutorialWidgetFactory)
+	{
+		TutorialWidget = CreateWidget<UTutorialUI>(this,TutorialWidgetFactory);
+		if (TutorialWidget)
+		{
+			TutorialWidget->AddToViewport();
+			TutorialWidget->SetTutorialText(text);
+		}
+	}
+ }
+
+ void AHT_PlayerController::HideTutorial()
+ {
+	if (TutorialWidget)
+	{
+		TutorialWidget->RemoveFromParent();
+	}
+ }
 
 void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore)
 {

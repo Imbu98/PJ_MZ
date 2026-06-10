@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "HT_PlayerController.h"
 #include "../../Default/PJ_MZCharacter.h"
 #include "PJ_MZ_Delegates.h"
 #include "Interface/Interact_Interface.h"
@@ -201,8 +202,6 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<class UAnimMontage> AM_PlayerStun;
 	
-	
-	
 	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
 	
 		
@@ -217,8 +216,35 @@ public:
 
 	UFUNCTION()
 	void SetMentalityPenalty(bool penalty);
+
+	// ===============================
+	// 정신력 회복
+	// ===============================
+	UFUNCTION(BlueprintCallable)
+	void HealMentaility(bool overlapped);
 	
-	
+	FTimerHandle HealTimerHandle;
+
+	// ===============================
+	// 튜토리얼
+	// ===============================
+	UPROPERTY()
+	FGameplayTagContainer ShownTutorialTags;
+
+	bool HasShownTutorial(const FGameplayTag& Tag) const
+	{
+		return ShownTutorialTags.HasTag(Tag);
+	}
+
+	void AddShownTutorial(const FGameplayTag& Tag,const FText& text)
+	{
+		if (Cached_Pc&&!HasShownTutorial(Tag))
+		{
+			Cached_Pc->ShowTutorial(text);
+		}
+		
+		ShownTutorialTags.AddTag(Tag);
+	}
 
 	
 };
