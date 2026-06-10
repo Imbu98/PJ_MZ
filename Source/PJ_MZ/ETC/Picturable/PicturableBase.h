@@ -19,14 +19,19 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
+
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<class UMaterialInstance> MaterialInstance; 
+	
 	UFUNCTION(BlueprintNativeEvent)
 	void PictureTaken();
 	

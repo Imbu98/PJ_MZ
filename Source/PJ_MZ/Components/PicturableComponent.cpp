@@ -35,13 +35,14 @@ void UPicturableComponent::SetInfo(FPicturableDatas picturableDataVal)
 	AEnemyBase* enemy =  Cast<AEnemyBase>(GetOwner());
 	if (!enemy)
 	{
-		UStaticMeshComponent* staticMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
-		if (staticMesh&&PicturableDatas.PicturableStaticMesh.IsValid())
+		APicturableBase* Picturable = Cast<APicturableBase>(GetOwner());
+		if (Picturable&&PicturableDatas.PicturableStaticMesh.IsValid())
 		{
-			staticMesh->SetStaticMesh(PicturableDatas.PicturableStaticMesh.Get());
-			staticMesh->SetCollisionProfileName(FName("Picturable"));
-			staticMesh->SetVisibility(true);
-			staticMesh->MarkRenderStateDirty();
+		Picturable->StaticMeshComp->SetStaticMesh(PicturableDatas.PicturableStaticMesh.Get());
+			Picturable->StaticMeshComp->SetCollisionProfileName(FName("Picturable"));
+			Picturable->StaticMeshComp->SetVisibility(true);
+			Picturable->StaticMeshComp->MarkRenderStateDirty();
+			//Picturable->MaterialInstance = PicturableDatas.materialInstance;
 		}
 	}
 }
