@@ -231,20 +231,16 @@ public:
 	UPROPERTY()
 	FGameplayTagContainer ShownTutorialTags;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<UDataTable> DT_Tutorial;
+	
+
 	bool HasShownTutorial(const FGameplayTag& Tag) const
 	{
 		return ShownTutorialTags.HasTag(Tag);
 	}
 
-	void AddShownTutorial(const FGameplayTag& Tag,const FText& text)
-	{
-		if (Cached_Pc&&!HasShownTutorial(Tag))
-		{
-			Cached_Pc->ShowTutorial(text);
-		}
-		
-		ShownTutorialTags.AddTag(Tag);
-	}
-
+	UFUNCTION(BlueprintCallable)
+	void AddShownTutorial(const FGameplayTag& Tag);
 	
 };

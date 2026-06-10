@@ -24,7 +24,7 @@ void APicturableBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void APicturableBase::PictureTaken()
+void APicturableBase::PictureTaken_Implementation()
 {
 	
 }

@@ -27,6 +27,7 @@ protected:
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	
 public:
+	UFUNCTION(BlueprintNativeEvent)
 	void PictureTaken();
 	
 
