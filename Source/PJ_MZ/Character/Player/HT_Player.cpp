@@ -524,4 +524,25 @@ void AHT_Player::HealMentaility(bool overlapped)
 	}
 }
 
+void AHT_Player::AddShownTutorial(const FGameplayTag& Tag)
+{
+	if (HasShownTutorial(Tag)) return;
+	
+	if (DT_Tutorial)
+	{
+		FTutorialData* Row =DT_Tutorial->FindRow<FTutorialData>(Tag.GetTagName(),TEXT("Find Tutorial"));
+		if (Row)
+		{
+			if (Row->LevelName == UGameplayStatics::GetCurrentLevelName(GetWorld()))
+			{
+				Cached_Pc->ShowTutorial(Row->TutorialText);
+				
+				ShownTutorialTags.AddTag(Tag);
+
+				PlayerAbilityTags.AddTag(TutorialTag);
+			}
+		}
+	}
+}
+
 

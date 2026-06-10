@@ -2,6 +2,7 @@
 #include "Enemy02AIController.h"
 
 #include "StateTreeEvents.h"
+#include "Character/Player/HT_Player.h"
 #include "Components/StateTreeAIComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Hearing.h"
@@ -48,6 +49,18 @@ void AEnemy02AIController::OnPerceptionUpdated(AActor* Actor, FAIStimulus Stimul
 			Event.Tag = FGameplayTag::RequestGameplayTag("Enemy.HearSound");
 			STComp->SendStateTreeEvent(Event);
 
+
+			if (Actor)
+			{
+				AHT_Player* player = Cast<AHT_Player>(Actor);
+				if (player)
+				{
+					const FGameplayTag TutorialTag =FGameplayTag::RequestGameplayTag(TEXT("Tutorial.Enemy02"));
+					
+					player->AddShownTutorial(TutorialTag);
+				}
+			}
+			
 			UE_LOG(LogTemp, Warning, TEXT("Enemy02: 소리 이벤트 발송"));
 		}
 	}
