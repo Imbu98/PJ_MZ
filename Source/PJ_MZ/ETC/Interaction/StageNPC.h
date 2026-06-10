@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "PJ_MZ_Delegates.h"
 #include "Base/InteractPawnBase.h"
 #include "UI/PopupUI.h"
 #include "StageNPC.generated.h"
@@ -48,5 +49,7 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<UStaticMeshComponent> DoorMeshComp;
+	
+	FOnPlayerGameStart OnPlayerGameStart;
 
 };

@@ -17,6 +17,8 @@ public:
 	// UPROPERTY()
 	// bool bResetDetection = false;
 	
+	bool bAttackHitValid = false;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UPicturableComponent> PicturableComp;
 	

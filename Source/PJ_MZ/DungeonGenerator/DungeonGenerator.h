@@ -69,9 +69,4 @@ private:
 		UDoorComponent* FromDoor,
 		TSubclassOf<ARoomBase> RoomClass,
 		const TArray<ARoomBase*>& SpawnedRooms);
-
-public:
-	FOnDungeonGenerationComplete OnDungeonGenerationComplete;
-	
-	bool bGenerationComplete = false;
 };

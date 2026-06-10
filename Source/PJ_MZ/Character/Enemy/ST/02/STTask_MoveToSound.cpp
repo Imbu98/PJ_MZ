@@ -66,7 +66,7 @@ EStateTreeRunStatus FSTTask_MoveToSound::Tick(
 
     if (MoveStatus == EPathFollowingStatus::Idle)
     {
-        return EStateTreeRunStatus::Failed; // → Investigate
+        return EStateTreeRunStatus::Failed;
     }
 
     return EStateTreeRunStatus::Running;

@@ -36,6 +36,8 @@ void AEnemyBase::HaltMovement()
 
 void AEnemyBase::StartAttack()
 {
+	bAttackHitValid = false;
+	
 	if (ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
 	{
 		FVector Dir = Player->GetActorLocation() - GetActorLocation();
@@ -88,16 +90,28 @@ void AEnemyBase::StartAttack()
 
 void AEnemyBase::AttackHit()
 {
-	UE_LOG(LogTemp, Warning, TEXT("공격 성공"));
+	AHT_Player* Player = Cast<AHT_Player>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (!Player) return;
 
-	AHT_Player* Player =
-		Cast<AHT_Player>(
-			GetWorld()->GetFirstPlayerController()->GetPawn());
-
-	if (Player)
+	float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
+	if (Distance > 220.f)
 	{
-		Player->playerAttacked(10.f, 1.5f);
+		UE_LOG(LogTemp, Warning, TEXT("공격 범위 밖 — 공격 취소, 이동 정지"));
+		HaltMovement();
+		return;
 	}
+	
+	bAttackHitValid = true;
+
+	FVector DirToEnemy = GetActorLocation() - Player->GetActorLocation();
+	DirToEnemy.Z = 0.f;
+	if (!DirToEnemy.IsNearlyZero())
+	{
+		Player->SetActorRotation(DirToEnemy.Rotation());
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("공격 성공"));
+	Player->playerAttacked(10.f, 1.5f);
 }
 
 void AEnemyBase::StopAttack()
@@ -132,24 +146,11 @@ void AEnemyBase::OnAttackMontageEnded(
 		Move->SetMovementMode(MOVE_Walking);
 	}
 
-	if (!bInterrupted)
+	if (!bInterrupted && bAttackHitValid)
 	{
 		DistoryAndRequestRespawn();
 	}
 }
-
-// void AEnemyBase::OnAttackSuccess()
-// {
-// 	UE_LOG(LogTemp, Warning, TEXT("공격성공"));
-// 	
-// 	AHT_Player* player =Cast<AHT_Player> (GetWorld()->GetFirstPlayerController()->GetPawn());
-// 	if (player)
-// 	{
-// 		player->playerAttacked(10.f,1.5f);
-// 	}
-// 	
-// 	DistoryAndRequestRespawn();
-// }
 
 void AEnemyBase::DistoryAndRequestRespawn()
 {

@@ -1,5 +1,7 @@
 
 #include "STEvaluator_Enemy02.h"
+
+#include "Enemy02AIController.h"
 #include "StateTreeExecutionContext.h"
 #include "StateTreeLinker.h"
 #include "Character/Enemy/EnemyBase.h"
@@ -23,22 +25,6 @@ void FSTEvaluator_Enemy02::Tick(FStateTreeExecutionContext& Context, const float
 	AAIController& Controller = Context.GetExternalData(AIControllerHandle);
 	APawn& Pawn = Context.GetExternalData(PawnHandle);
 	UStateTreeAIComponent& STComp = Context.GetExternalData(STComponentHandle);
-	
-	// if (AEnemyBase* Enemy = Cast<AEnemyBase>(&Controller))
-	// {
-	// 	if (Enemy->bResetDetection)
-	// 	{
-	// 		InstanceData.bPlayerDetected = false;
-	// 		InstanceData.bPlayerLooking = false;
-	// 		InstanceData.bWasInAttackRange = false;
-	// 		InstanceData.TargetActor = nullptr;
-	//
-	// 		Enemy->bResetDetection = false;
-	//
-	// 		UE_LOG(LogTemp, Warning, TEXT("Detection Reset"));
-	// 	}
-	// }
-	
 
 	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(Controller.GetWorld(), 0);
 	if (!Player) return;

@@ -3,6 +3,7 @@
 #include "StateTreeLinker.h"
 #include "AIController.h"
 #include "Character/Enemy/EnemyBase.h"
+#include "Character/Enemy/Enemy03/Enemy03AIController.h"
 #include "Character/Enemy/Enemy03/Enemy03Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -42,7 +43,7 @@ EStateTreeRunStatus FSTTask_Attack::Tick(
 		Context.GetExternalData(ControllerHandle);
 
 	APawn* Pawn = Controller.GetPawn();
-	if (!Pawn)
+	if (!Pawn || !IsValid(Pawn))
 	{
 		return EStateTreeRunStatus::Failed;
 	}
@@ -55,6 +56,27 @@ EStateTreeRunStatus FSTTask_Attack::Tick(
 
 	if (!Enemy->IsAttacking())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("어택끝남"));
+		
+		if (AEnemy03AIController* Enemy03 = Cast<AEnemy03AIController>(&Controller))
+		{
+			UStateTreeAIComponent* STComp = Controller.FindComponentByClass<UStateTreeAIComponent>();
+			
+			FStateTreeEvent Event;
+			Event.Tag = Enemy03->IsEnemyLookingAtPlayer()
+				? FGameplayTag::RequestGameplayTag("Enemy.StunEndedChase")
+				: FGameplayTag::RequestGameplayTag("Enemy.StunEndedIdle");
+
+			Enemy03->bResetDetection = true;
+			UE_LOG(LogTemp, Warning, TEXT("bResetDetection = true 설정됨"));
+			
+			STComp->SendStateTreeEvent(Event);
+
+			UE_LOG(LogTemp, Warning,
+				TEXT("Send Event : %s"),
+				*Event.Tag.ToString());
+		}
+	
 		return EStateTreeRunStatus::Succeeded;
 	}
 

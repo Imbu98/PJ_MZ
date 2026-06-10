@@ -50,8 +50,6 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
     
     float Distance = FVector::Dist(Pawn.GetActorLocation(), Player->GetActorLocation()); 
     
-    // bool bIsInAttackRange = Distance <= AttackRange;
-    
     if (Distance <= AttackRange && !InstanceData.bWasInAttackRange)
     {
         InstanceData.bWasInAttackRange = true;
@@ -66,8 +64,7 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
         InstanceData.bWasInAttackRange = false;
     }
     
-    // bool bIsInDetectRange = Distance < LoseTargetDistance;
-    
+
     if (InstanceData.bPlayerDetected && Distance > LoseTargetDistance)
     {
         InstanceData.bPlayerDetected = false;
@@ -83,14 +80,6 @@ void FSTEvaluator_Enemy03::Tick(FStateTreeExecutionContext& Context, const float
     
     if (Distance <= LoseTargetDistance)
     {
-        // const bool bIsPlayerLooking = IsPlayerLookingAtEnemy(Controller);
-        
-        // bool bLooking = IsPlayerLookingAtEnemy(Controller);
-        // UE_LOG(LogTemp, Warning, TEXT("감지체크 - bDetected: %s, bLooking: %s, Distance: %f"),
-        //     InstanceData.bPlayerDetected ? TEXT("true") : TEXT("false"),
-        //     bLooking ? TEXT("true") : TEXT("false"),
-        //     Distance);
-        
         if (InstanceData.bPlayerDetected)
         {
             InstanceData.bPlayerLooking = IsPlayerLookingAtEnemy(Controller);

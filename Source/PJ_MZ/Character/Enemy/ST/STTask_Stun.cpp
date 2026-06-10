@@ -85,7 +85,6 @@ EStateTreeRunStatus FSTTask_Stun::Tick(
 			UE_LOG(LogTemp, Warning,
 				TEXT("Send Event : %s"),
 				*Event.Tag.ToString());
-
 		}
 		else
 		{

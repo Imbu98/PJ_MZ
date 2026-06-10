@@ -103,6 +103,8 @@ void AStageNPC::GivePlayerToCamera()
 	{
 		DoorMeshComp->DestroyComponent();	
 	}
+	
+	OnPlayerGameStart.Broadcast();
 }
 
 void AStageNPC::HandleFirstTalk(AHT_PlayerState* PS)

@@ -12,7 +12,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FShotCountChangeDelegate,int32);
 // 쿨타임 델리게이트
 DECLARE_MULTICAST_DELEGATE(FObscuraCooltimeFinished);
 // 던전 생성 완료 델리게이트
-DECLARE_MULTICAST_DELEGATE(FOnDungeonGenerationComplete);
+DECLARE_MULTICAST_DELEGATE(FOnPlayerGameStart);
 // 카메라 줌인 , 줌아웃 델리게이트
 DECLARE_MULTICAST_DELEGATE_OneParam(FCameraFOVChangeDelegate,float);
 

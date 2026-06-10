@@ -6,6 +6,7 @@
 #include "EnemyBase.h"
 #include "Enemy02/Enemy02Character.h"
 #include "Enemy03/Enemy03Character.h"
+#include "ETC/Interaction/StageNPC.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -18,34 +19,20 @@ void AEnemySpawnManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    if (!PCGDungeonManager)
+    if (!StageNPC)
     {
-        PCGDungeonManager = Cast<APCGDungeonManager>(
-            UGameplayStatics::GetActorOfClass(GetWorld(), APCGDungeonManager::StaticClass()));
+        StageNPC = Cast<AStageNPC>(
+            UGameplayStatics::GetActorOfClass(GetWorld(), AStageNPC::StaticClass()));
     }
 
-    if (PCGDungeonManager)
+    if (StageNPC)
     {
-    	UDungeonGenerator* Generator = PCGDungeonManager->GetDungeonGenerator();
-    	if (Generator)
-    	{
-    		Generator->OnDungeonGenerationComplete.AddUObject(
-				this, &AEnemySpawnManager::OnMapGenerationComplete);
-    		
-    		if (Generator->bGenerationComplete)
-    		{
-    			OnMapGenerationComplete();
-    		}
-    	}
-    	else
-    	{
-    		UE_LOG(LogTemp, Warning, TEXT("Generator 못찾음"));
-    	}
-
+    		StageNPC->OnPlayerGameStart.AddUObject(
+				this, &AEnemySpawnManager::OnPlayerStartedGame);
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("PCGDungeonManager 못찾음"));
+        UE_LOG(LogTemp, Warning, TEXT("StageNPC 못찾음"));
     }
 }
 
@@ -141,48 +128,46 @@ FVector AEnemySpawnManager::GetRandomSpawnLocation()
 	FVector PlayerLocation = PC->GetPawn()->GetActorLocation();
 	FNavLocation ResultLocation;
 	FNavLocation BestLocation;
-	bool bFoundAny = false;
+	float BestDistance = 0.f;
 
-	for (int32 i = 0; i < 10; i++)
+	for (int32 i = 0; i < 20; i++)
 	{
-		// bool bFound = NavSystem->GetRandomReachablePointInRadius(
-		// 	FVector::ZeroVector,
-		// 	SpawnSearchRadius,
-		// 	ResultLocation
-		// );
-		
-		bool bFound = NavSystem->GetRandomPointInNavigableRadius(
-		FVector::ZeroVector,
-		SpawnSearchRadius,
-		ResultLocation);
+		bool bFound = NavSystem->GetRandomReachablePointInRadius(
+			PlayerLocation,
+			SpawnSearchRadius,
+			ResultLocation
+		);
 
 		if (bFound)
 		{
-			bFoundAny = true;
-			BestLocation = ResultLocation;
-
 			float Distance = FVector::Dist(ResultLocation.Location, PlayerLocation);
+
 			if (Distance >= MinSpawnDistanceFromPlayer)
 			{
 				return ResultLocation.Location;
 			}
+
+			if (Distance > BestDistance)
+			{
+				BestDistance = Distance;
+				BestLocation = ResultLocation;
+			}
 		}
 	}
 
-	// 최소거리 못 지켜도 찾은 위치 중 하나에 스폰
-	if (bFoundAny)
+	if (BestDistance > 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("최소거리 미달 - 찾은 위치에 스폰"));
+		UE_LOG(LogTemp, Warning, TEXT("최소거리 미달 - 가장 먼 위치에 스폰 (%.0f)"), BestDistance);
 		return BestLocation.Location;
 	}
 
 	return FVector::ZeroVector;
 }
 
-void AEnemySpawnManager::OnMapGenerationComplete()
+void AEnemySpawnManager::OnPlayerStartedGame()
 {
 	
-	UE_LOG(LogTemp, Warning, TEXT("던전 생성 완료 - 적 스폰 시작"));
+	UE_LOG(LogTemp, Warning, TEXT("던전 문 오픈 - 적 스폰 시작"));
 	
 	FTimerHandle SpawnDelayTimer;
 	GetWorldTimerManager().SetTimer(

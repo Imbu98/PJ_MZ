@@ -32,7 +32,7 @@ protected:
 private:
 	// PCG 맵 생성 완료 이벤트 바인딩
 	UFUNCTION()
-	void OnMapGenerationComplete();
+	void OnPlayerStartedGame();
 
 	// 실제 스폰 처리
 	void SpawnEnemy(TSubclassOf<AEnemyBase> EnemyClass);
@@ -47,5 +47,5 @@ private:
 	TMap<AEnemyBase*, FTimerHandle> PendingRespawns;
 	
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TObjectPtr<APCGDungeonManager> PCGDungeonManager;
+	TObjectPtr<class AStageNPC> StageNPC;
 };
