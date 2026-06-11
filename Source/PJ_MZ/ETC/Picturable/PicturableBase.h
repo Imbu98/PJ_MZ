@@ -30,7 +30,7 @@ public:
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
 
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<class UMaterialInstance> MaterialInstance; 
+	TObjectPtr<class UMaterialInstanceDynamic> MaterialInstance; 
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void PictureTaken();

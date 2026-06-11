@@ -111,7 +111,7 @@ void AEnemyBase::AttackHit()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("공격 성공"));
-	Player->playerAttacked(10.f, 1.5f);
+	Player->playerAttacked(-10.f, 1.5f);
 }
 
 void AEnemyBase::StopAttack()

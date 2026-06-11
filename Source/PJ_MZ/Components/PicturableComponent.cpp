@@ -36,13 +36,19 @@ void UPicturableComponent::SetInfo(FPicturableDatas picturableDataVal)
 	if (!enemy)
 	{
 		APicturableBase* Picturable = Cast<APicturableBase>(GetOwner());
-		if (Picturable&&PicturableDatas.PicturableStaticMesh.IsValid())
+
+		if (Picturable && !PicturableDatas.PicturableStaticMesh.IsNull())
 		{
-		Picturable->StaticMeshComp->SetStaticMesh(PicturableDatas.PicturableStaticMesh.Get());
-			Picturable->StaticMeshComp->SetCollisionProfileName(FName("Picturable"));
-			Picturable->StaticMeshComp->SetVisibility(true);
-			Picturable->StaticMeshComp->MarkRenderStateDirty();
-			//Picturable->MaterialInstance = PicturableDatas.materialInstance;
+			// 아직 로드 안 됐으면 강제 동기 로드
+			UStaticMesh* Mesh = PicturableDatas.PicturableStaticMesh.LoadSynchronous();
+
+			if (Mesh)
+			{
+				Picturable->StaticMeshComp->SetStaticMesh(Mesh);
+				Picturable->StaticMeshComp->SetCollisionProfileName(FName("Picturable"));
+				Picturable->StaticMeshComp->SetVisibility(true);
+				Picturable->StaticMeshComp->MarkRenderStateDirty();
+			}
 		}
 	}
 }
