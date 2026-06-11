@@ -77,7 +77,6 @@ void AHT_Player::BeginPlay()
 		BlurMID = UMaterialInstanceDynamic::Create(BlurMaterial, this);
 		PostProcessComp->AddOrUpdateBlendable(BlurMID, 1.0f);
 	}
-	
 }
 
 void AHT_Player::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -232,6 +231,9 @@ void AHT_Player::OnChangeMentality(float amount)
 	}
 
 	BlurMID->SetScalarParameterValue("BlurStrength", Alpha);
+	
+	// ===== 숨소리 =====
+	PlayBreath();
 }
 
 void AHT_Player::OnInteractInput(const FInputActionValue& Value)
@@ -239,9 +241,6 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 	if (IsPlayerStunned()) return;
 	
 	if (!Cached_Pc) return;
-	
-	// 기본상태가 아니면 상호작용 할 수 없게 변경
-	if (ObscuraCameraComp->GetObscuraMode()!=EObscuraModeAction::IDLE) return;
 	
 	// 대화 중이면 다음 문장
 	if (PlayerAbilityTags.HasTag(DialogTag))
@@ -265,6 +264,9 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 		
 		return;
 	}
+	
+	// 기본상태가 아니면 상호작용 할 수 없게 변경
+	if (ObscuraCameraComp->GetObscuraMode()!=EObscuraModeAction::IDLE) return;
 
 	// 아니면 기존 상호작용
 	TArray<AActor*> actorsToIgnore;
@@ -506,7 +508,9 @@ void AHT_Player::SetMentalityPenalty(bool penalty)
 
 	
 
-	// TO DO: 랜덤 이벤트 발생 
+	// 타이머로 랜덤타이머 20~40 사이에서
+	// 랜덤이벤트 발생
+	// 
 }
 
 void AHT_Player::HealMentaility(bool overlapped)
@@ -543,6 +547,38 @@ void AHT_Player::AddShownTutorial(const FGameplayTag& Tag)
 			}
 		}
 	}
+}
+
+void AHT_Player::PlayBreath()
+{
+	if (!Cached_PS) return;
+	
+	if (!SoundComp) return;
+
+	const float Mentality = Cached_PS->CurrentMentality;
+
+	if (Mentality > 50.f)
+	{
+		SoundComp->ControlBreath(false,nullptr);
+		return;
+	}
+
+	USoundBase* SoundToPlay = nullptr;
+
+	if (Mentality <= 30.f)
+	{
+		SoundToPlay = BreathPanic;
+	}
+	else
+	{
+		SoundToPlay = BreathStress;
+	}
+
+	if (SoundToPlay)
+	{
+		SoundComp->ControlBreath(true,SoundToPlay);
+	}
+
 }
 
 

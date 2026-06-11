@@ -40,3 +40,31 @@ void USoundComponent::ControlHorrorBGM(bool soundOn)
 	}
 }
 
+void USoundComponent::ControlBreath(bool soundOn,USoundBase* sound)
+{
+	if (soundOn)
+	{
+		if (!BreathBgmAudioComp)
+		{
+			BreathBgmAudioComp =
+				UGameplayStatics::SpawnSound2D(
+					GetWorld(),
+					sound
+				);
+		}
+		else
+		{
+			BreathBgmAudioComp->SetSound(sound);
+			BreathBgmAudioComp->Play();
+		}	
+	}
+	else
+	{
+		if (BreathBgmAudioComp)
+		{
+			BreathBgmAudioComp->Stop();
+		}
+	}
+	
+}
+

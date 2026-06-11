@@ -269,23 +269,30 @@ void AHT_PlayerController::SetResultUI(const float totalScore)
 
  void AHT_PlayerController::ShowTutorial(const FText& text)
  {
-	if (TutorialWidgetFactory)
+	if (!TutorialWidget)
 	{
-		TutorialWidget = CreateWidget<UTutorialUI>(this,TutorialWidgetFactory);
-		if (TutorialWidget)
+		if (TutorialWidgetFactory)
 		{
-			TutorialWidget->AddToViewport();
-			TutorialWidget->SetTutorialText(text);
+			TutorialWidget = CreateWidget<UTutorialUI>(this,TutorialWidgetFactory);
+			if (TutorialWidget)
+			{
+				TutorialWidget->AddToViewport();
+				TutorialWidget->SetTutorialText(text);
+			}
 		}
 	}
+	
+	TutorialWidget->SetVisibility(ESlateVisibility::Visible);
+	TutorialWidget->SetTutorialText(text);
  }
 
  void AHT_PlayerController::HideTutorial()
  {
 	if (TutorialWidget)
 	{
-		TutorialWidget->RemoveFromParent();
+		TutorialWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
+	CachedPlayer->PlayerAbilityTags.RemoveTag(CachedPlayer->TutorialTag);
  }
 
 void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entries,int32 myRank, const FLeaderboardEntry& myScore)

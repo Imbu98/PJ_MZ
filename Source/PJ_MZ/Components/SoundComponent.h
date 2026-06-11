@@ -31,10 +31,16 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UAudioComponent> horrorBgmAudioComp;
 	
+	UPROPERTY()
+	TObjectPtr<class UAudioComponent> BreathBgmAudioComp;
+	
 public:
 	UFUNCTION()
 	void PlayCameraShutterSound();
 	
 	UFUNCTION()
 	void ControlHorrorBGM(bool soundOn);
+	
+	UFUNCTION()
+	void ControlBreath(bool soundOn,USoundBase* sound);
 };
