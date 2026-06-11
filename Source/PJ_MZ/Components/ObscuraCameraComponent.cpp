@@ -261,7 +261,7 @@ void UObscuraCameraComponent::CapturePhoto(FOwningPictureData& datas)
         
         if (!Viewport->ReadPixels(Pixels))
         {
-            GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Viewport ReadPixels 실패! (화면을 읽어오지 못함)"));
+            //GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Viewport ReadPixels 실패! (화면을 읽어오지 못함)"));
             return;
         }
 
@@ -296,8 +296,8 @@ void UObscuraCameraComponent::CapturePhoto(FOwningPictureData& datas)
         if (Cached_PS)
         {
         	datas.PhotoImage = Photo;
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, 
-                FString::Printf(TEXT("찰칵! 앨범 저장 완료 W:%d H:%d"), Width, Height));
+            //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, 
+               //FString::Printf(TEXT("찰칵! 앨범 저장 완료 W:%d H:%d"), Width, Height));
         }
     // });
 }
