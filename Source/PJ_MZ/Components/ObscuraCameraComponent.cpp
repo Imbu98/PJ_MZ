@@ -95,6 +95,15 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 	
 	int32 CurrentCanShotCount =Cached_PS->GetCurrentCanShotCount();
 	// 촬영횟수가 없으면 사망
+	if (MainPhotoActor)
+	{
+		UPicturableComponent* picturableComp = MainPhotoActor->FindComponentByClass<UPicturableComponent>();
+		if (picturableComp)
+		{
+			picturableComp->PictureTaken();
+		}
+	}
+	
 	if (CurrentCanShotCount <= 0)
 	{
 		float penaltyAmount = -10.f;
@@ -110,15 +119,6 @@ void UObscuraCameraComponent::ApplyShutterDamage()
 		// OnGameEnd();
 		
 		return;
-	}
-	
-	if (MainPhotoActor)
-	{
-		UPicturableComponent* picturableComp = MainPhotoActor->FindComponentByClass<UPicturableComponent>();
-		if (picturableComp)
-		{
-			picturableComp->PictureTaken();
-		}
 	}
 	
 	Cached_PS->SetCurrentCanShotCount(CurrentCanShotCount-1);

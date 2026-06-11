@@ -243,4 +243,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddShownTutorial(const FGameplayTag& Tag);
 	
+	// ===============================
+    // 숨소리
+    // ===============================
+    
+    UPROPERTY(EditAnywhere, Category="Audio")
+    TObjectPtr<USoundBase> BreathStress;
+    
+    UPROPERTY(EditAnywhere, Category="Audio")
+    TObjectPtr<USoundBase> BreathPanic;
+    
+    FTimerHandle BreathTimerHandle;
+    
+    void PlayBreath();
+    float GetBreathInterval() const;
+    	
+	
 };
