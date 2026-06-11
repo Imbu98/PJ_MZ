@@ -113,20 +113,29 @@ void UStageSelectUI::OnLeaderboardReceived(const TArray<FLeaderboardEntry>& Entr
 					ScoreLeaderboardWidget->RemoveFromParent();
 				});
 				
-				ScoreLeaderboardWidget->GenerateMyScore(myScore,myRank,OnScoreBtn);
+				bool bHasMyScore = !myScore.PlayerName.IsEmpty();
 
-				if (Entries.Num() > 0)
+				if (Entries.Num() > 0 || bHasMyScore)
 				{
-					for (int32 i=0;i<Entries.Num();i++)
+					ScoreLeaderboardWidget->Text_NoRecord->SetVisibility(ESlateVisibility::Collapsed);
+
+					if (bHasMyScore)
 					{
-						bool isMyScore=false;
-						if (Entries[i].PlayerName==myScore.PlayerName)
-						{
-							isMyScore=true;
-						}
-						ScoreLeaderboardWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
-						UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
-					}					
+						ScoreLeaderboardWidget->GenerateMyScore(
+							myScore,
+							myRank,
+							OnScoreBtn);
+					}
+
+					for (int32 i = 0; i < Entries.Num(); i++)
+					{
+						bool bIsMyScore = Entries[i].PlayerName == myScore.PlayerName;
+
+						ScoreLeaderboardWidget->GenerateScoreList(
+							Entries[i],
+							bIsMyScore,
+							i + 1);
+					}
 				}
 				else
 				{

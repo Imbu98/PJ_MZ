@@ -312,20 +312,29 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 				GetWorld()->SeamlessTravel(LevelPath);
 			});
 			
-			ScoreLeaderboardUIWidget->GenerateMyScore(myScore,myRank,OnScoreBtnAction);
-			
-			if (Entries.Num() > 0)
+			bool bHasMyScore = !myScore.PlayerName.IsEmpty();
+
+			if (Entries.Num() > 0 || bHasMyScore)
 			{
-				for (int32 i=0;i<Entries.Num();i++)
+				ScoreLeaderboardUIWidget->Text_NoRecord->SetVisibility(ESlateVisibility::Collapsed);
+
+				if (bHasMyScore)
 				{
-					bool isMyScore=false;
-					if (Entries[i].PlayerName==myScore.PlayerName)
-					{
-						isMyScore=true;
-					}
-					ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
-					UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
-				}					
+					ScoreLeaderboardUIWidget->GenerateMyScore(
+						myScore,
+						myRank,
+						OnScoreBtnAction);
+				}
+
+				for (int32 i = 0; i < Entries.Num(); i++)
+				{
+					bool bIsMyScore = Entries[i].PlayerName == myScore.PlayerName;
+
+					ScoreLeaderboardUIWidget->GenerateScoreList(
+						Entries[i],
+						bIsMyScore,
+						i + 1);
+				}
 			}
 			else
 			{
