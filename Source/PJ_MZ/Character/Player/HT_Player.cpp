@@ -275,7 +275,7 @@ void AHT_Player::OnInteractInput(const FInputActionValue& Value)
 	TArray<AActor*> actorsToIgnore;
 	FHitResult outHit;
 	bool isHit = UKismetSystemLibrary::SphereTraceSingleByProfile(GetWorld(), GetActorLocation(), GetActorLocation(),200.f,
-		TEXT("Interactable"),false,actorsToIgnore,EDrawDebugTrace::ForDuration,outHit,
+		TEXT("Interactable"),false,actorsToIgnore,EDrawDebugTrace::None,outHit,
 		true,FLinearColor::Red);
 	
 	if (isHit)
@@ -294,7 +294,7 @@ void AHT_Player::OnShotObscura(const FInputActionValue& Value)
 	if (!ObscuraCameraComp || !Cached_PS) return;
 	if (Cached_PS->IsObscraCooltime)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("CooltimeBlocked"));
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("CooltimeBlocked"));
 		return;
 	}
 

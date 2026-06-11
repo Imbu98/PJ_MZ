@@ -39,7 +39,7 @@ void AInteractPawnBase::Interacted_Implementation()
 {
 	if (CanInteract&&CanInteractableObject)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("Interacted"));	
+		//GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("Interacted"));	
 	}
 }
 
