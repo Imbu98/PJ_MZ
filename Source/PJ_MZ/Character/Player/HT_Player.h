@@ -6,6 +6,8 @@
 #include "GameplayTagContainer.h"
 #include "HT_PlayerController.h"
 #include "../../Default/PJ_MZCharacter.h"
+#include "Engine/Texture2D.h"
+#include "Sound/SoundBase.h"
 #include "PJ_MZ_Delegates.h"
 #include "Interface/Interact_Interface.h"
 #include "HT_Player.generated.h"
@@ -257,6 +259,24 @@ public:
     
     void PlayBreath();
     float GetBreathInterval() const;
-    	
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Jumpscare|UI")
+	TSubclassOf<UUserWidget> JumpscareWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* JumpscareWidgetInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Jumpscare|Assets")
+	TArray<UTexture2D*> JumpscareTextures;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Jumpscare|Assets")
+	TArray<USoundBase*> JumpscareSounds;    
+
+private:
+	FTimerHandle JumpscareLoopTimerHandle;
+	FTimerHandle JumpscareHideTimerHandle;
+	
+	void StartJumpscareTimer(); 
+	void TriggerJumpscare();
+	void HideJumpscareImage();  
 };

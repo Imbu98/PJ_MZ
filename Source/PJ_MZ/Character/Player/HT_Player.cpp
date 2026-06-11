@@ -19,6 +19,9 @@
 #include "UI/ObscuraUI.h"
 #include "HT_PlayerState.h"
 #include "ImageUtils.h"
+#include "Components/Image.h"
+#include "Engine/Texture2D.h"
+#include "Sound/SoundBase.h"
 #include "Components/PostProcessComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SoundComponent.h"
@@ -506,11 +509,23 @@ void AHT_Player::SetMentalityPenalty(bool penalty)
 	// 공포 BGM 키기 
 	SoundComp->ControlHorrorBGM(penalty);
 
-	
+	if (penalty)
+	{
+		// 이미 타이머가 활성화되어 있으면 중복 시작 방지
+		if (GetWorldTimerManager().IsTimerActive(JumpscareLoopTimerHandle))
+			return;
 
-	// 타이머로 랜덤타이머 20~40 사이에서
-	// 랜덤이벤트 발생
-	// 
+		StartJumpscareTimer();
+	}
+	else
+	{
+		// 진행 중인 모든 타이머 정지
+		GetWorldTimerManager().ClearTimer(JumpscareLoopTimerHandle);
+		GetWorldTimerManager().ClearTimer(JumpscareHideTimerHandle);
+
+		// 표시 중인 이미지가 있으면 숨김
+		HideJumpscareImage();
+	}
 }
 
 void AHT_Player::HealMentaility(bool overlapped)
@@ -578,7 +593,85 @@ void AHT_Player::PlayBreath()
 	{
 		SoundComp->ControlBreath(true,SoundToPlay);
 	}
+}
 
+void AHT_Player::StartJumpscareTimer()
+{
+	const float Delay = FMath::RandRange(20.0f, 40.0f);
+
+	GetWorldTimerManager().SetTimer(
+		JumpscareLoopTimerHandle,
+		this,
+		&AHT_Player::TriggerJumpscare,
+		Delay,
+		false 
+	);
+}
+
+void AHT_Player::TriggerJumpscare()
+{
+	// ── 1. 위젯 인스턴스 생성 (최초 1회만) ─────────────────
+	if (!JumpscareWidgetInstance && JumpscareWidgetClass)
+	{
+		JumpscareWidgetInstance = CreateWidget<UUserWidget>(
+			GetWorld(), JumpscareWidgetClass);
+	}
+
+	if (!JumpscareWidgetInstance) return;
+
+	// ── 2. 랜덤 이미지 선택 & 위젯 UImage에 적용 ────────────
+	if (JumpscareTextures.Num() > 0)
+	{
+		// const int32 TexIdx = FMath::RandRange(0, JumpscareTextures.Num() - 1);
+
+		const int32 TexIdx = FMath::RandRange(0, 2);
+		UTexture2D* SelectedTexture = JumpscareTextures[TexIdx];
+
+		UImage* ImgWidget = Cast<UImage>(
+			JumpscareWidgetInstance->GetWidgetFromName(TEXT("JumpscareImage")));
+
+		if (ImgWidget && SelectedTexture)
+		{
+			ImgWidget->SetBrushFromTexture(SelectedTexture, true);
+		}
+	}
+
+	// ── 3. 위젯 화면에 표시 ──────────────────────────────────
+	JumpscareWidgetInstance->AddToViewport(999);   // 최상단 ZOrder
+
+	// ── 4. 랜덤 사운드 재생 ──────────────────────────────────
+	if (JumpscareSounds.Num() > 0)
+	{
+		const int32 SndIdx = FMath::RandRange(0, JumpscareSounds.Num() - 1);
+		USoundBase* SelectedSound = JumpscareSounds[SndIdx];
+
+		if (SelectedSound)
+		{
+			UGameplayStatics::PlaySound2D(GetWorld(), SelectedSound);
+		}
+	}
+	
+
+	// 3) 1초 후 이미지 자동 숨김 타이머 설정
+	GetWorldTimerManager().SetTimer(
+		JumpscareHideTimerHandle,
+		this,
+		&AHT_Player::HideJumpscareImage,
+		1.0f,
+		false
+	);
+
+	// 4) 이미지 숨김과 무관하게 다음 루프 타이머 재설정
+	//    (이미지 숨김 1초 후가 아닌, 이벤트 발생 시점부터 다시 카운트)
+	StartJumpscareTimer();
+}
+
+void AHT_Player::HideJumpscareImage()
+{
+	if (JumpscareWidgetInstance && JumpscareWidgetInstance->IsInViewport())
+	{
+		JumpscareWidgetInstance->RemoveFromParent();
+	}
 }
 
 
