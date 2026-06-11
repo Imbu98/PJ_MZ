@@ -44,7 +44,7 @@ struct FSTTask_Investigate : public FStateTreeTaskCommonBase
 	float MoveSpeed = 400.f;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
-	float WanderRadius = 500.f;
+	float WanderRadius = 650.f;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float AcceptanceRadius = 50.f;
