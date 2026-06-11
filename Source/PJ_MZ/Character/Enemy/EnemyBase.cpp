@@ -92,7 +92,7 @@ void AEnemyBase::AttackHit()
 {
 	AHT_Player* Player = Cast<AHT_Player>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (!Player) return;
-
+	
 	float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
 	if (Distance > 220.f)
 	{
@@ -107,7 +107,9 @@ void AEnemyBase::AttackHit()
 	DirToEnemy.Z = 0.f;
 	if (!DirToEnemy.IsNearlyZero())
 	{
-		Player->SetActorRotation(DirToEnemy.Rotation());
+		
+		Player->GetController()->SetControlRotation(DirToEnemy.Rotation());
+		// Player->SetActorRotation(DirToEnemy.Rotation());
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("공격 성공"));

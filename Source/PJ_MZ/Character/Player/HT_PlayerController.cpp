@@ -7,6 +7,7 @@
 #include "Components/DynamoDBComponent.h"
 #include "Components/ObscuraCameraComponent.h"
 #include "../../Framework/PJ_MZGameMode.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "Public/UI/TutorialUI.h"
 #include "UI/ControlFadeUI.h"
@@ -313,16 +314,22 @@ void AHT_PlayerController::OnLeaderboardReceived(const TArray<FLeaderboardEntry>
 			
 			ScoreLeaderboardUIWidget->GenerateMyScore(myScore,myRank,OnScoreBtnAction);
 			
-			for (int32 i=0;i<Entries.Num();i++)
+			if (Entries.Num() > 0)
 			{
-				bool isMyScore=false;
-				if (Entries[i].PlayerName==myScore.PlayerName)
+				for (int32 i=0;i<Entries.Num();i++)
 				{
-					isMyScore=true;
-				}
-				
-				ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
-				UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+					bool isMyScore=false;
+					if (Entries[i].PlayerName==myScore.PlayerName)
+					{
+						isMyScore=true;
+					}
+					ScoreLeaderboardUIWidget->GenerateScoreList(Entries[i],isMyScore,i+1);
+					UE_LOG(LogTemp, Log, TEXT("%s | %.2f | %.2f"), *Entries[i].PlayerName, Entries[i].Score, Entries[i].ClearTime);
+				}					
+			}
+			else
+			{
+				ScoreLeaderboardUIWidget->Text_NoRecord->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 	}

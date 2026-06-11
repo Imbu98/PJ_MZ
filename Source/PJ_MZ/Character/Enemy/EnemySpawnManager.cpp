@@ -57,12 +57,6 @@ void AEnemySpawnManager::RequestRespawn(AEnemyBase* Enemy, float RespawnDelay)
 
 void AEnemySpawnManager::SpawnAllEnemy()
 {
-	TSubclassOf<AEnemy02Character> Enemy02 = LoadObject<UClass>(
-		nullptr, TEXT("/Game/SY/Enemy/Enemy02/BP_Enemy02.BP_Enemy02_C"));
-	
-	TSubclassOf<AEnemy03Character> Enemy03 = LoadObject<UClass>(
-		nullptr, TEXT("/Game/SY/Enemy/Enemy03/BP_Enemy03.BP_Enemy03_C"));
-	
 	if (Enemy02)
 	{
 		SpawnEnemy(Enemy02);

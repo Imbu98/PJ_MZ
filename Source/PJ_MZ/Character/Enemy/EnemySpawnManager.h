@@ -6,6 +6,8 @@
 #include "EnemyBase.h"
 #include "DungeonGenerator/DungeonGenerator.h"
 #include "DungeonGenerator/PCGDungeonManager.h"
+#include "Enemy02/Enemy02Character.h"
+#include "Enemy03/Enemy03Character.h"
 #include "EnemySpawnManager.generated.h"
 
 UCLASS()
@@ -17,7 +19,13 @@ public:
 	AEnemySpawnManager();
 	
 	void RequestRespawn(AEnemyBase* Enemy, float RespawnDelay);
-
+	
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	TSubclassOf<AEnemy02Character> Enemy02;
+	
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	TSubclassOf<AEnemy03Character> Enemy03;
+	
 protected:
 	virtual void BeginPlay() override;
 	

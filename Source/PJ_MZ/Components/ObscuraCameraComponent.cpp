@@ -178,6 +178,13 @@ void UObscuraCameraComponent::OnGameEnd()
 
 	if (!Cached_PS) return;
 	
+	UMz_GameInstance* Mz_GI = Cast<UMz_GameInstance>(GetWorld()->GetGameInstance());
+	if (Mz_GI)
+	{
+		// 처음초기화하는거면 PS에서 Init
+		Mz_GI->bIsShotCountInitialized=false;
+	}
+	
 
 	// 임시 플레이어 정보 - 나중에 교체
 	FString GameId    = UGameplayStatics::GetCurrentLevelName(GetWorld());
